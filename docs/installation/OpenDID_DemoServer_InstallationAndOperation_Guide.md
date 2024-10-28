@@ -129,7 +129,7 @@ did-demo-server
 ├── CODE_OF_CONDUCT.md
 ├── CONTRIBUTING.md
 ├── LICENSE
-├── LICENSE.dependencies.md
+├── dependencies-license.md 
 ├── MAINTAINERS.md
 ├── README.md
 ├── RELEASE-PROCESS.md
