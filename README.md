@@ -4,14 +4,25 @@ Demo Server
 Welcome to the Demo Server Repository. <br>
 This repository contains the source code, documentation, and related resources for the Demo Server.
 
-## Video Tutorial
-[- UserRegistration_demo_sample](videos/OpenDID_Demo_UserRegistration.mov)
+# OpenDID Demonstration Videos
 
-[- VC Issuance_App_demo_sample](videos/OpenDID_Demo_VCIssuance_App.mov)
+The OpenDID demonstration videos include the following four key scenarios:
 
-[- VC Issuance_Web_demo_sample](videos/OpenDID_Demo_VCIssuance_Demo.mov)
+## 1. User Registration
+- [UserRegistration_demo_sample(video)](videos/OpenDID_Demo_UserRegistration.mov)
+- **Description**: A scenario where the user directly issues a National ID VC using the app.
 
-[- VP Submission_demo_sample](videos/OpenDID_Demo_VPSubmission.mov)
+## 2. VC Issuance (App - National ID)
+- [VC Issuance_App_demo_sample(video)](videos/OpenDID_Demo_VCIssuance_App.mov)
+- **Description**: A scenario where the user directly issues a National ID VC using the app.
+
+## 3. VC Issuance (Demo - Mobile Driver License)
+- [ VC Issuance_Web_demo_sample(video)](videos/OpenDID_Demo_VCIssuance_Demo.mov)
+- **Description**: Demonstrates the scenario where the user receives a Mobile Driver License VC issuance request from the Demo site.
+
+## 4. VP Submission
+- [VP Submission_demo_sample(video)](videos/OpenDID_Demo_VPSubmission.mov)
+- **Description**: A scenario where the user submits a Verifiable Presentation (VP) through the app after receiving a VP submission request from the Demo site.
 
 ## Folder Structure
 Overview of the major folders and documents in the project directory:
