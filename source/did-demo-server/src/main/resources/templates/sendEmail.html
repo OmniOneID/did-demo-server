@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Send Email</title>
+  </head>
+  <body>
+
+    <div id="Dialog-Email" class="modal open">
+      <div class="modal-dialog">
+        <div class="modal-body">
+          <div class="text-item">
+            <h5>Issue a mobile ID</h5>
+          </div>
+
+          <div class="info-item">
+            <p>
+                To issue a mobile ID, please complete the issuance using the following methods.
+            </p>
+
+            <ul>
+              <li class="text-unerline">
+                Enter the DID of OpenDID and send a push to the app.
+              </li>
+              <li>
+                Select the notification on your phone, run the OpenDID app, and proceed with the issuance.
+              </li>
+            </ul>
+          </div>
+
+          <div class="did-item">
+            <h5>My email address</h5>
+            <div class="input">
+              <input id="emailDisplay" type="text" />
+
+              <button class="btn-primary" onclick="sendEmail()">
+                Send Email
+              </button>
+            </div>
+          </div>
+
+          <div class="caution-item">
+            <p>The QR code will be sent to your email.</p>
+            <p>
+              Please complete the issuance of the certificate by scanning the QR code after running the app.
+            </p>
+            <p>
+              If the sent email is not received, please check the spam mailbox.
+            </p>
+            <p>The QR code is valid for 7 days after sending.</p>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <div class="button-group">
+            <button class="btn-secondary" onclick="closePopup()">Close</button>
+            <button class="btn-primary" onclick="submitCertificate()">
+                Check issuance
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

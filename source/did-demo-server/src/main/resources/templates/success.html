@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Submit Certificate</title>
+    <link rel="stylesheet" href="/styles/success.css" />
+  </head>
+  <body>
+
+    <div id="Dialog-VPSuccess" class="modal open">
+      <div class="modal-dialog">
+        <div class="modal-body">
+          <div class="img-wrapper">
+            <img src="/images/success.svg" alt="Success Icon" />
+          </div>
+          <div class="text-item">
+            <h5>Submission of certificate completed</h5>
+            <p>
+              The certificate has been submitted. <br />
+              The following certificate has been submitted via the Open DID app.
+            </p>
+          </div>
+
+          <div class="info-table">
+            <table>
+              <tr>
+                <th>VC</th>
+                <td id="vc">Data Loading...</td>
+              </tr>
+              <tr>
+                <th>Issuer</th>
+                <td id="issuer">Data Loading...</td>
+              </tr>
+              <tr>
+<!--                <th>이름</th>-->
+                <th>Name</th>
+                <td id="name">Data Loading...</td>
+              </tr>
+              <tr>
+                <th>BirthDate</th>
+                <td id="birth">Data Loading...</td>
+              </tr>
+              <tr>
+                <th>License Number</th>
+                <td id="license">Data Loading...</td>
+              </tr>
+            </table>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <div class="button-group">
+            <button class="btn-primary" onclick="closePopup()">Confirm</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

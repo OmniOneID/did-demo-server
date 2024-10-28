@@ -1,0 +1,28 @@
+@keyframes Scale {
+  50% {
+    transform: scale(0.9);
+  }
+}
+
+@keyframes FadeInDown {
+  0% {
+    opacity: 0;
+    transform: translate3d(0, -20%, 0);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateZ(0);
+  }
+}
+
+@keyframes FadeInUp {
+  0% {
+    transform: translateY(80px);
+    opacity: 0;
+  }
+  100% {
+    transform: translateY(0px);
+    opacity: 1;
+  }
+}

@@ -1,0 +1,132 @@
+
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background-color: #f2f2f2;
+}
+.container {
+    background-color: white;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    width: 90%;
+    max-width: 400px;
+    padding: 20px;
+    text-align: center;
+    margin: 20px auto;
+}
+.container h2 {
+    margin-bottom: 20px;
+    font-size: 1.5em;
+}
+.container p {
+    margin: 10px 0;
+    font-size: 14px;
+    color: #333;
+}
+.container .highlight {
+    font-weight: bold;
+    color: #333;
+    text-decoration: underline;
+}
+.container .instructions {
+    text-align: left;
+    font-size: 12px;
+    margin: 20px 0;
+}
+.container .instructions p {
+    margin: 5px 0;
+}
+.input-container {
+    margin: 20px 0;
+    text-align: left;
+}
+.input-container label {
+    display: block;
+    margin-bottom: 5px;
+}
+.did-row {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+}
+.did-display {
+    flex-grow: 1;
+    padding: 10px;
+    text-align: left;
+    min-height: 20px;
+    word-break: break-all;
+    margin-bottom: 10px;
+}
+.input-container button {
+    width: 100%;
+    padding: 10px;
+    background-color: #000;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-top: 10px;
+}
+.input-container button:hover {
+    background-color: #333;
+}
+.container .note {
+    font-size: 12px;
+    color: red;
+    text-align: left;
+    margin: 10px 0;
+}
+.container .link {
+    text-align: left;
+    font-size: 12px;
+}
+.container .button-container {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 20px;
+    flex-wrap: wrap;
+}
+.container .button-container button {
+    flex: 1 0 45%;
+    padding: 10px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    background-color: #ccc;
+    color: #000;
+    margin: 5px;
+}
+.container .button-container .confirm-button {
+    background-color: #000;
+    color: #fff;
+}
+#timer {
+    display: none;
+    font-size: 20px;
+    margin: 20px 0;
+    font-weight: bold;
+}
+
+@media (max-width: 480px) {
+    .container {
+        width: 95%;
+        padding: 15px;
+    }
+    .container h2 {
+        font-size: 1.2em;
+    }
+    .container .instructions,
+    .container .note,
+    .container .link {
+        font-size: 11px;
+    }
+    .input-container button,
+    .container .button-container button {
+        font-size: 14px;
+    }
+}

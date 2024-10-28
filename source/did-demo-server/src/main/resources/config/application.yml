@@ -1,0 +1,27 @@
+spring:
+  application:
+    name: demo
+  profiles:
+    default: dev
+    group:
+        dev:
+          - logging
+          - spring-docs
+          - demo
+  jackson:
+    default-property-inclusion: non_null
+
+tas:
+  url: http://127.0.0.1:8090/tas
+
+issuer:
+  url: http://127.0.0.1:8091/issuer
+
+verifier:
+  url: http://127.0.0.1:8092/verifier
+
+cas:
+  url: http://127.0.0.1:8094/cas
+
+server:
+  port: 8099

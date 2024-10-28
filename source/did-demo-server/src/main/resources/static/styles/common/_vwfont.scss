@@ -1,0 +1,27 @@
+/* vw 변환 function */
+@function vw($target) {
+  @if type-of($target) == number {
+    @return calc(($target * 100) / $mobile-size) * 1vw;
+  } @else if type-of($target) ==list {
+    $vw: ();
+
+    @each $value in $target {
+      @if type-of($value) ==number {
+        $vw: append($vw, (($value * 100) / $mobile-size) * 1vw);
+      } @else if type-of($value) ==string {
+        $vw: append($vw, $value);
+      }
+    }
+
+    @return $vw;
+  } @else {
+    @return $target;
+  }
+}
+
+/* rem 변환 function */
+$mobile-size: null;
+$browser-context: 16; // 브라우저의 기본 폰트
+@function rem($pixels, $context: $browser-context) {
+  @return #{$pixels/$context}rem;
+}

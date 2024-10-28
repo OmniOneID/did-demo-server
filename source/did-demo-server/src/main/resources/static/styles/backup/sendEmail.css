@@ -1,0 +1,103 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background-color: #f2f2f2;
+}
+.container {
+    background-color: white;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    width: 400px;
+    padding: 20px;
+    text-align: center;
+}
+.container h2 {
+    margin-bottom: 20px;
+}
+.container p {
+    margin: 10px 0;
+    font-size: 14px;
+    color: #333;
+}
+.container .highlight {
+    font-weight: bold;
+    color: #333;
+    text-decoration: underline;
+}
+.container .instructions {
+    text-align: left;
+    font-size: 12px;
+    margin: 20px 0;
+}
+.container .instructions p {
+    margin: 5px 0;
+}
+.container .input-container {
+    margin: 20px 0;
+    text-align: left;
+}
+.container .input-container label {
+    display: block;
+    margin-bottom: 5px;
+}
+.container .input-container .email-row {
+    display: flex;
+    align-items: center;
+}
+.container .input-container .email-display {
+    flex-grow: 1;
+    padding: 10px;
+    text-align: left;
+    min-height: 20px;
+    word-break: break-all;
+    margin-right: 10px;
+    /*border: 1px solid #ccc;*/
+    /*border-radius: 5px;*/
+}
+.container .input-container button {
+    width: 100px;
+    padding: 10px;
+    background-color: #000;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    flex-shrink: 0;
+}
+.container .input-container button:hover {
+    background-color: #333;
+}
+.container .note {
+    font-size: 12px;
+    color: red;
+    text-align: left;
+    margin: 10px 0;
+}
+.container .link {
+    text-align: left;
+    font-size: 12px;
+}
+.container .button-container {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 20px;
+}
+.container .button-container button {
+    flex: 1;
+    padding: 10px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    background-color: #ccc;
+    color: #000;
+    margin: 0 5px;
+}
+.container .button-container .confirm-button {
+    background-color: #000;
+    color: #fff;
+}

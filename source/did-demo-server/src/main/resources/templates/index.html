@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Main Page</title>
+  <link rel="stylesheet" href="/styles/reset.css" />
+  <link rel="stylesheet" href="/styles/index.css" />
+</head>
+
+<body>
+<main>
+  <section>
+    <div class="wrapper">
+      <div class="home-title">
+        <button class="btn-gnb" onclick="handleReload()">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <title>chevron-left</title>
+            <path
+                    d="M15.41,16.58L10.83,12L15.41,7.41L14,6L8,12L14,18L15.41,16.58Z"
+            />
+          </svg>
+        </button>
+        <h1 onclick="handleReload()">OpenDID Demo</h1>
+        <p class="sub-title">This is the main OpenDID demo page</p>
+      </div>
+
+      <div class="select-list">
+        <button class="btn-select" data-ref="VC 발급">
+          <div class="img-element icon-vc"></div>
+          <h5>VC issuance</h5>
+        </button>
+        <button class="btn-select" data-ref="VP 제출">
+          <div class="img-element icon-vp"></div>
+          <h5>VP Submission</h5>
+        </button>
+        <button class="btn-select" data-ref="정보입력">
+          <div class="img-element icon-info"></div>
+          <h5>Enter Information</h5>
+        </button>
+      </div>
+
+      <div class="context">
+        <div class="context-item" data-ref="VC 발급">
+            <p>
+                Ready to issue your OpenDID mobile ID <br />
+                Click the button below to generate a QR code.
+            </p>
+          <div class="button-group">
+            <button
+                    id="issueForm"
+                    class="btn-primary"
+                    onclick="openVCPopup()"
+            >
+              Issuance of ID card
+            </button>
+          </div>
+        </div>
+
+        <div class="context-item" data-ref="VP 제출">
+          <p>OpenDID Demo Submit your mobile ID.<br/>
+          A QR code will be generated when you click the button.
+          </p>
+          <div class="button-group">
+            <button class="btn-primary" onclick="openVPPopup()">
+              Submit your ID
+            </button>
+          </div>
+        </div>
+
+        <div class="context-item information" data-ref="정보입력">
+          <p>
+            Please enter the information required to issue an ID card.
+            <br class="mobile-only" />
+            This information will be used to use the Demo site.
+          </p>
+
+          <div class="button-group mobile-only-flex">
+            <button
+                    class="btn-tab active"
+                    data-ref="사용자정보"
+                    onclick="handleEnterInfo('사용자정보')"
+            >
+              User Information
+            </button>
+            <button
+                    class="btn-tab"
+                    data-ref="신분증정보"
+                    onclick="handleEnterInfo('신분증정보')"
+            >
+              Identification information
+            </button>
+          </div>
+
+          <div class="information-field pc-only-flex">
+            <div class="item-box show" data-ref="신분증정보">
+              <div class="label">
+                <p>User Information</p>
+                <div class="divider"></div>
+              </div>
+
+              <div class="input-group">
+                <div class="input">
+                  <p>
+                    First Name
+                    <span class="color-error">*</span>
+                  </p>
+                  <input
+                          id="firstname"
+                          type="text"
+                          placeholder="please enter the contents."
+                          maxlength="50"
+                          required
+                  />
+                </div>
+                <div class="input">
+                  <p>
+                    Last Name
+                    <span class="color-error">*</span>
+                  </p>
+                  <input
+                          id="lastname"
+                          type="text"
+                          placeholder="please enter the contents."
+                          maxlength="50"
+                          required
+                  />
+                </div>
+                <div class="input pc-only-flex">
+                  <p>DID</p>
+                  <input
+                          id="did"
+                          type="text"
+                          placeholder="please enter the contents."
+                  />
+                </div>
+                <div class="input pc-only-flex">
+                  <p>Email</p>
+                  <input
+                          id="email"
+                          type="text"
+                          placeholder="please enter the contents."
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div class="item-box" data-ref="신분증정보">
+              <div class="label">
+                <p>Identification information</p>
+                <div class="divider"></div>
+              </div>
+
+              <div class="input-group">
+                <div class="input">
+                  <p>
+                    birth date
+                    <span class="color-error">*</span>
+                  </p>
+                    <input
+                            id="birthdate"
+                            type="text"
+                            placeholder="YYYY-MM-DD"
+                            pattern="\d{4}-\d{2}-\d{2}"
+                            title="Please enter a date in the format YYYY-MM-DD"
+                            required
+                    />
+                </div>
+                <div class="input">
+                  <p>address
+                    <span class="color-error">*</span>
+                  </p>
+                    <input
+                            id="address"
+                            type="text"
+                            placeholder="Enter your address."
+                            maxlength="100"
+                            required
+                    />
+                </div>
+                <div class="input">
+                  <p>License number
+                    <span class="color-error">*</span>
+                  </p>
+                    <input
+                            id="licenseNum"
+                            type="text"
+                            placeholder="00-000000-000"
+                            pattern="\d{2}-\d{6}-\d{3}"
+                            title="Please enter the license number in the format: 00-000000-000"
+                            maxlength="12"
+                            required
+                    />
+                </div>
+                <div class="input">
+                  <p>
+                      Date of issue
+                    <span class="color-error">*</span>
+                  </p>
+                    <input
+                            id="issueDate"
+                            type="text"
+                            placeholder="YYYY-MM-DD"
+                            pattern="\d{4}-\d{2}-\d{2}"
+                            title="Please enter a date in the format YYYY-MM-DD"
+                            required
+                    />
+                </div>
+              </div>
+            </div>
+            <p class="color-info">* Indicates required input.</p>
+          </div>
+
+          <div class="button-group pc-only-flex">
+<!--            <button class="btn-primary" onclick="saveUserInfo()">저장</button>-->
+            <button class="btn-primary" onclick="saveUserInfo()">Save</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="step-content">
+      <div class="step">
+        <div class="top">
+          <div class="arrow-item">
+            <p>App</p>
+            <div class="arrow-img"></div>
+          </div>
+          <div class="arrow-item">
+            <p>Demo Web-Page & App</p>
+            <div class="arrow-img"></div>
+          </div>
+        </div>
+
+        <div class="steps">
+          <div class="step-item">
+            <div class="icon-img">
+              <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="27"
+                      height="27"
+                      viewBox="0 0 27 27"
+                      fill="none"
+              >
+                <rect
+                        x="2.17935"
+                        y="1.67935"
+                        width="22.6413"
+                        height="22.6413"
+                        rx="2.94384"
+                        stroke="#333333"
+                        stroke-width="1.3587"
+                />
+                <path
+                        d="M12.9375 16.2228C13.0619 16.3472 13.2306 16.417 13.4063 16.417C13.5822 16.417 13.7509 16.3472 13.8752 16.2228L17.3906 12.7074C17.6495 12.4485 17.6495 12.0286 17.3905 11.7697C17.1316 11.5108 16.7118 11.5108 16.4528 11.7697L14.0694 14.1531L14.0694 7.08004C14.0694 6.71386 13.7725 6.41699 13.4063 6.41699C13.0402 6.41699 12.7433 6.71386 12.7433 7.08004L12.7433 14.1533L10.3598 11.7698C10.1009 11.5109 9.68108 11.5109 9.42214 11.7698C9.16324 12.0287 9.16324 12.4485 9.42214 12.7075L12.9375 16.2228Z"
+                        fill="#333333"
+                />
+                <path
+                        d="M10.332 18H16.332"
+                        stroke="#333333"
+                        stroke-width="1.3587"
+                        stroke-linecap="round"
+                />
+              </svg>
+            </div>
+            <h5>Step 1</h5>
+            <div class="text-info pc-only-flex">
+              <span>Download and register on OpenDID app.</span>
+              <span>Register as a user via the app.</span>
+
+            </div>
+          </div>
+
+          <div class="arrow-img">
+            <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="8"
+                    height="12"
+                    viewBox="0 0 8 12"
+                    fill="none"
+            >
+              <path
+                      d="M7.87683 5.78927L0.630454 11.2241L0.630454 0.354492L7.87683 5.78927Z"
+                      fill="#2F325E"
+              />
+            </svg>
+          </div>
+
+          <div class="step-item">
+            <div class="icon-img">
+              <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="27"
+                      height="27"
+                      viewBox="0 0 27 27"
+                      fill="none"
+              >
+                <path
+                        d="M24.7778 2.22915C23.7677 1.19836 22.1299 1.19836 21.1197 2.22915L10.8649 12.6933C10.7946 12.765 10.7439 12.8539 10.7174 12.9515L9.36881 17.9194C9.31335 18.1231 9.36971 18.3412 9.51611 18.4908C9.66273 18.6402 9.87648 18.6977 10.0761 18.6414L14.9446 17.2651C15.0403 17.238 15.1274 17.1862 15.1977 17.1145L25.4523 6.65015C26.4609 5.61868 26.4609 3.94889 25.4523 2.91741L24.7778 2.22915ZM12.1173 13.0745L20.5101 4.51022L23.2169 7.2722L14.8238 15.8365L12.1173 13.0745ZM11.5766 14.1816L13.7391 16.3885L10.7479 17.2341L11.5766 14.1816ZM24.6395 5.82076L24.0299 6.4428L21.3229 3.68059L21.9328 3.05854C22.4939 2.48598 23.4037 2.48598 23.9648 3.05854L24.6395 3.74681C25.1997 4.32005 25.1997 5.24774 24.6395 5.82076Z"
+                        fill="#333333"
+                />
+                <path
+                        d="M13.9523 2.43652H6.70589C4.70486 2.43652 3.0827 4.05868 3.0827 6.05971V20.5525C3.0827 22.5535 4.70486 24.1757 6.70589 24.1757H21.1986C23.1997 24.1757 24.8218 22.5535 24.8218 20.5525V13.3061"
+                        stroke="#333333"
+                        stroke-width="1.3587"
+                        stroke-linecap="round"
+                />
+              </svg>
+            </div>
+            <h5>Step 2</h5>
+            <div class="text-info pc-only-flex">
+<!--              <span> 사용자 정보입력 </span>-->
+<!--              <span>-->
+<!--                    데모 사이트의 원활한 사용을 위해 정보를 입력 해주세요.-->
+<!--                  </span>-->
+              <span>Enter user information</span>
+              <span>Please enter your information to ensure smooth use of the demo site.</span>
+            </div>
+          </div>
+
+          <div class="arrow-img">
+            <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="8"
+                    height="12"
+                    viewBox="0 0 8 12"
+                    fill="none"
+            >
+              <path
+                      d="M7.87683 5.78927L0.630454 11.2241L0.630454 0.354492L7.87683 5.78927Z"
+                      fill="#2F325E"
+              />
+            </svg>
+          </div>
+
+          <div class="step-item">
+            <div class="icon-img">
+              <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="27"
+                      height="27"
+                      viewBox="0 0 27 27"
+                      fill="none"
+              >
+                <rect
+                        x="3.17935"
+                        y="2.67935"
+                        width="20.3804"
+                        height="20.3804"
+                        rx="2.94384"
+                        stroke="#333333"
+                        stroke-width="1.3587"
+                />
+                <path
+                        d="M9.74634 12.4168L12.7498 15.5871L17.8985 10.1523"
+                        stroke="#333333"
+                        stroke-width="1.3587"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                />
+              </svg>
+            </div>
+            <h5>Step 3</h5>
+            <div class="text-info pc-only-flex">
+              <span>Issue a mobile ID card</span>
+              <span>Get your own digital ID.</span>
+            </div>
+          </div>
+
+          <div class="arrow-img">
+            <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="8"
+                    height="12"
+                    viewBox="0 0 8 12"
+                    fill="none"
+            >
+              <path
+                      d="M7.87683 5.78927L0.630454 11.2241L0.630454 0.354492L7.87683 5.78927Z"
+                      fill="#2F325E"
+              />
+            </svg>
+          </div>
+
+          <div class="step-item">
+            <div class="icon-img">
+              <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="27"
+                      height="27"
+                      viewBox="0 0 27 27"
+                      fill="none"
+              >
+                <path
+                        d="M23.2308 20.6723C23.7368 20.2406 24.0587 19.599 24.0587 18.8833C24.0587 17.5868 23.0038 16.5319 21.7073 16.5319C20.4107 16.5319 19.3559 17.5868 19.3559 18.8833C19.3559 19.5991 19.6777 20.2406 20.1838 20.6723C19.1333 21.223 18.4145 22.3238 18.4145 23.59V24.0625H16.2927V23.5899C16.2927 22.3238 15.574 21.223 14.5235 20.6722C15.0295 20.2406 15.3514 19.599 15.3514 18.8833C15.3514 17.7472 14.5415 16.7968 13.4688 16.5789V15.0946C15.2766 14.9315 16.8193 13.8352 17.6097 12.2921H18.648C20.8529 12.2921 22.6467 10.4983 22.6467 8.29338C22.6467 6.09142 20.8684 4.30277 18.6631 4.29466C17.6153 2.28348 15.5173 1 13.2354 1C10.9534 1 8.85541 2.28348 7.8077 4.29466H7.35203C5.14712 4.29466 3.35331 6.08847 3.35331 8.29338C3.35331 10.503 5.14211 12.2921 7.35203 12.2921H8.39031C9.18067 13.8352 10.7234 14.9315 12.5312 15.0946V16.5789C11.4585 16.7968 10.6486 17.7472 10.6486 18.8833C10.6486 19.599 10.9704 20.2406 11.4765 20.6722C10.426 21.223 9.70727 22.3238 9.70727 23.5899V24.0625H7.58547V23.5899C7.58547 22.3238 6.86673 21.223 5.81622 20.6722C6.32228 20.2406 6.64412 19.599 6.64412 18.8833C6.64412 17.5867 5.5893 16.5319 4.29273 16.5319C2.99617 16.5319 1.94134 17.5867 1.94134 18.8833C1.94134 19.599 2.26314 20.2406 2.76925 20.6722C1.71873 21.223 1 22.3238 1 23.5899V24.5312C1 24.7901 1.20986 25 1.46875 25H24.5312C24.7901 25 25 24.7901 25 24.5312V23.5899C25 22.3238 24.2813 21.223 23.2308 20.6723ZM2.87884 18.8833C2.87884 18.1037 3.51311 17.4694 4.29273 17.4694C5.07236 17.4694 5.70662 18.1037 5.70662 18.8833C5.70662 19.6629 5.07236 20.2972 4.29273 20.2972C3.51311 20.2972 2.87884 19.6629 2.87884 18.8833ZM6.64797 24.0625H1.9375V23.5899C1.9375 22.2912 2.99406 21.2347 4.29273 21.2347C5.59141 21.2347 6.64797 22.2912 6.64797 23.5899V24.0625ZM7.35203 11.3546C5.6605 11.3546 4.29081 9.98505 4.29081 8.29338C4.29081 6.60541 5.66406 5.23216 7.35203 5.23216H8.09992C8.28311 5.23216 8.44952 5.12542 8.52592 4.95892C9.36836 3.12348 11.2169 1.9375 13.2354 1.9375C15.2538 1.9375 17.1023 3.12348 17.9447 4.95892C18.0212 5.12542 18.1876 5.23216 18.3708 5.23216H18.648C20.3395 5.23216 21.7092 6.6017 21.7092 8.29338C21.7092 9.98134 20.336 11.3546 18.648 11.3546H17.9791C18.1069 10.905 18.1754 10.4307 18.1754 9.9407C18.1754 7.087 15.8538 4.76533 13 4.76533C10.1463 4.76533 7.82467 7.087 7.82467 9.9407C7.82467 10.4307 7.89316 10.905 8.02098 11.3546H7.35203ZM8.76213 9.9407C8.76213 7.60394 10.6632 5.70283 13 5.70283C15.3368 5.70283 17.2379 7.60394 17.2379 9.9407C17.2379 12.2775 15.3368 14.1786 13 14.1786C10.6632 14.1786 8.76213 12.2775 8.76213 9.9407ZM11.5861 18.8833C11.5861 18.1037 12.2204 17.4694 13 17.4694C13.7796 17.4694 14.4139 18.1037 14.4139 18.8833C14.4139 19.6629 13.7796 20.2972 13 20.2972C12.2204 20.2972 11.5861 19.6629 11.5861 18.8833ZM10.6448 23.5899C10.6448 22.2912 11.7013 21.2347 13 21.2347C14.2987 21.2347 15.3552 22.2912 15.3552 23.5899V24.0625H10.6448V23.5899ZM20.2934 18.8833C20.2934 18.1037 20.9276 17.4694 21.7073 17.4694C22.4869 17.4694 23.1212 18.1037 23.1212 18.8833C23.1212 19.6629 22.4869 20.2972 21.7073 20.2972C20.9276 20.2972 20.2934 19.6629 20.2934 18.8833ZM24.0625 24.0625H19.352V23.5899C19.352 22.2912 20.4086 21.2347 21.7073 21.2347C23.0059 21.2347 24.0625 22.2912 24.0625 23.5899V24.0625Z"
+                        fill="#333333"
+                />
+                <path
+                        d="M11.4095 9.93868L12.8732 11.3769L15.115 9.07461"
+                        stroke="#333333"
+                        stroke-width="0.905797"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                />
+              </svg>
+            </div>
+            <h5>Step 4</h5>
+            <div class="text-info pc-only-flex">
+                <span>Submit your ID</span>
+                <span>Please submit the issued mobile ID card</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="text mobile-only-flex">
+        <div class="text-item">
+          <h5>Step 1.</h5>
+          <p>Download and register on OpenDID app.</p>
+          <p>Register as a user via the app.</p>
+        </div>
+        <div class="text-item">
+          <h5>Step 2.</h5>
+          <p>Enter user information</p>
+          <p>Please enter your information to ensure smooth use of the demo site.</p>
+        </div>
+        <div class="text-item">
+          <h5>Step 3.</h5>
+          <p>Issue a mobile ID card</p>
+          <p>Get your own digital ID.</p>
+        </div>
+        <div class="text-item">
+          <h5>Step 4.</h5>
+          <p>Submit your ID</p>
+          <p>Please submit the issued mobile ID card.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<div id="PopupArea"></div>
+
+<script src="/scripts/index.js"></script>
+<script src="/scripts/addInformation.js"></script>
+</body>
+</html>

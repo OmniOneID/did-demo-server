@@ -1,0 +1,8 @@
+demo:
+  # for Verifiable Presentation
+  device: WEB
+  service: login
+  mode: Direct
+  # for Issue Verifiable Credential
+  vcPlanId: vcplanid000000000001
+  issuer: did:omn:issuer

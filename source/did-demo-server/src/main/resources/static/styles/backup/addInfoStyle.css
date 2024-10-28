@@ -1,0 +1,105 @@
+
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+header {
+    background-color: #ff8400;
+    color: #fff;
+    text-align: center;
+    padding: 10px 0;
+}
+.nav-links {
+    margin-top: 10px;
+}
+.nav-links a {
+    color: #fff;
+    margin: 0 10px;
+    text-decoration: none;
+}
+.nav-links a:hover {
+    text-decoration: underline;
+}
+footer {
+    background-color: #ff8400;
+    color: #fff;
+    text-align: center;
+    padding: 10px 0;
+}
+main {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 2rem;
+}
+form {
+    background-color: #ffffff;
+    padding: 2rem;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    max-width: 400px;
+    width: 100%;
+}
+h2 {
+    margin-top: 0;
+}
+label {
+    display: block;
+    margin-top: 1rem;
+}
+input[type="text"], input[type="email"] {
+    width: 100%;
+    padding: 0.5rem;
+    margin-top: 0.25rem;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+button {
+    display: block;
+    width: 100%;
+    padding: 0.75rem;
+    margin-top: 1.5rem;
+    background-color: #ffd700;
+    color: black;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+button:hover {
+    background-color: #ffc107;
+}
+@media (max-width: 600px) {
+    form {
+        padding: 1rem;
+    }
+}
+@media (max-width: 768px) {
+    .mobile-hide {
+        display: none;
+    }
+}
+.clickable {
+    cursor: pointer;
+    color: #fff;
+    transition: color 0.3s;
+}
+.clickable:hover {
+    color: #000000;
+}
+.mobile-only {
+    display: none;
+}
+
+@media screen and (max-width: 768px) {
+    .mobile-only {
+        display: inline;
+    }
+    .pc-only {
+        display: none;
+    }
+}

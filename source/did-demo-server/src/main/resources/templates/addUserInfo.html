@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+    <title>User Information</title>
+    <link rel="stylesheet" href="/styles/reset.css" />
+    <link rel="stylesheet" href="/styles/index.css" />
+  </head>
+  <style>
+      .error-valid-message {
+          color: red;
+          font-size: 0.8em;
+          margin-top: 5px;
+          display: none;
+      }
+  </style>
+  <body>
+    <div class="wrapper">
+      <div id="AddInformation" class="context show">
+        <div class="information-field">
+          <div class="item-box show" data-ref="사용자정보">
+            <div class="label">
+                <p>User Information</p>
+              <div class="divider"></div>
+            </div>
+
+            <div class="input-group">
+              <div class="input">
+                <p>
+                  First Name
+                  <span class="color-error">*</span>
+                </p>
+                <input
+                  id="firstName"
+                  type="text"
+                  placeholder="please enter the contents."
+                  required
+                />
+              </div>
+                <div id="firstNameError" class="error-valid-message"></div>
+              <div class="input">
+                <p>
+                  Last Name
+                  <span class="color-error">*</span>
+                </p>
+                <input
+                  id="lastName"
+                  type="text"
+                  placeholder="please enter the contents."
+                  required
+                />
+              </div>
+                <div id="lastNameError" class="error-valid-message"></div>
+            </div>
+          </div>
+            <p class="color-info">* Indicates required input.</p>
+          </div>
+
+        <div class="button-group">
+          <button class="btn-primary" onclick="saveMobileUserInfo()">Save</button>
+        </div>
+      </div>
+    </div>
+    <script src="/scripts/addUserInfo.js"></script>
+  </body>
+</html>

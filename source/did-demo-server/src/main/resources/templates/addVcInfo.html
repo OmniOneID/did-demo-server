@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+    <title>Identification Information</title>
+  <link rel="stylesheet" href="/styles/reset.css" />
+  <link rel="stylesheet" href="/styles/index.css" />
+</head>
+<style>
+    .error-valid-message {
+        color: red;
+        font-size: 0.8em;
+        margin-top: 5px;
+        display: none;
+    }
+</style>
+<body>
+<div class="wrapper">
+  <div id="AddInformation" class="context show">
+    <div class="information-field">
+      <div class="item-box" data-ref="신분증정보">
+        <div class="label">
+            <p>Identification Information</p>
+          <div class="divider"></div>
+        </div>
+
+        <div class="input-group">
+          <div class="input">
+            <p>
+                Birthdate
+              <span class="color-error">*</span>
+            </p>
+              <input
+                      id="birthdate"
+                      type="text"
+                      placeholder="YYYY-MM-DD"
+                      pattern="\d{4}-\d{2}-\d{2}"
+                      title="Please enter a date in the format YYYY-MM-DD"
+                      required
+              />
+          </div>
+            <div id="birthdateError" class="error-valid-message"></div>
+          <div class="input">
+            <p>
+                Address
+              <span class="color-error">*</span>
+            </p>
+            <input
+                    id="address"
+                    type="text"
+                    placeholder="please enter the contents."
+                    required
+
+            />
+          </div>
+            <div id="addressError" class="error-valid-message"></div>
+          <div class="input">
+            <p>
+                License Number
+              <span class="color-error">*</span>
+            </p>
+            <input
+                    id="licenseNum"
+                    type="text"
+                    placeholder="please enter the contents."
+                    required
+
+            />
+          </div>
+            <div id="licenseNumError" class="error-valid-message"></div>
+          <div class="input">
+            <p>Issue Date
+              <span class="color-error">*</span>
+            </p>
+            <input
+                    id="issueDate"
+                    type="text"
+                    placeholder="YYYY-MM-DD"
+                    pattern="\d{4}-\d{2}-\d{2}"
+                    title="Please enter a date in the format YYYY-MM-DD"
+            />
+          </div>
+            <div id="issueDateError" class="error-valid-message"></div>
+        </div>
+      </div>
+      <input
+              id="did"
+              type="text"
+              hidden
+      />
+        <input
+                id="userName"
+                type="text"
+                hidden
+        />
+      <p class="color-info">* Indicates required input.</p>
+    </div>
+
+    <div class="button-group">
+      <button class="btn-primary" onclick="saveVcInfo()">Save</button>
+    </div>
+  </div>
+</div>
+<script src="/scripts/addVcInfo.js"></script>
+</body>
+</html>

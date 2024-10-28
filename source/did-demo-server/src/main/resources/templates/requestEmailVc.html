@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>User_CertificateIssueRequest</title>
+</head>
+
+<body
+        style="
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      padding: 0;
+      font-weight: 400;
+      -ms-text-size-adjust: 100%;
+      -webkit-text-size-adjust: 100%;
+      font-size: 16px;
+      color: #444;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      max-width: 48rem;
+      margin: 0 auto;
+      text-align: center;
+      line-height: 1;
+    "
+>
+<table
+        style="
+        display: table;
+        width: 100%;
+        height: auto;
+        border: 1px solid #eee;
+        padding: 3rem 1.5rem;
+      "
+>
+    <tbody>
+    <tr>
+        <td align="center">
+            <div style="display: block; width: 100%; margin-bottom: 1.5rem">
+                <h5
+                        style="
+                  color: #232527;
+                  font-weight: 600;
+                  font-size: 1.25rem;
+                  margin: 0;
+                "
+                >
+                    A certificate has been requested from [{issuerName}].
+                </h5>
+            </div>
+        </td>
+    </tr>
+
+    <tr>
+        <td align="center">
+            <div
+                    style="
+                background: #e2e2e2;
+                border-radius: 0.5rem;
+                padding: 2rem;
+                margin-bottom: 1.5rem;
+              "
+            >
+                <div style="background: #fff; text-align: center; padding: 2rem">
+                <span
+                        style="
+                    display: block;
+                    font-size: 1rem;
+                    font-weight: 700;
+                    padding-bottom: 1rem;
+                  "
+                >
+<!--                  인증 QR 코드-->
+                    Authentication QR code
+                </span>
+
+                    <div
+                            style="
+                    display: flex;
+                    flex-direction: column;
+                    justify-content: center;
+                    align-items: center;
+                    border: 1px solid gray;
+                    border-radius: 0.5rem;
+                    max-width: 16rem;
+                    background: white;
+                    overflow: hidden;
+                    margin-bottom: 1rem;
+                    margin: 0 auto;
+                  "
+                    >
+                        <img
+                                src="{qrImg}"
+                                alt=""
+                                style="
+                      display: block;
+                      width: 14rem;
+                      height: 14rem;
+                      background: white;
+                      aspect-ratio: 1 / 1;
+                      object-fit: cover;
+                      padding: 1rem;
+                    "
+                        />
+
+                        <div
+                                style="flex: 1; text-align: center; padding-bottom: 2rem"
+                        >
+
+                            <span
+                                    style="
+                        display: block;
+                        font-size: 1rem;
+                        margin-bottom: 0.25rem;
+                      "
+                            >Requested ID card</span
+                            >
+                            <p style="font-size: 1.25rem; font-weight: 700; margin: 0">
+                                {vcSchemaName}
+                            </p>
+                            <span
+                                    style="
+                        display: block;
+                        width: 100%;
+                        height: 1px;
+                        background: #e2e2e2;
+                        margin: 0.75rem 0;
+                      "
+                            ></span>
+                            <span
+                                    style="
+                        display: block;
+                        font-size: 1rem;
+                        margin-bottom: 0.25rem;
+                      "
+                            ><b>QR Validity period</b></span
+                            >
+                            <span style="display: block; font-size: 1rem">
+                                {qrExpiredDate}까지
+                    </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </td>
+    </tr>
+
+    <tr style="display: table; width: 100%; margin-bottom: 1rem">
+        <td
+                style="
+              width: 100%;
+              background: #dce7f8;
+              padding: 1.5rem;
+              border-radius: 0.5rem;
+              text-align: center;
+            "
+        >
+            <span style="font-size: 1rem; color: #444; line-height: 1.4">
+                Please use the OpenDID app to scan the QR code.<br>
+                If you do not have the app, please install it and scan the QR code.
+            </span>
+        </td>
+    </tr>
+
+    </tbody>
+</table>
+
+<table
+        style="
+        display: table;
+        width: 100%;
+        height: auto;
+        padding: 3rem 1.5rem;
+        font-size: 0.875rem;
+        text-align: left;
+        background: #777;
+        color: #fff;
+      "
+>
+    <tbody>
+    <tr style="display: table; margin-bottom: 1rem">
+        <td style="margin-bottom: 1rem">
+            <a
+                    href="#"
+                    style="
+                color: #fff;
+                text-decoration: none;
+                font-weight: 700;
+                margin-right: 0.5rem;
+              "
+            >
+                Terms of Service
+            </a>
+
+            <span>|</span>
+
+            <a
+                    href=" #"
+                    style="
+                color: #fff;
+                text-decoration: none;
+                font-weight: 700;
+                margin-left: 0.5rem;
+              "
+            >
+                Privacy Policy
+            </a>
+        </td>
+    </tr>
+    <tr style="display: table; margin-bottom: 1rem">
+        <td>
+            <span>
+              This email is sent to those who do not agree to receive email notifications
+              because it contains important information.<br />
+              This email is not a reply-only email.
+            </span>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <span style="opacity: 0.6">COPYRIGHTⓒ2024 BY OpenDID., LTD. ALL RIGHTS RESERVED</span
+            >
+        </td>
+    </tr>
+    </tbody>
+</table>
+</body>
+</html>

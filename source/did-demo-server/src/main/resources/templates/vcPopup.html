@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:align-items="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Issue a certificate</title>
+  </head>
+    <div id="Dialog-VC" class="modal open">
+      <div class="modal-dialog">
+        <div class="modal-body">
+          <div class="text-item">
+            <h5>Issue with QR</h5>
+            <p>Please launch the Open DID app and scan the QR code below.</p>
+          </div>
+
+          <div class="qr-item">
+            <div class="qr-img">
+              <img
+                id="vcQrImage"
+                src=""
+                alt="Item Image"
+                style="max-width: 100%; height: auto"
+              />
+            </div>
+
+            <div class="counter">
+              <p>
+                <i class="icons">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="15"
+                    height="15"
+                    viewBox="0 0 15 15"
+                    fill="none"
+                  >
+                    <g clip-path="url(#clip0_92_178)">
+                      <path
+                        d="M9.9942 8.73618L8.04222 7.27219V4.29003C8.04222 3.99018 7.79984 3.7478 7.49999 3.7478C7.20014 3.7478 6.95776 3.99018 6.95776 4.29003V7.54333C6.95776 7.71412 7.03802 7.87518 7.17465 7.97711L9.34351 9.60377C9.4411 9.67697 9.55498 9.71221 9.66829 9.71221C9.83367 9.71221 9.99634 9.63792 10.1026 9.49478C10.2827 9.25563 10.2339 8.91566 9.9942 8.73618Z"
+                        fill="#666666"
+                      />
+                      <path
+                        d="M7.5 0.5C3.63996 0.5 0.5 3.63996 0.5 7.5C0.5 11.36 3.63996 14.5 7.5 14.5C11.36 14.5 14.5 11.36 14.5 7.5C14.5 3.63996 11.36 0.5 7.5 0.5ZM7.5 13.4156C4.23857 13.4156 1.58443 10.7614 1.58443 7.5C1.58443 4.23857 4.23857 1.58443 7.5 1.58443C10.762 1.58443 13.4156 4.23857 13.4156 7.5C13.4156 10.7614 10.7614 13.4156 7.5 13.4156Z"
+                        fill="#666666"
+                      />
+                    </g>
+                    <defs>
+                      <clipPath id="clip0_92_178">
+                        <rect
+                          width="14"
+                          height="14"
+                          fill="white"
+                          transform="translate(0.5 0.5)"
+                        />
+                      </clipPath>
+                    </defs>
+                  </svg>
+                </i>
+                Time left
+              </p>
+              <span class="color-error" id="vcOfferQRCountdown">00:00</span>
+            </div>
+
+            <div class="bottom-item">
+              <div class="refresh-item">
+                <p>Validity period</p>
+                <button class="btn-refresh" onclick="vcOfferRefresh()">
+                  Renew
+                </button>
+              </div>
+
+              <div class="other-process">
+                <p>If you cannot scan the QR code?</p>
+                <button class="btn-push" onclick="openPushPopup()">
+                    Receive mobile push
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <div class="button-group">
+            <button class="btn-secondary" onclick="closePopup()">Close</button>
+            <button class="btn-primary" onclick="submitCertificate()">
+                Check issuance
+            </button>
+          </div>
+        </div>
+
+        <div class="textarea-container">
+          <label for="responseTextArea"></label>
+          <textarea id="responseTextArea"></textarea>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

@@ -1,0 +1,108 @@
+
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+}
+
+header {
+    background-color: #ff8400;
+    color: #fff;
+    text-align: center;
+    padding: 10px 0;
+}
+
+.container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    max-width: 960px;
+    margin: 20px auto;
+    padding: 0 20px;
+    flex: 1;
+}
+.container h1 {
+    font-size: 1.5em;
+    margin-bottom: 20px;
+}
+
+section {
+    margin-bottom: 20px;
+}
+
+footer {
+    background-color: #ff8400;
+    color: #fff;
+    text-align: center;
+    padding: 10px 0;
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+}
+.nav-links {
+    margin-top: 10px;
+}
+.nav-links a {
+    color: #fff;
+    margin: 0 10px;
+    text-decoration: none;
+}
+.nav-links a:hover {
+    text-decoration: underline;
+}
+.confirm-button {
+    padding: 10px 20px;
+    background-color: #ffd700;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1em;
+}
+.confirm-button:hover {
+    background-color: #ffc107;
+}
+.clickable {
+    cursor: pointer;
+    color: #fff;
+    transition: color 0.3s;
+}
+.clickable:hover {
+    color: #000000;
+}
+.mobile-only {
+    display: none;
+}
+@media screen and (min-width: 769px) {
+    .pc-only {
+        display: inline-block;
+    }
+
+    /* PC에서만 적용할 추가 스타일 */
+    .container {
+        max-width: 600px; /* PC에서 더 넓은 컨테이너 */
+    }
+
+    .input-container button {
+        width: auto; /* 버튼 너비 자동 조정 */
+        padding: 10px 20px;
+    }
+
+    .did-row {
+        flex-wrap: nowrap; /* PC에서는 줄바꿈 방지 */
+    }
+
+    .did-display {
+        margin-bottom: 0; /* PC에서는 아래 여백 제거 */
+    }
+}
+
+
+@media screen and (max-width: 768px) {
+    .mobile-only {
+        display: inline;
+    }
+    .pc-only {
+        display: none;
+    }
+
+}
