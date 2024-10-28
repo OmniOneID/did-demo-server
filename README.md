@@ -4,6 +4,15 @@ Demo Server
 Welcome to the Demo Server Repository. <br>
 This repository contains the source code, documentation, and related resources for the Demo Server.
 
+## Video Tutorial
+[- UserRegistration_demo_sample](videos/OpenDID_Demo_UserRegistration.mov)
+
+[- VC Issuance_App_demo_sample](videos/OpenDID_Demo_VCIssuance_App.mov)
+
+[- VC Issuance_Web_demo_sample](videos/OpenDID_Demo_VCIssuance_Demo.mov)
+
+[- VP Submission_demo_sample](videos/OpenDID_Demo_VPSubmission.mov)
+
 ## Folder Structure
 Overview of the major folders and documents in the project directory:
 
