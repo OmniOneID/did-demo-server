@@ -9,7 +9,7 @@ This repository contains the source code, documentation, and related resources f
 The OpenDID demonstration videos include the following four key scenarios:
 
 ## 1. User Registration
-<video src="videos/OpenDID_Demo_UserRegistration.mov" width="640" height="460" controls></video>
+<video src="https://github.com/jinhwankim6557/fork-demo-server/blob/develop/videos/OpenDID_Demo_UserRegistration.mov" width="640" height="460" controls></video>
 - [UserRegistration_demo_sample(video)](videos/OpenDID_Demo_UserRegistration.mov)
 - **Description**: A scenario where the user directly issues a National ID VC using the app.
 
@@ -24,6 +24,9 @@ The OpenDID demonstration videos include the following four key scenarios:
 - **Description**: Demonstrates the scenario where the user receives a Mobile Driver License VC issuance request from the Demo site.
 
 ## 4. VP Submission
+
+https://github.com/jinhwankim6557/fork-demo-server/blob/develop/videos/OpenDID_Demo_UserRegistration.mov
+
 - [VP Submission_demo_sample(video)](videos/OpenDID_Demo_VPSubmission.mov)
 - **Description**: A scenario where the user submits a Verifiable Presentation (VP) through the app after receiving a VP submission request from the Demo site.
 
