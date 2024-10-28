@@ -4,6 +4,26 @@ Demo Server
 Welcome to the Demo Server Repository. <br>
 This repository contains the source code, documentation, and related resources for the Demo Server.
 
+# OpenDID Demonstration Videos
+
+The OpenDID demonstration videos include the following four key scenarios:
+
+## 1. User Registration
+- [UserRegistration_demo_sample(video)](videos/OpenDID_Demo_UserRegistration.mov)
+- **Description**: A scenario where the user directly issues a National ID VC using the app.
+
+## 2. VC Issuance (App - National ID)
+- [VC Issuance_App_demo_sample(video)](videos/OpenDID_Demo_VCIssuance_App.mov)
+- **Description**: A scenario where the user directly issues a National ID VC using the app.
+
+## 3. VC Issuance (Demo - Mobile Driver License)
+- [ VC Issuance_Web_demo_sample(video)](videos/OpenDID_Demo_VCIssuance_Demo.mov)
+- **Description**: Demonstrates the scenario where the user receives a Mobile Driver License VC issuance request from the Demo site.
+
+## 4. VP Submission
+- [VP Submission_demo_sample(video)](videos/OpenDID_Demo_VPSubmission.mov)
+- **Description**: A scenario where the user submits a Verifiable Presentation (VP) through the app after receiving a VP submission request from the Demo site.
+
 ## Folder Structure
 Overview of the major folders and documents in the project directory:
 
@@ -14,7 +34,7 @@ did-demo-server
 ├── CODE_OF_CONDUCT.md
 ├── CONTRIBUTING.md
 ├── LICENSE
-├── LICENSE-dependencies.md
+├── dependencies-license.md
 ├── MAINTAINERS.md
 ├── README.md
 ├── RELEASE-PROCESS.md
@@ -31,6 +51,7 @@ did-demo-server
         └── src
         └── build.gradle
         └── README.md
+└── videos
 ```
 
 <br/>
@@ -43,7 +64,7 @@ Below is a description of each folder and file in the directory:
 | CODE_OF_CONDUCT.md      | Code of conduct for contributors                    |
 | CONTRIBUTING.md         | Contribution guidelines and procedures              |
 | LICENSE                 | License                                             |
-| LICENSE-dependencies.md | License information for project dependencies        |
+| dependencies-license.md | License information for project dependencies        |
 | MAINTAINERS.md          | Guidelines for project maintainers                  |
 | RELEASE-PROCESS.md      | Procedure for releasing new versions                |
 | SECURITY.md             | Security policy and vulnerability reporting method  |
@@ -60,6 +81,7 @@ Below is a description of each folder and file in the directory:
 | ┖ src                   | Main source code directory                          |
 | ┖ build.gradle          | Gradle build configuration file                     |
 | ┖ README.md             | Source code overview and guide                      |
+| videos                  | Demonstration videos                                |
 
 <br/>
 
@@ -72,7 +94,7 @@ Libraries used in this project are organized into two main categories:
 
    - `did-crypto-sdk-server-1.0.0.jar`
 
-2. **Third-Party Libraries**: These libraries are open-source dependencies managed via the [build.gradle](source/demo/build.gradle) file. For a detailed list of third-party libraries and their licenses, please refer to the [LICENSE-dependencies.md](LICENSE-dependencies.md) file.
+2. **Third-Party Libraries**: These libraries are open-source dependencies managed via the [build.gradle](source/demo/build.gradle) file. For a detailed list of third-party libraries and their licenses, please refer to the [dependencies-license.md](dependencies-license.md) file.
 
 ## Installation And Operation Guide
 
