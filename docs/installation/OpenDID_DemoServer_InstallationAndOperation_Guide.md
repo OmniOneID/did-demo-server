@@ -154,7 +154,7 @@ did-demo-server
 | CODE_OF_CONDUCT.md      | Code of conduct for contributors                    |
 | CONTRIBUTING.md         | Contribution guidelines and procedures              |
 | LICENSE                 | License                                             |
-| LICENSE-dependencies.md | License information for project dependencies        |
+| dependencies-license.md | License information for project dependencies        |
 | MAINTAINERS.md          | Guidelines for project maintainers                  |
 | RELEASE-PROCESS.md      | Procedure for releasing new versions                |
 | SECURITY.md             | Security policy and vulnerability reporting method  |
