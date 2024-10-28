@@ -9,14 +9,17 @@ This repository contains the source code, documentation, and related resources f
 The OpenDID demonstration videos include the following four key scenarios:
 
 ## 1. User Registration
+<video src="videos/OpenDID_Demo_UserRegistration.mov" width="640" height="460" controls></video>
 - [UserRegistration_demo_sample(video)](videos/OpenDID_Demo_UserRegistration.mov)
 - **Description**: A scenario where the user directly issues a National ID VC using the app.
 
 ## 2. VC Issuance (App - National ID)
+<video src="videos/OpenDID_Demo_VCIssuance_App.mov" width="640" height="460" controls></video>
 - [VC Issuance_App_demo_sample(video)](videos/OpenDID_Demo_VCIssuance_App.mov)
 - **Description**: A scenario where the user directly issues a National ID VC using the app.
 
 ## 3. VC Issuance (Demo - Mobile Driver License)
+<video src="videos/OpenDID_Demo_VCIssuance_Demo.mov" width="640" height="460" controls></video>
 - [ VC Issuance_Web_demo_sample(video)](videos/OpenDID_Demo_VCIssuance_Demo.mov)
 - **Description**: Demonstrates the scenario where the user receives a Mobile Driver License VC issuance request from the Demo site.
 
@@ -51,6 +54,7 @@ did-demo-server
         └── src
         └── build.gradle
         └── README.md
+└── videos
 ```
 
 <br/>
@@ -80,6 +84,7 @@ Below is a description of each folder and file in the directory:
 | ┖ src                   | Main source code directory                          |
 | ┖ build.gradle          | Gradle build configuration file                     |
 | ┖ README.md             | Source code overview and guide                      |
+| videos                  | Demonstration videos                                |
 
 <br/>
 
