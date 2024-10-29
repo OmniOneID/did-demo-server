@@ -44,42 +44,42 @@ jobs:
         run: |
           release_tag=${GITHUB_HEAD_REF#release/QA-}
           echo "Release tag: $release_tag"
-          echo "release_tag=$release_tag" >> $GITHUB_ENV  # Write to the environment file
+          echo "::set-output name=release_tag::$release_tag"
 
       - name: Get commit messages
         id: get_commit_messages
         run: |
           commits=$(git log ${{ github.event.pull_request.base.sha }}..${{ github.event.pull_request.head.sha }} --pretty=format:"* %s")
           echo "$commits" > commit_messages.txt
-          echo "commits=$commits" >> $GITHUB_ENV  # Write to the environment file
+          echo "::set-output name=commits::$commits"
 
       - name: Find JAR file
         id: find_jar
         run: |
           jar_path=$(find ./build/libs -name "*.jar" | head -n 1)
           echo "JAR path found: $jar_path"
-          echo "jar_path=$jar_path" >> $GITHUB_ENV  # Write to the environment file
+          echo "::set-output name=jar_path::$jar_path"
 
       - name: Calculate SHA-256
         id: calculate_sha
         run: |
           sha256=$(sha256sum ${{ env.jar_path }} | awk '{ print $1 }')
           echo "SHA-256: $sha256"
-          echo "jar_sha256=$sha256" >> $GITHUB_ENV  # Write to the environment file
-
+          echo "::set-output name=jar_sha256::$sha256"
+  
       - name: Create GitHub Release
         id: create_release
         uses: actions/create-release@v1
         env: 
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with: 
-          tag_name: ${{ env.release_tag }}
-          release_name: ${{ env.release_tag }}
+          tag_name: ${{ steps.set_release_title.outputs.release_tag }}
+          release_name: ${{ steps.set_release_title.outputs.release_tag }}
           body: |
             ## Changes:
-            ${{ env.commits }}
+            ${{ steps.get_commit_messages.outputs.commits }}
             ## Checksum:
-            SHA-256: ${{ env.jar_sha256 }}
+            SHA-256: ${{ steps.calculate_sha.outputs.jar_sha256 }}
 
       - name: Upload JAR
         uses: actions/upload-release-asset@v1
@@ -87,6 +87,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: source/did-demo-server/${{ env.jar_path }}
-          asset_name: did-demo-server-${{ env.release_tag }}.jar
+          asset_path: source/did-demo-server/${{ steps.find_jar.outputs.jar_path }}
+          asset_name: did-demo-server-${{ steps.set_release_title.outputs.release_tag }}.jar
           asset_content_type: application/java-archive
