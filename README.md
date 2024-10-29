@@ -29,11 +29,7 @@ https://github.com/user-attachments/assets/1024ad1b-79f7-446e-95e9-6ca48624d1fb
 - **Description**: A scenario where the user submits a Verifiable Presentation (VP) through the app after receiving a VP submission request from the Demo site.
 
 ## Folder Structure
-Overview of the major folders and docu
-
-
-
-ments in the project directory:
+Overview of the major folders and documents in the project directory:
 
 ```
 did-demo-server
