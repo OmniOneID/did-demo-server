@@ -73,18 +73,15 @@ Below is a description of each folder and file in the directory:
 | RELEASE-PROCESS.md      | Procedure for releasing new versions                |
 | SECURITY.md             | Security policy and vulnerability reporting method  |
 | docs                    | Documentation                                       |
-| ┖ api                   | API guide documents                                 |
-| ┖ errorCode             | Error codes and troubleshooting guide               |
 | ┖ installation          | Installation and setup guide                        |
-| ┖ db                    | Database ERD, table specifications                  |
 | source                  | Source code                                         |
 | ┖ did-demo-server       | DEMO server source code and build files             |
-| ┖ gradle                | Gradle build settings and scripts                   |
-| ┖ libs                  | External libraries and dependencies                 |
-| ┖ sample                | Sample files                                        |
-| ┖ src                   | Main source code directory                          |
-| ┖ build.gradle          | Gradle build configuration file                     |
-| ┖ README.md             | Source code overview and guide                      |
+| &nbsp;&nbsp;&nbsp;┖ gradle                | Gradle build settings and scripts                   |
+| &nbsp;&nbsp;&nbsp;┖ libs                  | External libraries and dependencies                 |
+| &nbsp;&nbsp;&nbsp;┖ sample                | Sample files                                        |
+| &nbsp;&nbsp;&nbsp;┖ src                   | Main source code directory                          |
+| &nbsp;&nbsp;&nbsp;┖ build.gradle          | Gradle build configuration file                     |
+| &nbsp;&nbsp;&nbsp;┖ README.md             | Source code overview and guide                      |
 | videos                  | Demonstration videos                                |
 
 <br/>
@@ -94,11 +91,11 @@ Below is a description of each folder and file in the directory:
 
 Libraries used in this project are organized into two main categories:
 
-1. **Open DID Libraries**: These libraries are developed by the Open DID project and are available in the [libs folder](source/demo/libs). They include:
+1. **Open DID Libraries**: These libraries are developed by the Open DID project and are available in the [libs folder](source/did-demo-server/libs). They include:
 
    - `did-crypto-sdk-server-1.0.0.jar`
 
-2. **Third-Party Libraries**: These libraries are open-source dependencies managed via the [build.gradle](source/demo/build.gradle) file. For a detailed list of third-party libraries and their licenses, please refer to the [dependencies-license.md](dependencies-license.md) file.
+2. **Third-Party Libraries**: These libraries are open-source dependencies managed via the [build.gradle](source/did-demo-server/build.gradle) file. For a detailed list of third-party libraries and their licenses, please refer to the [dependencies-license.md](dependencies-license.md) file.
 
 ## Installation And Operation Guide
 
