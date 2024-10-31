@@ -9,22 +9,22 @@ This repository contains the source code, documentation, and related resources f
 The OpenDID demonstration videos include the following four key scenarios:
 
 ## 1. User Registration
-https://github.com/user-attachments/assets/b85f151a-c8d0-4d2a-80e4-40137af1b03d
+https://github.com/user-attachments/assets/c7ccfc7e-f314-4581-83d8-f728b7657f1b
 - [UserRegistration_demo_sample(video)](videos/OpenDID_Demo_UserRegistration.mov)
 - **Description**: A scenario where the user directly issues a National ID VC using the app.
 
 ## 2. VC Issuance (App - National ID)
-https://github.com/user-attachments/assets/731232fc-662c-4d11-b0aa-bdd221869439
+https://github.com/user-attachments/assets/e9730f2b-e02a-4478-aa72-d972f16b316c
 - [VC Issuance_App_demo_sample(video)](videos/OpenDID_Demo_VCIssuance_App.mov)
 - **Description**: A scenario where the user directly issues a National ID VC using the app.
 
 ## 3. VC Issuance (Demo - Mobile Driver License)
-https://github.com/user-attachments/assets/1b80903d-9551-43cb-8811-da40206bcab4
+https://github.com/user-attachments/assets/d648d63e-419c-4eb4-92cc-36c13a935278
 - [ VC Issuance_Web_demo_sample(video)](videos/OpenDID_Demo_VCIssuance_Demo.mov)
 - **Description**: Demonstrates the scenario where the user receives a Mobile Driver License VC issuance request from the Demo site.
 
 ## 4. VP Submission
-https://github.com/user-attachments/assets/1024ad1b-79f7-446e-95e9-6ca48624d1fb
+https://github.com/user-attachments/assets/2bca0ec8-ce31-491f-a427-28062e50db50
 - [VP Submission_demo_sample(video)](videos/OpenDID_Demo_VPSubmission.mov)
 - **Description**: A scenario where the user submits a Verifiable Presentation (VP) through the app after receiving a VP submission request from the Demo site.
 
