@@ -9,22 +9,22 @@
 OpenDID 시연 영상은 다음 네 가지 주요 시나리오를 포함합니다:
 
 ## 1. 사용자 등록
-https://github.com/user-attachments/assets/b85f151a-c8d0-4d2a-80e4-40137af1b03d
+https://github.com/user-attachments/assets/e503d751-cc6d-4f0f-acf4-eeb0d7cdb141
 - [사용자등록_데모_샘플(영상)](videos/OpenDID_Demo_UserRegistration.mov)
 - **설명**: 사용자가 앱을 사용하여 직접 국가 신분증 VC를 발급하는 시나리오입니다.
 
 ## 2. VC 발급 (앱 - 국가 신분증)
-https://github.com/user-attachments/assets/731232fc-662c-4d11-b0aa-bdd221869439
+https://github.com/user-attachments/assets/001a988d-84cc-44f3-9411-c281f07ed02e
 - [VC발급_앱_데모_샘플(영상)](videos/OpenDID_Demo_VCIssuance_App.mov)
 - **설명**: 사용자가 앱을 사용하여 직접 국가 신분증 VC를 발급하는 시나리오입니다.
 
 ## 3. VC 발급 (데모 - 모바일 운전면허증)
-https://github.com/user-attachments/assets/1b80903d-9551-43cb-8811-da40206bcab4
+https://github.com/user-attachments/assets/a512d4f7-74be-4dad-b800-6cb916f71ad3
 - [VC발급_웹_데모_샘플(영상)](videos/OpenDID_Demo_VCIssuance_Demo.mov)
 - **설명**: 사용자가 데모 사이트로부터 모바일 운전면허증 VC 발급 요청을 받는 시나리오를 보여줍니다.
 
 ## 4. VP 제출
-https://github.com/user-attachments/assets/1024ad1b-79f7-446e-95e9-6ca48624d1fb
+https://github.com/user-attachments/assets/e5e606da-8430-46db-ab44-a4518b64a236
 - [VP제출_데모_샘플(영상)](videos/OpenDID_Demo_VPSubmission.mov)
 - **설명**: 사용자가 데모 사이트로부터 VP 제출 요청을 받은 후 앱을 통해 검증 가능한 제시(VP)를 제출하는 시나리오입니다.
 
