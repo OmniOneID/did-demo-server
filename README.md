@@ -9,7 +9,7 @@ This repository contains the source code, documentation, and related resources f
 The OpenDID demonstration videos include the following four key scenarios:
 
 ## 1. User Registration
-https://github.com/user-attachments/assets/c7ccfc7e-f314-4581-83d8-f728b7657f1b
+https://github.com/user-attachments/assets/2a8e99e6-34b0-4f75-8378-a561b71d2e34
 - [UserRegistration_demo_sample(video)](videos/OpenDID_Demo_UserRegistration.mov)
 - **Description**: A scenario where the user directly issues a National ID VC using the app.
 
