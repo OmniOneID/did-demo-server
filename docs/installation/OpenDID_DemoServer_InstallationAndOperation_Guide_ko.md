@@ -425,4 +425,4 @@ logging:
   - API 문서에서 응답 본문의 기본 미디어 타입을 설정합니다.
   - 예시: `application/json`
 
-[Open DID Installation Guide]: https://github.com/OmniOneID/did-release/blob/main/release-V1.0.0.0/OepnDID_Installation_Guide-V1.0.0.0.md
+[Open DID Installation Guide]: https://github.com/OmniOneID/did-release/blob/develop/unrelease-V1.0.1.0/OepnDID_Installation_Guide-V1.0.1.0_ko.md
