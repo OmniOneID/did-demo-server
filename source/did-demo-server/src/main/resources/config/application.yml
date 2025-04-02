@@ -12,16 +12,30 @@ spring:
     default-property-inclusion: non_null
 
 tas:
-  url: http://127.0.0.1:8090/tas
+  url: http://10.48.17.123:8090/tas
 
 issuer:
-  url: http://127.0.0.1:8091/issuer
+  url: http://10.48.17.123:8091/issuer
 
 verifier:
-  url: http://127.0.0.1:8092/verifier
+  url: http://10.48.17.123:8092/verifier
 
 cas:
-  url: http://127.0.0.1:8094/cas
+  url: http://10.48.17.123:8094/cas
 
 server:
   port: 8099
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include:
+          - "health"
+          - "shutdown"
+  endpoint:
+    health:
+      show-details: "never"
+    shutdown:
+      enabled: true
+
