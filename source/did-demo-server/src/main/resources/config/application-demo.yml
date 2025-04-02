@@ -1,8 +1,6 @@
 demo:
   # for Verifiable Presentation
-  device: WEB
-  service: login
-  mode: Direct
+  policyId: a1b2c3d4-e5f6-7890-1234-56789abcdef0
   # for Issue Verifiable Credential
   vcPlanId: vcplanid000000000001
   issuer: did:omn:issuer

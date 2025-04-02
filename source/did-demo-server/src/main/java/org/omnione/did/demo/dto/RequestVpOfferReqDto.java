@@ -34,16 +34,7 @@ import org.omnione.did.base.datamodel.enums.PresentMode;
 @Builder
 public class RequestVpOfferReqDto {
     private String id;
-    @NotNull(message = "mode cannot be null")
-    @Schema(example = "Direct")
-    private PresentMode mode;
-    @NotNull(message = "device cannot be null")
-    @Schema(example = "app")
-    private String device;
-    @Schema(example = "11st")
-    @NotNull(message = "service cannot be null")
-    private String service;
-    @Min(value = 1, message = "validSeconds must be greater than 0")
-    @Builder.Default
-    private int validSeconds = 180;
+    @Schema(example = "a1b2c3d4-e5f6-7890-1234-56789abcdef0")
+    @NotNull(message = "policyId cannot be null")
+    private String policyId;
 }
