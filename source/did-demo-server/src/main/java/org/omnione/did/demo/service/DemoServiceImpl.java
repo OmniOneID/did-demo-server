@@ -71,11 +71,9 @@ public class DemoServiceImpl implements DemoService{
         log.debug("\t Make VP Offer Request");
         try {
             RequestVpOfferReqDto offerReqDto = RequestVpOfferReqDto.builder()
-                    .mode(demoProperty.getMode())
-                    .device(demoProperty.getDevice())
-                    .service(demoProperty.getService())
+                    .policyId(demoProperty.getPolicyId())
                     .build();
-            log.debug("\t Request VP Offer QR");
+            log.debug("\t Request VP Offer QR : " + offerReqDto.toString());
             RequestVpOfferResDto requestVpOfferResDto = verifierFeign.requestVpOfferQR(offerReqDto);
             if (requestVpOfferResDto == null) {
                 throw new OpenDidException(ErrorCode.VP_OFFER_NOT_FOUND);
@@ -122,7 +120,9 @@ public class DemoServiceImpl implements DemoService{
                 .vcPlanId(demoProperty.getVcPlanId())
                 .issuer(demoProperty.getIssuer())
                 .build();
+
         log.debug("\t Request VC Offer to TAS");
+
         RequestVcOfferResDto requestVcOfferResDto = tasFeign.requestVcOfferQR(vcOfferReqDto);
         String jsonString = JsonUtil.serializeAndSort(requestVcOfferResDto.getIssueOfferPayload());
         String encDataPayload = BaseMultibaseUtil.encode(jsonString.getBytes(), MultiBaseType.base64);

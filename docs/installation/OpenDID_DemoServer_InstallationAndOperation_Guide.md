@@ -433,4 +433,4 @@ This configuration file manages the values used for generating QR codes for VP O
   - Sets the default media type for response bodies in API documentation.
   - Example: `application/json`
 
-[Open DID Installation Guide]: https://github.com/OmniOneID/did-release/blob/main/release-V1.0.0.0/OepnDID_Installation_Guide-V1.0.0.0.md
+[Open DID Installation Guide]: https://github.com/OmniOneID/did-release/blob/develop/unrelease-V1.0.1.0/OepnDID_Installation_Guide-V1.0.1.0.md

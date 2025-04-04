@@ -6,7 +6,7 @@ plugins {
 }
 
 group = 'org.omnione.did.demo'
-version = '1.0.0'
+version = '1.0.1'
 
 java {
     sourceCompatibility = '17'
@@ -54,6 +54,8 @@ dependencies {
 
     // Security
     implementation fileTree(dir: 'libs', includes: ['*'])
+
+    implementation 'org.springframework.boot:spring-boot-starter-actuator'
 }
 
 tasks.named('test') {

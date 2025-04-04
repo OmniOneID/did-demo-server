@@ -25,10 +25,8 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 @Setter
 @ConfigurationProperties(prefix = "demo")
 public class DemoProperty {
-    private String device;
-    private String service;
-    private PresentMode mode;
     private String vcPlanId;
     private String issuer;
+    private String policyId;
 }
 
