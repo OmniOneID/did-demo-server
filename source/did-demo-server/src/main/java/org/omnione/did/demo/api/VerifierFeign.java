@@ -15,24 +15,25 @@
  */
 
 package org.omnione.did.demo.api;
-import org.omnione.did.demo.dto.ConfirmVerifyReqDto;
-import org.omnione.did.demo.dto.ConfirmVerifyResDto;
-import org.omnione.did.demo.dto.RequestVpOfferReqDto;
-import org.omnione.did.demo.dto.RequestVpOfferResDto;
+import org.omnione.did.demo.dto.*;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 /**
  * The VerifierFeign interface is a Feign client that provides endpoints for requesting a VP offer and submitting a VP.
  * It is used to communicate with the Verifier service.
  */
-@FeignClient(value = "Verifier", url = "${verifier.url}", path = "/api/v1")
+@FeignClient(value = "Verifier", url = "${verifier.url}")
 public interface VerifierFeign {
-    @RequestMapping(value = "/request-offer-qr", method = RequestMethod.POST)
+    @RequestMapping(value = "/api/v1/request-offer-qr", method = RequestMethod.POST)
     RequestVpOfferResDto requestVpOfferQR(@RequestBody RequestVpOfferReqDto requestVpOfferReqDto);
 
-    @RequestMapping(value = "/confirm-verify", method = RequestMethod.POST)
+    @RequestMapping(value = "/api/v1/confirm-verify", method = RequestMethod.POST)
     ConfirmVerifyResDto confirmVerify(@RequestBody ConfirmVerifyReqDto confirmVerifyReqDto);
 
+    @RequestMapping(value = "/admin/v1/policies", method = RequestMethod.GET)
+    List<VpPolicyResponseDto> getPolicies();
 
 }

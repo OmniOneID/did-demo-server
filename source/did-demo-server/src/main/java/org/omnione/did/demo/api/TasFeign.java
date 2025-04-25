@@ -25,7 +25,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
  * The TasFeign interface is a Feign client that provides endpoints for requesting a VC offer and submitting a VC.
  * It is used to communicate with the TAS service.
  */
-@FeignClient(value = "Tas", url = "${tas.url}", path = "/api/v1")
+@FeignClient(value = "Tas", url = "${tas.url}", path = "tas/api/v1")
 public interface TasFeign {
     @RequestMapping(value = "/offer-issue-vc/qr", method = RequestMethod.POST)
     RequestVcOfferResDto requestVcOfferQR(@RequestBody RequestVcOfferReqDto requestVcOfferReqDto);
@@ -40,4 +40,6 @@ public interface TasFeign {
 
     @RequestMapping(value = "/issue-vc/result", method = RequestMethod.POST)
     RequestVcSubmitResDto requestVcSubmitConfirm(RequestVcSubmitReqDto requestVcSubmitReqDto);
+
+
 }

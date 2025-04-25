@@ -29,15 +29,9 @@ import org.springframework.web.bind.annotation.RequestParam;
  * The IssuerFeign interface is a Feign client that provides endpoints for saving user information and vc information.
  * It is used to communicate with the Issuer service.
  */
-@FeignClient(value = "Issuer", url = "${issuer.url}", path = "/api/v1")
-public interface IssuerFeign {
+@FeignClient(value = "IssuerAdmin", url = "${issuer.url}", path = "/admin/v1")
+public interface IssuerAdminFeign {
     @RequestMapping(value = "/users/demo", method = RequestMethod.POST)
     void saveUserInfo(@RequestBody SaveUserInfoReqDto saveUserInfoReqDto);
-
-    @RequestMapping(value = "/vc", method = RequestMethod.POST)
-    void saveVcInfo(@RequestBody SaveVcInfoReqDto saveVcInfoReqDto);
-
-    @RequestMapping(value = "/issue-vc/result", method = RequestMethod.GET)
-    IssueVcResultResDto issueVcResult(@RequestParam("offerId") String offerId);
 
 }

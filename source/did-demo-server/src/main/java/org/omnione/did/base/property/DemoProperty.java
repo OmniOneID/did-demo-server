@@ -17,14 +17,17 @@
 package org.omnione.did.base.property;
 
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import lombok.Setter;
-import org.omnione.did.base.datamodel.enums.PresentMode;
-import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.omnione.did.base.config.ConfigService;
+import org.springframework.stereotype.Component;
 
 @Getter
 @Setter
-@ConfigurationProperties(prefix = "demo")
+@Component
+@RequiredArgsConstructor
 public class DemoProperty {
+    private final ConfigService configService;
     private String vcPlanId;
     private String issuer;
     private String policyId;

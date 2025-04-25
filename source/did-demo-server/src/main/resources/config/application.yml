@@ -9,10 +9,10 @@ spring:
           - spring-docs
           - demo
   jackson:
-    default-property-inclusion: non_null
+    default-property-inclusion: non-null
 
 tas:
-  url: http://127.0.0.1:8090/tas
+  url: http://127.0.0.1:8090
 
 issuer:
   url: http://127.0.0.1:8091/issuer
@@ -25,3 +25,16 @@ cas:
 
 server:
   port: 8099
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include:
+          - "health"
+          - "shutdown"
+  endpoint:
+    health:
+      show-details: "never"
+    shutdown:
+      enabled: true

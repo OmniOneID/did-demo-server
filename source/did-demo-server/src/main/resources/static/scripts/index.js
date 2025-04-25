@@ -85,23 +85,157 @@ function handleReload() {
 // 팝업창위치
 const pouparea = document.getElementById("PopupArea");
 
+// VC Schema 목록 가져오기
+async function fetchVcSchemas() {
+  try {
+    const response = await fetch('/demo/api/vc-schemas');
+    if (!response.ok) {
+      throw new Error('Failed to fetch VC Schemas');
+    }
+    return await response.json();
+  } catch (error) {
+    console.error('Error fetching VC schemas:', error);
+    alert('Failed to load VC Schemas. Please try again later.');
+    return { vcSchemaList: [] };
+  }
+}
+
+// 신분증 종류 선택 팝업 열기
+async function openVcSchemaSelector() {
+  try {
+    // 로딩 표시
+    const loadingOverlay = document.createElement('div');
+    loadingOverlay.className = 'loading-overlay';
+    loadingOverlay.innerHTML = '<div class="spinner"></div>';
+    document.body.appendChild(loadingOverlay);
+    
+    // VC Schema 목록 가져오기
+    const schemasData = await fetchVcSchemas();
+    const schemas = schemasData.vcSchemaList || [];
+    
+    // 로딩 숨기기
+    document.body.removeChild(loadingOverlay);
+    
+    if (schemas.length === 0) {
+      alert('No credential types available. Please try again later.');
+      return;
+    }
+    
+    // 선택 팝업 생성
+    const popup = document.createElement('div');
+    popup.className = 'search-popup';
+    
+    let popupContent = `
+      <div class="search-popup-content">
+        <h3>Select Credential Type</h3>
+        <div class="search-input-container">
+          <input type="text" id="schemaSearch" placeholder="Search credential type..." class="search-popup-input" oninput="filterSchemas(this)">
+        </div>
+        <div class="search-results" id="schemaResults">
+    `;
+    
+    schemas.forEach(schema => {
+      popupContent += `
+        <div class="search-option">
+          <input type="radio" id="${schema.schemaId}" name="schemaSelection" value="${schema.schemaId}">
+          <label for="${schema.schemaId}">${schema.title}</label>
+        </div>
+      `;
+    });
+    
+    popupContent += `
+        </div>
+        <div class="search-popup-buttons">
+          <button class="btn-secondary" onclick="closeSchemaPopup()">Cancel</button>
+          <button class="btn-primary" onclick="selectSchema()">Select</button>
+        </div>
+      </div>
+    `;
+    
+    popup.innerHTML = popupContent;
+    document.body.appendChild(popup);
+    
+  } catch (error) {
+    console.error('Error opening schema selector:', error);
+    alert('Failed to load credential types. Please try again later.');
+  }
+}
+
+// 스키마 팝업 닫기
+function closeSchemaPopup() {
+  const popup = document.querySelector('.search-popup');
+  if (popup) {
+    document.body.removeChild(popup);
+  }
+}
+
+// 스키마 필터링
+function filterSchemas(input) {
+  const searchTerm = input.value.toLowerCase();
+  const options = document.querySelectorAll('#schemaResults .search-option');
+  
+  options.forEach(option => {
+    const label = option.querySelector('label').textContent.toLowerCase();
+    if (label.includes(searchTerm)) {
+      option.style.display = 'flex';
+    } else {
+      option.style.display = 'none';
+    }
+  });
+}
+
+// 스키마 선택 처리
+function selectSchema() {
+  const selected = document.querySelector('input[name="schemaSelection"]:checked');
+  if (!selected) {
+    alert('Please select a credential type');
+    return;
+  }
+  
+  const schemaId = selected.value;
+  closeSchemaPopup();
+  
+  // URL에서 name 파라미터 추출
+  let schemaName = '';
+  try {
+    const url = new URL(schemaId);
+    const params = new URLSearchParams(url.search);
+    if (params.has('name')) {
+      schemaName = params.get('name');
+    }
+  } catch (e) {
+    console.error('Failed to parse schema URL:', e);
+    schemaName = schemaId; // 파싱 실패 시 원래 값 사용
+  }
+  
+  // 선택된 스키마로 addVcInfo 페이지 열기
+  const did = localStorage.getItem('did') || '';
+  const userName = localStorage.getItem('userName') || '';
+  
+  window.open(`/addVcInfo?did=${encodeURIComponent(did)}&userName=${encodeURIComponent(userName)}&vcSchemaId=${encodeURIComponent(schemaName)}`, "popup", "width=480,height=768");
+}
+
+// 모바일 정보 입력 처리 - 수정됨
 function handleEnterInfo(type) {
   switch (type) {
     case "사용자정보":
       window.open("/addUserInfo", "popup", "width=480,height=768");
-      
       break;
     case "신분증정보":
-      window.open("/addVcInfo", "popup", "width=480,height=768");
+      // 모바일 환경에서는 먼저 신분증 종류 선택 팝업을 보여줌
+      if (isMobile) {
+        openVcSchemaSelector();
+      } else {
+        window.open("/addVcInfo", "popup", "width=480,height=768");
+      }
       break;
-
     default:
       break;
   }
 }
+
 // VC발급창 OPEN
 async function openVCPopup() {
-
   if (isMobile) {
     try {
       // Fetch the external HTML file

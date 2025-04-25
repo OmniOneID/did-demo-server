@@ -16,11 +16,8 @@
 
 package org.omnione.did.demo.service;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.google.zxing.WriterException;
-import org.omnione.did.crypto.exception.CryptoException;
 import org.omnione.did.demo.dto.*;
-
 import java.io.IOException;
 
 /**
@@ -37,4 +34,7 @@ public interface DemoService {
     SaveUserInfoResDto saveVcInfo(SaveVcInfoReqDto saveUserInfoReqDto);
     IssueVcResultResDto issueVcResult(IssueVcResultReqDto issueVcResultReqDto);
     ConfirmVerifyResDto confirmVerify(ConfirmVerifyReqDto confirmVerifyReqDto);
+    VcSchemaResponseDto getVcSchemas();
+    VcSchemaResponseDto.VcSchemaDto getVcSchema(String schemaId);
+
 }

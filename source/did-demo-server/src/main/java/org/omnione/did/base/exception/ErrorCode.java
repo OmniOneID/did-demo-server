@@ -23,7 +23,8 @@ public enum ErrorCode {
     VC_INVALID_FORMAT("8002", "DID and userName not Found.", 400),
     VP_OFFER_NOT_FOUND("8003", "VP offer not found.", 404),
     JSON_PROCESSING_ERROR("8004", "Error occurred while processing JSON data.", 400),
-    ;
+    VC_PLAN_NOT_FOUND("8005", "VC plan not found.", 404),
+    VC_SCHEMA_NOT_FOUND("8006", "VC Schema not found", 400 );
 
     private final String code;
     private final String message;

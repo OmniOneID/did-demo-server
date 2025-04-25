@@ -4,9 +4,282 @@
   <meta charset="UTF-8" />
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Main Page</title>
+  <title>OpenDID Demo</title>
   <link rel="stylesheet" href="/styles/reset.css" />
   <link rel="stylesheet" href="/styles/index.css" />
+  <style>
+    .mt-20 {
+      margin-top: 20px;
+    }
+
+    /* Style for search button next to input */
+    .search-input {
+      display: flex;
+      width: 100%;
+      align-items: center; 
+    }
+
+    .search-input input {
+      flex-grow: 1;
+      border-top-right-radius: 0;
+      border-bottom-right-radius: 0;
+      margin-right: 5px; 
+    }
+
+    .btn-search {
+      padding: 6px 10px; 
+      background-color: #2F325E;
+      color: white;
+      border: none;
+      border-top-right-radius: 4px;
+      border-bottom-right-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+      margin-left: 5px; 
+      height: 90%; 
+      align-self: center; 
+    }
+
+    .btn-search:hover {
+      background-color: #242645;
+    }
+
+    /* Ensure proper display for the select elements */
+    select {
+      width: 100%;
+      padding: 8px 12px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      background-color: white;
+      font-size: 14px;
+    }
+
+    /* Search Popup Styles */
+    .search-popup {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.5);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+    }
+
+    .search-popup-content {
+      background-color: white;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+      width: 90%;
+      max-width: 400px;
+      max-height: 80vh;
+      overflow-y: auto;
+    }
+
+    .search-popup-content h3 {
+      margin-top: 0;
+      margin-bottom: 15px;
+      color: #2F325E;
+      font-size: 18px;
+      text-align: center;
+    }
+
+    .search-input-container {
+      margin-bottom: 15px;
+    }
+
+    .search-popup-input {
+      width: 100%;
+      padding: 8px 12px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      font-size: 14px;
+    }
+
+    .search-results {
+      margin-bottom: 20px;
+      max-height: 200px;
+      overflow-y: auto;
+      border: 1px solid #eee;
+      border-radius: 4px;
+      padding: 10px;
+    }
+
+    .search-option {
+      padding: 8px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      border-bottom: 1px solid #eee;
+    }
+
+    .search-option:last-child {
+      border-bottom: none;
+    }
+
+    .search-option:hover {
+      background-color: #f5f5f5;
+    }
+
+    .search-option input[type="radio"] {
+      margin-right: 10px;
+      width: 14px;
+      height: 14px;
+      cursor: pointer;
+      accent-color: #2F325E;
+    }
+
+    .search-option label {
+      cursor: pointer;
+      font-size: 14px;
+      flex: 1;
+    }
+
+    .search-popup-buttons {
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+    }
+
+    .icon-server {
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%232F325E' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='2' y='2' width='20' height='8' rx='2' ry='2'%3E%3C/rect%3E%3Crect x='2' y='14' width='20' height='8' rx='2' ry='2'%3E%3C/rect%3E%3Cline x1='6' y1='6' x2='6.01' y2='6'%3E%3C/line%3E%3Cline x1='6' y1='18' x2='6.01' y2='18'%3E%3C/line%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: center;
+      background-size: 60%;
+    }
+
+    .btn-secondary {
+      background-color: #f0f0f0;
+      color: #333;
+      border: 1px solid #ccc;
+      padding: 10px 20px;
+      border-radius: 5px;
+      cursor: pointer;
+      font-weight: 500;
+      transition: background-color 0.3s;
+      margin-left: 10px;
+    }
+
+    .btn-secondary:hover {
+      background-color: #e0e0e0;
+    }
+    
+    /* Loading indicator styles */
+    .loading-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(255, 255, 255, 0.8);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 2000;
+    }
+    
+    .spinner {
+      width: 50px;
+      height: 50px;
+      border: 5px solid #f3f3f3;
+      border-top: 5px solid #2F325E;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+    
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    /* 동적 폼 스타일 개선 */
+    .credential-form-container {
+      border: 1px solid #e0e0e0;
+      border-radius: 8px;
+      padding: 20px;
+      margin-top: 20px;
+      background-color: #f9f9f9;
+    }
+
+    .credential-section-title {
+      font-size: 18px;
+      font-weight: 500;
+      color: #2F325E;
+      margin-bottom: 15px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid #e0e0e0;
+    }
+
+    .identification-form {
+      margin-top: 15px;
+    }
+
+    .input-group {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+      margin-bottom: 15px;
+    }
+
+    /* 미디어 쿼리 삭제 또는 비활성화 */
+    @media screen and (min-width: 768px) {
+      /* 이 부분을 제거하거나 아래와 같이 변경 */
+      .input-group {
+        grid-template-columns: 1fr;  /* 단일 열로 유지 */
+      }
+    }
+
+    .input {
+      margin-bottom: 10px;
+    }
+
+    .input p {
+      font-size: 14px;
+      margin-bottom: 5px;
+      font-weight: 500;
+    }
+
+    .input input,
+    .input select {
+      width: 100%;
+      padding: 8px 12px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      font-size: 14px;
+      background-color: white;
+    }
+
+    .color-error {
+      color: #ff3b30;
+    }
+
+    .color-info {
+      color: #777;
+      font-size: 12px;
+      margin-top: 5px;
+    }
+
+    /* 레이블과 디바이더 스타일 */
+    .label {
+      margin-bottom: 15px;
+    }
+
+    .label p {
+      font-size: 16px;
+      font-weight: 500;
+      color: #333;
+    }
+
+    .divider {
+      height: 1px;
+      background-color: #e0e0e0;
+      margin-top: 5px;
+      margin-bottom: 15px;
+    }
+  </style>
 </head>
 
 <body>
@@ -17,9 +290,7 @@
         <button class="btn-gnb" onclick="handleReload()">
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
             <title>chevron-left</title>
-            <path
-                    d="M15.41,16.58L10.83,12L15.41,7.41L14,6L8,12L14,18L15.41,16.58Z"
-            />
+            <path d="M15.41,16.58L10.83,12L15.41,7.41L14,6L8,12L14,18L15.41,16.58Z" />
           </svg>
         </button>
         <h1 onclick="handleReload()">OpenDID Demo</h1>
@@ -39,29 +310,82 @@
           <div class="img-element icon-info"></div>
           <h5>Enter Information</h5>
         </button>
+        <button class="btn-select" data-ref="서버설정">
+          <div class="img-element icon-server"></div>
+          <h5>Server Settings</h5>
+        </button>
       </div>
 
       <div class="context">
+        <!-- VC 발급 섹션 -->
         <div class="context-item" data-ref="VC 발급">
-            <p>
-                Ready to issue your OpenDID mobile ID <br />
-                Click the button below to generate a QR code.
-            </p>
+          <p>
+            Ready to issue your OpenDID mobile ID<br />
+            Click the button below to generate a QR code.
+          </p>
+          <div class="input-group mt-20">
+            <div class="label">
+              <p>Choose VC Plan ID</p>
+              <div class="divider"></div>
+            </div>
+            <div class="input">
+              <p>
+                VC Plan
+                <span class="color-error">*</span>
+              </p>
+              <div class="search-input">
+                <input
+                  id="vcPlanIssuance"
+                  type="text"
+                  placeholder="Select VC Plan"
+                  maxlength="100"
+                  required
+                  readonly
+                />
+                <button class="btn-search" onclick="searchVcPlanIssuance()">Search</button>
+              </div>
+            </div>
+          </div>
           <div class="button-group">
             <button
-                    id="issueForm"
-                    class="btn-primary"
-                    onclick="openVCPopup()"
+              id="issueForm"
+              class="btn-primary"
+              onclick="openVCPopup()"
             >
               Issuance of ID card
             </button>
           </div>
         </div>
 
+        <!-- VP 제출 섹션 -->
         <div class="context-item" data-ref="VP 제출">
-          <p>OpenDID Demo Submit your mobile ID.<br/>
-          A QR code will be generated when you click the button.
+          <p>
+            OpenDID Demo Submit your mobile ID.<br/>
+            A QR code will be generated when you click the button.
           </p>
+          <div class="input-group mt-20">
+            <div class="label">
+              <p>Choose VP Policy ID</p>
+              <div class="divider"></div>
+            </div>
+            <div class="input">
+              <p>
+                VP Policy
+                <span class="color-error">*</span>
+              </p>
+              <div class="search-input">
+                <input
+                  id="vpPolicySubmission"
+                  type="text"
+                  placeholder="Select VP Policy"
+                  maxlength="100"
+                  required
+                  readonly
+                />
+                <button class="btn-search" onclick="searchVpPolicy()">Search</button>
+              </div>
+            </div>
+          </div>
           <div class="button-group">
             <button class="btn-primary" onclick="openVPPopup()">
               Submit your ID
@@ -69,6 +393,7 @@
           </div>
         </div>
 
+        <!-- 정보입력 섹션 -->
         <div class="context-item information" data-ref="정보입력">
           <p>
             Please enter the information required to issue an ID card.
@@ -78,143 +403,171 @@
 
           <div class="button-group mobile-only-flex">
             <button
-                    class="btn-tab active"
-                    data-ref="사용자정보"
-                    onclick="handleEnterInfo('사용자정보')"
+              class="btn-tab active"
+              data-ref="사용자정보"
+              onclick="handleEnterInfo('사용자정보')"
             >
               User Information
             </button>
             <button
-                    class="btn-tab"
-                    data-ref="신분증정보"
-                    onclick="handleEnterInfo('신분증정보')"
+              class="btn-tab"
+              data-ref="신분증정보"
+              onclick="handleEnterInfo('신분증정보')"
             >
               Identification information
             </button>
           </div>
 
           <div class="information-field pc-only-flex">
-            <div class="item-box show" data-ref="신분증정보">
-              <div class="label">
-                <p>User Information</p>
-                <div class="divider"></div>
+            <div class="credential-form-container">
+              <div class="credential-section-title">User Information</div>
+              <!-- 각 입력 필드를 개별 div로 감싸서 세로로 배치 -->
+              <div class="input">
+                <p>
+                  First Name
+                  <span class="color-error">*</span>
+                </p>
+                <input
+                  id="firstname"
+                  type="text"
+                  placeholder="Please enter your first name"
+                  maxlength="50"
+                  required
+                />
               </div>
+              <div class="input">
+                <p>
+                  Last Name
+                  <span class="color-error">*</span>
+                </p>
+                <input
+                  id="lastname"
+                  type="text"
+                  placeholder="Please enter your last name"
+                  maxlength="50"
+                  required
+                />
+              </div>
+              <div class="input">
+                <p>DID</p>
+                <input
+                  id="did"
+                  type="text"
+                  placeholder="Enter your DID (optional)"
+                />
+              </div>
+              <div class="input">
+                <p>Email</p>
+                <input
+                  id="email"
+                  type="text"
+                  placeholder="Enter your email (optional)"
+                />
+              </div>
+            </div>
 
+            <!-- 자격증 타입 선택 영역 -->
+            <div class="credential-form-container">
+              <div class="credential-section-title">Choose Credential Type</div>
               <div class="input-group">
                 <div class="input">
                   <p>
-                    First Name
+                    VC Schema
                     <span class="color-error">*</span>
                   </p>
-                  <input
-                          id="firstname"
-                          type="text"
-                          placeholder="please enter the contents."
-                          maxlength="50"
-                          required
-                  />
-                </div>
-                <div class="input">
-                  <p>
-                    Last Name
-                    <span class="color-error">*</span>
-                  </p>
-                  <input
-                          id="lastname"
-                          type="text"
-                          placeholder="please enter the contents."
-                          maxlength="50"
-                          required
-                  />
-                </div>
-                <div class="input pc-only-flex">
-                  <p>DID</p>
-                  <input
-                          id="did"
-                          type="text"
-                          placeholder="please enter the contents."
-                  />
-                </div>
-                <div class="input pc-only-flex">
-                  <p>Email</p>
-                  <input
-                          id="email"
-                          type="text"
-                          placeholder="please enter the contents."
-                  />
+                  <select id="vcSchema" onchange="displayIdentificationForm()">
+                    <option value="">-- Select credential type --</option>
+                  </select>
                 </div>
               </div>
             </div>
 
-            <div class="item-box" data-ref="신분증정보">
-              <div class="label">
-                <p>Identification information</p>
-                <div class="divider"></div>
-              </div>
-
-              <div class="input-group">
-                <div class="input">
-                  <p>
-                    birth date
-                    <span class="color-error">*</span>
-                  </p>
-                    <input
-                            id="birthdate"
-                            type="text"
-                            placeholder="YYYY-MM-DD"
-                            pattern="\d{4}-\d{2}-\d{2}"
-                            title="Please enter a date in the format YYYY-MM-DD"
-                            required
-                    />
-                </div>
-                <div class="input">
-                  <p>address
-                    <span class="color-error">*</span>
-                  </p>
-                    <input
-                            id="address"
-                            type="text"
-                            placeholder="Enter your address."
-                            maxlength="100"
-                            required
-                    />
-                </div>
-                <div class="input">
-                  <p>License number
-                    <span class="color-error">*</span>
-                  </p>
-                    <input
-                            id="licenseNum"
-                            type="text"
-                            placeholder="00-000000-000"
-                            pattern="\d{2}-\d{6}-\d{3}"
-                            title="Please enter the license number in the format: 00-000000-000"
-                            maxlength="12"
-                            required
-                    />
-                </div>
-                <div class="input">
-                  <p>
-                      Date of issue
-                    <span class="color-error">*</span>
-                  </p>
-                    <input
-                            id="issueDate"
-                            type="text"
-                            placeholder="YYYY-MM-DD"
-                            pattern="\d{4}-\d{2}-\d{2}"
-                            title="Please enter a date in the format YYYY-MM-DD"
-                            required
-                    />
-                </div>
-              </div>
+            <!-- 동적 폼 영역 - 자격증 정보 입력 -->
+            <div id="identificationForms" class="credential-form-container" style="display: none;">
+              <!-- 동적으로 생성된 폼이 여기에 추가됨 -->
             </div>
+            
             <p class="color-info">* Indicates required input.</p>
           </div>
 
           <div class="button-group pc-only-flex">
-<!--            <button class="btn-primary" onclick="saveUserInfo()">저장</button>-->
             <button class="btn-primary" onclick="saveUserInfo()">Save</button>
+          </div>
+        </div>
+
+        <!-- 서버설정 섹션 -->
+        <div class="context-item information" data-ref="서버설정">
+          <p>
+            Please configure the server settings for OpenDID.
+            <br class="mobile-only" />
+            These settings will be used for the Demo environment.
+          </p>
+
+          <div class="information-field pc-only-flex">
+            <div class="credential-form-container">
+              <div class="credential-section-title">Servers Setting</div>
+              <div class="input-group">
+                <div class="input">
+                  <p>
+                    TAS Server
+                    <span class="color-error">*</span>
+                  </p>
+                  <input
+                    id="tasServer"
+                    type="text"
+                    placeholder="https://tas.example.com/api"
+                    maxlength="100"
+                    required
+                  />
+                </div>
+                <div class="input">
+                  <p>
+                    Issuer Server
+                    <span class="color-error">*</span>
+                  </p>
+                  <input
+                    id="issuerServer"
+                    type="text"
+                    placeholder="https://issuer.example.com/api"
+                    maxlength="100"
+                    required
+                  />
+                </div>
+                <div class="input">
+                  <p>
+                    CA Server
+                    <span class="color-error">*</span>
+                  </p>
+                  <input
+                    id="caServer"
+                    type="text"
+                    placeholder="https://ca.example.com/api"
+                    maxlength="100"
+                    required
+                  />
+                </div>
+                <div class="input">
+                  <p>
+                    Verifier Server
+                    <span class="color-error">*</span>
+                  </p>
+                  <input
+                    id="verifierServer"
+                    type="text"
+                    placeholder="https://verifier.example.com/api"
+                    maxlength="100"
+                    required
+                  />
+                </div>
+              </div>
+            </div>
+            <p class="color-info">* Indicates required input.</p>
+            <p class="color-info">Note: Server restart is required to apply changes.</p>
+          </div>
+
+          <div class="button-group pc-only-flex">
+            <button class="btn-primary" onclick="saveServerSettings()">Save Settings</button>
+            <button class="btn-secondary" onclick="testConnection()">Test Connection</button>
           </div>
         </div>
       </div>
@@ -310,10 +663,6 @@
             </div>
             <h5>Step 2</h5>
             <div class="text-info pc-only-flex">
-<!--              <span> 사용자 정보입력 </span>-->
-<!--              <span>-->
-<!--                    데모 사이트의 원활한 사용을 위해 정보를 입력 해주세요.-->
-<!--                  </span>-->
               <span>Enter user information</span>
               <span>Please enter your information to ensure smooth use of the demo site.</span>
             </div>
@@ -382,7 +731,6 @@
               />
             </svg>
           </div>
-
           <div class="step-item">
             <div class="icon-img">
               <svg
@@ -407,8 +755,8 @@
             </div>
             <h5>Step 4</h5>
             <div class="text-info pc-only-flex">
-                <span>Submit your ID</span>
-                <span>Please submit the issued mobile ID card</span>
+              <span>Submit your ID</span>
+              <span>Please submit the issued mobile ID card</span>
             </div>
           </div>
         </div>
@@ -442,7 +790,734 @@
 
 <div id="PopupArea"></div>
 
+<!-- 로딩 인디케이터 -->
+<div id="loadingOverlay" class="loading-overlay" style="display: none;">
+  <div class="spinner"></div>
+</div>
+
 <script src="/scripts/index.js"></script>
 <script src="/scripts/addInformation.js"></script>
+
+<script>
+  // API Functions
+  async function fetchVcPlans() {
+    try {
+      const response = await fetch('/demo/api/vc-plans');
+      if (!response.ok) {
+        throw new Error('Failed to fetch VC Plans');
+      }
+      return await response.json();
+    } catch (error) {
+      console.error('Error fetching VC plans:', error);
+      alert('Failed to load VC Plans. Please try again later.');
+      return [];
+    }
+  }
+
+  async function fetchVpPolicies() {
+    try {
+      const response = await fetch('/demo/api/vp-policies');
+      if (!response.ok) {
+        throw new Error('Failed to fetch VP Policies');
+      }
+      return await response.json();
+    } catch (error) {
+      console.error('Error fetching VP policies:', error);
+      alert('Failed to load VP Policies. Please try again later.');
+      return [];
+    }
+  }
+
+  // Search VC Plan function
+  async function searchVcPlanIssuance() {
+    const vcPlans = await fetchVcPlans();
+
+    const popup = document.createElement('div');
+    popup.className = 'search-popup';
+    popup.innerHTML = `
+    <div class="search-popup-content">
+      <h3>Select VC Plan</h3>
+      <div class="search-input-container">
+        <input type="text" id="vcPlanSearch" placeholder="Search VC Plan..." class="search-popup-input" oninput="filterVcPlans(this)">
+      </div>
+      <div class="search-results" id="vcPlanResults">
+        ${vcPlans.map(plan => `
+          <div class="search-option">
+            <input type="radio" id="${plan.vcPlanId}" name="vcPlanSelection" value="${plan.name}">
+            <label for="${plan.vcPlanId}">${plan.vcPlanId}${plan.name ? ' - ' + plan.name : ''}</label>
+          </div>
+        `).join('')}
+      </div>
+      <div class="search-popup-buttons">
+        <button class="btn-secondary" onclick="closeSearchPopup()">Cancel</button>
+        <button class="btn-primary" onclick="selectVcPlan()">Select</button>
+      </div>
+    </div>
+  `;
+
+    document.body.appendChild(popup);
+  }
+
+  // Search VP Policy function
+  async function searchVpPolicy() {
+    const vpPolicies = await fetchVpPolicies();
+
+    const popup = document.createElement('div');
+    popup.className = 'search-popup';
+    popup.innerHTML = `
+    <div class="search-popup-content">
+      <h3>Select VP Policy</h3>
+      <div class="search-input-container">
+        <input type="text" id="vpPolicySearch" placeholder="Search VP Policy..." class="search-popup-input" oninput="filterVpPolicies(this)">
+      </div>
+      <div class="search-results" id="vpPolicyResults">
+        ${vpPolicies.map(policy => `
+          <div class="search-option">
+            <input type="radio" id="${policy.policyId}" name="vpPolicySelection" value="${policy.policyTitle}">
+            <label for="${policy.policyId}">${policy.policyTitle}</label>
+          </div>
+        `).join('')}
+      </div>
+      <div class="search-popup-buttons">
+        <button class="btn-secondary" onclick="closeSearchPopup()">Cancel</button>
+        <button class="btn-primary" onclick="selectVpPolicy()">Select</button>
+      </div>
+    </div>
+  `;
+
+    document.body.appendChild(popup);
+  }
+
+  // Filter VC Plans
+  function filterVcPlans(input) {
+    const searchTerm = input.value.toLowerCase();
+    const options = document.querySelectorAll('#vcPlanResults .search-option');
+
+    options.forEach(option => {
+      const label = option.querySelector('label').textContent.toLowerCase();
+      if (label.includes(searchTerm)) {
+        option.style.display = 'flex';
+      } else {
+        option.style.display = 'none';
+      }
+    });
+  }
+
+  // Filter VP Policies
+  function filterVpPolicies(input) {
+    const searchTerm = input.value.toLowerCase();
+    const options = document.querySelectorAll('#vpPolicyResults .search-option');
+
+    options.forEach(option => {
+      const label = option.querySelector('label').textContent.toLowerCase();
+      if (label.includes(searchTerm)) {
+        option.style.display = 'flex';
+      } else {
+        option.style.display = 'none';
+      }
+    });
+  }
+
+  // Select VC Plan
+  async function selectVcPlan() {
+    const selected = document.querySelector('input[name="vcPlanSelection"]:checked');
+    if (selected) {
+      const vcPlanId = selected.id;
+      const vcPlanName = selected.value;
+      
+      // UI 업데이트
+      document.getElementById('vcPlanIssuance').value = vcPlanName;
+      document.getElementById('vcPlanIssuance').setAttribute('data-id', vcPlanId);
+      
+      try {        
+        const response = await fetch('/demo/api/current-vc-plan', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ vcPlanId: vcPlanId })
+        });
+        
+        if (!response.ok) {
+          throw new Error('Failed to update current VC Plan');
+        }
+        
+        console.log('Selected VC Plan saved:', vcPlanId);
+      } catch (error) {
+        console.error('Error saving current VC Plan:', error);
+        alert('Failed to save VC Plan selection. Please try again.');
+      }
+      
+      closeSearchPopup();
+    } else {
+      alert('Please select a VC Plan');
+    }
+  }
+
+  // Select VP Policy
+  async function selectVpPolicy() {
+    const selected = document.querySelector('input[name="vpPolicySelection"]:checked');
+    if (selected) {
+      const vpPolicyId = selected.id;
+      const vpPolicyTitle = selected.value;
+      
+      // UI 업데이트
+      document.getElementById('vpPolicySubmission').value = vpPolicyTitle;
+      document.getElementById('vpPolicySubmission').setAttribute('data-id', vpPolicyId);
+      
+      try {        
+        const response = await fetch('/demo/api/current-vp-policy', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ vpPolicyId: vpPolicyId })
+        });
+        
+        if (!response.ok) {
+          throw new Error('Failed to update current VP Policy');
+        }
+        
+        console.log('Selected VP Policy saved:', vpPolicyId);
+      } catch (error) {
+        console.error('Error saving current VP Policy:', error);
+        alert('Failed to save VP Policy selection. Please try again.');
+      }
+      
+      closeSearchPopup();
+    } else {
+      alert('Please select a VP Policy');
+    }
+  }
+
+  // Close search popup
+  function closeSearchPopup() {
+    const popup = document.querySelector('.search-popup');
+    if (popup) {
+      popup.remove();
+    }
+  }
+
+  // Dynamic identification form handling
+  function displayIdentificationForm() {
+    const vcSchema = document.getElementById('vcSchema').value;
+    const formsContainer = document.getElementById('identificationForms');
+
+    // Hide all forms first
+    document.querySelectorAll('.identification-form').forEach(form => {
+      form.style.display = 'none';
+    });
+
+    // If no schema selected, hide the forms container
+    if (!vcSchema) {
+      formsContainer.style.display = 'none';
+      return;
+    }
+
+    // Show the forms container
+    formsContainer.style.display = 'block';
+
+    // Show the selected form
+    const selectedForm = document.getElementById(`${vcSchema}Form`);
+    if (selectedForm) {
+      selectedForm.style.display = 'block';
+    }
+  }
+
+  // Save server settings
+  async function saveServerSettings() {
+    // Get values from the servers settings
+    const tasServer = document.getElementById('tasServer').value;
+    const issuerServer = document.getElementById('issuerServer').value;
+    const caServer = document.getElementById('caServer').value;
+    const verifierServer = document.getElementById('verifierServer').value;
+
+    // Basic validation
+    if (!tasServer || !issuerServer || !caServer || !verifierServer) {
+      alert('Please enter all server URLs');
+      return;
+    }
+
+    // Create settings object
+    const settings = {
+      tasServer,
+      issuerServer,
+      caServer,
+      verifierServer
+    };
+
+    // Save settings to server
+    try {
+      const response = await fetch('/demo/api/server-settings', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(settings)
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to save server settings');
+      }
+
+      alert('Server settings saved successfully!');
+    } catch (error) {
+      console.error('Error saving server settings:', error);
+      alert('Failed to save server settings. Please try again.');
+    }
+  }
+
+  // Test connections
+  async function testConnection() {
+    const tasServer = document.getElementById('tasServer').value;
+    const issuerServer = document.getElementById('issuerServer').value;
+    const caServer = document.getElementById('caServer').value;
+    const verifierServer = document.getElementById('verifierServer').value;
+
+    if (!tasServer || !issuerServer || !caServer || !verifierServer) {
+      alert('Please enter all server URLs to test connections');
+      return;
+    }
+
+    const settings = {
+      tasServer,
+      issuerServer,
+      caServer,
+      verifierServer
+    };
+
+    try {
+      const response = await fetch('/demo/api/test-connection', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(settings)
+      });
+
+      if (!response.ok) {
+        throw new Error('Connection test failed');
+      }
+
+      const results = await response.json();
+
+      // Show results
+      if (results.allSuccess) {
+        alert('All server connections successful!');
+      } else {
+        const failedServers = results.results
+                .filter(result => !result.success)
+                .map(result => result.server);
+        alert(`Connection failed for: ${failedServers.join(', ')}. Please check your server settings and try again.`);
+      }
+    } catch (error) {
+      console.error('Error testing connections:', error);
+      alert('Failed to test connections. Please try again.');
+    }
+  }
+
+  // Update button interaction for all tabs
+  document.addEventListener('DOMContentLoaded', function() {
+    const selectButtons = document.querySelectorAll('.btn-select');
+    const contextItems = document.querySelectorAll('.context-item');
+
+    selectButtons.forEach(button => {
+      button.addEventListener('click', function() {
+        const ref = this.getAttribute('data-ref');
+
+        // Remove active class from all buttons and hide all context items
+        selectButtons.forEach(btn => btn.classList.remove('active'));
+        contextItems.forEach(item => item.classList.remove('show'));
+
+        // Add active class to clicked button and show the corresponding context item
+        this.classList.add('active');
+        document.querySelector(`.context-item[data-ref="${ref}"]`).classList.add('show');
+      });
+    });
+  });
+
+  // VC Schema 목록 가져오기
+async function fetchVcSchemas() {
+  try {
+    const response = await fetch('/demo/api/vc-schemas');
+    if (!response.ok) {
+      throw new Error('Failed to fetch VC Schemas');
+    }
+    return await response.json();
+  } catch (error) {
+    console.error('Error fetching VC schemas:', error);
+    alert('Failed to load VC Schemas. Please try again later.');
+    return { vcSchemaList: [] };
+  }
+}
+
+// Select Box에 Schema 목록 채우기
+async function populateVcSchemaSelect() {
+  const schemasData = await fetchVcSchemas();
+  const schemas = schemasData.vcSchemaList || [];
+  const selectElement = document.getElementById('vcSchema');
+  
+  // 기존 옵션 초기화 (첫 번째 기본 옵션은 유지)
+  while (selectElement.options.length > 1) {
+    selectElement.remove(1);
+  }
+  
+  // 새 옵션 추가
+  schemas.forEach((schema, index) => {
+    const option = document.createElement('option');
+    option.value = index; // 인덱스를 값으로 사용
+    option.textContent = schema.title;
+    selectElement.appendChild(option);
+  });
+  
+  // 전체 스키마 데이터를 전역 변수에 저장
+  window.vcSchemaData = schemas;
+}
+
+// 동적 폼 생성
+function createDynamicForm(schemaIndex) {
+  // 선택된 스키마가 없거나 잘못된 경우 처리
+  if (!window.vcSchemaData || schemaIndex === "" || !window.vcSchemaData[schemaIndex]) {
+    document.getElementById('identificationForms').style.display = 'none';
+    return;
+  }
+  
+  const schema = window.vcSchemaData[schemaIndex];
+  const formsContainer = document.getElementById('identificationForms');
+  
+  // 폼 컨테이너 표시
+  formsContainer.style.display = 'block';
+  formsContainer.innerHTML = ''; // 기존 내용 초기화
+  
+  // 폼 생성
+  const formDiv = document.createElement('div');
+  formDiv.className = 'identification-form';
+  
+  // 제목 추가
+  const titleDiv = document.createElement('div');
+  titleDiv.className = 'label';
+  titleDiv.innerHTML = `
+    <p>${schema.title}</p>
+    <div class="divider"></div>
+  `;
+  formDiv.appendChild(titleDiv);
+  
+  // 입력 필드 그룹 생성
+  const inputGroupDiv = document.createElement('div');
+  inputGroupDiv.className = 'input-group';
+  
+  // 모든 클레임과 네임스페이스 정보 수집
+  if (schema.vcSchema && schema.vcSchema.credentialSubject && schema.vcSchema.credentialSubject.claims) {
+    schema.vcSchema.credentialSubject.claims.forEach(claim => {
+      // 네임스페이스 정보 가져오기
+      const namespace = claim.namespace ? claim.namespace.id : '';
+      
+      if (claim.items && Array.isArray(claim.items)) {
+        claim.items.forEach(item => {
+          const inputDiv = document.createElement('div');
+          inputDiv.className = 'input';
+          
+          // 라벨 생성
+          const labelP = document.createElement('p');
+          labelP.textContent = item.caption;
+          
+          // 필수 표시 (모든 필드를 필수로 가정)
+          const requiredSpan = document.createElement('span');
+          requiredSpan.className = 'color-error';
+          requiredSpan.textContent = '*';
+          labelP.appendChild(requiredSpan);
+          
+          inputDiv.appendChild(labelP);
+          
+          // 입력 요소 생성
+          const inputElement = document.createElement('input');
+          inputElement.type = 'text';
+          
+          // 중요: ID를 namespace.id 형태로 설정
+          const fieldId = namespace ? `${namespace}.${item.id}` : item.id;
+          
+          inputElement.id = fieldId;
+          inputElement.name = fieldId;
+          inputElement.placeholder = `Enter ${item.caption}`;
+          inputElement.required = true;
+          inputElement.setAttribute('data-caption', item.caption);
+          inputElement.setAttribute('data-original-id', item.id);
+          inputElement.setAttribute('data-namespace', namespace);
+          
+          inputDiv.appendChild(inputElement);
+          inputGroupDiv.appendChild(inputDiv);
+        });
+      }
+    });
+  }
+  
+  formDiv.appendChild(inputGroupDiv);
+  formsContainer.appendChild(formDiv);
+}
+// 폼 데이터 수집 및 전송
+async function saveUserInfo() {
+  const schemaSelect = document.getElementById('vcSchema');
+  const schemaIndex = schemaSelect.value;
+  
+  // 스키마가 선택되지 않은 경우
+  if (!schemaIndex || schemaIndex === "") {
+    alert('Please select a credential type');
+    return;
+  }
+  
+  const schema = window.vcSchemaData[schemaIndex];
+  
+  // 기본 사용자 정보
+  const firstname = document.getElementById('firstname').value;
+  const lastname = document.getElementById('lastname').value;
+  const did = document.getElementById('did').value;
+  const email = document.getElementById('email').value;
+  
+  // 기본 유효성 검사
+  if (!firstname || !lastname) {
+    alert('Please enter required user information');
+    return;
+  }
+  
+  // 사용자 정보 객체 생성
+  const userInfo = {
+    firstname,
+    lastname,
+    did,
+    email,
+    vcSchemaId: schema.schemaId,
+    vcSchemaTitle: schema.title,
+    vcSchemaIndex: schemaIndex // 나중에 폼 자동 생성을 위해 인덱스 저장
+  };
+  
+  const dynamicFields = {};
+  const inputs = document.querySelectorAll('#identificationForms input');
+  
+  // 각 입력 필드를 순회하면서 namespace.id 형태의 키로 값을 저장
+  inputs.forEach(input => {
+    if (input.id) {
+      // input.id는 이미 namespace.id 형태로 저장되어 있음
+      dynamicFields[input.id] = input.value;
+    }
+  });
+  
+  userInfo.fields = dynamicFields;
+  
+  try {
+    // 로딩 인디케이터 표시
+    showLoading();
+    
+    const response = await fetch('/demo/api/save-user-info', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(userInfo)
+    });
+    
+    // 로딩 인디케이터 숨기기
+    hideLoading();
+    
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.message || 'Failed to save user information');
+    }
+    
+    alert('User information saved successfully!');
+  } catch (error) {
+    // 로딩 인디케이터 숨기기 (에러 발생 시에도)
+    hideLoading();
+    
+    console.error('Error saving user information:', error);
+    alert('Failed to save user information. Please try again.');
+  }
+}
+
+// 이전에 저장된 사용자 정보 불러오기
+async function loadUserInfo() {
+  try {
+    showLoading();
+    
+    const response = await fetch('/demo/api/user-info');
+    
+    hideLoading();
+    
+    if (!response.ok) {
+      if (response.status === 404) {
+        console.log('No saved user info found');
+        return null;
+      }
+      throw new Error('Failed to load user information');
+    }
+    
+    const userInfo = await response.json();
+    return userInfo;
+  } catch (error) {
+    hideLoading();
+    console.error('Error loading user information:', error);
+    return null;
+  }
+}
+
+// 저장된 정보로 폼 채우기
+async function populateFormWithSavedData() {
+  const userInfo = await loadUserInfo();
+  if (!userInfo || !userInfo.firstname) return; // 기본 정보가 없으면 종료
+  
+  // 기본 사용자 정보 채우기
+  document.getElementById('firstname').value = userInfo.firstname || '';
+  document.getElementById('lastname').value = userInfo.lastname || '';
+  document.getElementById('did').value = userInfo.did || '';
+  document.getElementById('email').value = userInfo.email || '';
+  
+  // 스키마 선택 및 동적 폼 생성
+  if (userInfo.vcSchemaId && window.vcSchemaData) {
+    // 스키마 인덱스를 직접 가져오거나 ID로 찾기
+    let schemaIndex = userInfo.vcSchemaIndex;
+    
+    // 저장된 인덱스가 없거나 잘못된 경우 ID로 검색
+    if (schemaIndex === undefined || !window.vcSchemaData[schemaIndex] || window.vcSchemaData[schemaIndex].schemaId !== userInfo.vcSchemaId) {
+      schemaIndex = window.vcSchemaData.findIndex(schema => schema.schemaId === userInfo.vcSchemaId);
+    }
+    
+    if (schemaIndex >= 0) {
+      const selectElement = document.getElementById('vcSchema');
+      selectElement.value = schemaIndex;
+      
+      // 동적 폼 생성
+      createDynamicForm(schemaIndex);
+      
+      // 폼이 완전히 생성된 후 값 채우기
+      setTimeout(() => {
+        if (userInfo.fields) {
+          Object.keys(userInfo.fields).forEach(key => {
+            const input = document.getElementById(key);
+            if (input) {
+              input.value = userInfo.fields[key];
+            }
+          });
+        }
+      }, 300);
+    }
+  }
+}
+
+// 로딩 인디케이터 표시
+function showLoading() {
+  const loadingOverlay = document.getElementById('loadingOverlay');
+  if (loadingOverlay) {
+    loadingOverlay.style.display = 'flex';
+  }
+}
+
+// 로딩 인디케이터 숨기기
+function hideLoading() {
+  const loadingOverlay = document.getElementById('loadingOverlay');
+  if (loadingOverlay) {
+    loadingOverlay.style.display = 'none';
+  }
+}
+
+// 동적 폼 생성
+function createDynamicForm(schemaIndex) {
+  // 선택된 스키마가 없거나 잘못된 경우 처리
+  if (!window.vcSchemaData || schemaIndex === "" || !window.vcSchemaData[schemaIndex]) {
+    document.getElementById('identificationForms').style.display = 'none';
+    return;
+  }
+  
+  const schema = window.vcSchemaData[schemaIndex];
+  const formsContainer = document.getElementById('identificationForms');
+  
+  // 폼 컨테이너 표시
+  formsContainer.style.display = 'block';
+  formsContainer.innerHTML = ''; // 기존 내용 초기화
+  
+  // 폼 생성
+  const formDiv = document.createElement('div');
+  formDiv.className = 'identification-form';
+  
+  // 제목 추가
+  const titleDiv = document.createElement('div');
+  titleDiv.className = 'credential-section-title';
+  titleDiv.textContent = schema.title || 'Identification Information';
+  formDiv.appendChild(titleDiv);
+  
+  // 입력 필드 그룹 생성
+  const inputGroupDiv = document.createElement('div');
+  inputGroupDiv.className = 'input-group';
+  
+  // 모든 클레임과 네임스페이스 정보 수집
+  if (schema.vcSchema && schema.vcSchema.credentialSubject && schema.vcSchema.credentialSubject.claims) {
+    schema.vcSchema.credentialSubject.claims.forEach(claim => {
+      // 네임스페이스 정보 가져오기
+      const namespace = claim.namespace ? claim.namespace.id : '';
+      
+      if (claim.items && Array.isArray(claim.items)) {
+        claim.items.forEach(item => {
+          const inputDiv = document.createElement('div');
+          inputDiv.className = 'input';
+          
+          // 라벨 생성
+          const labelP = document.createElement('p');
+          labelP.textContent = item.caption || item.id;
+          
+          // 필수 표시 (모든 필드를 필수로 가정)
+          const requiredSpan = document.createElement('span');
+          requiredSpan.className = 'color-error';
+          requiredSpan.textContent = '*';
+          labelP.appendChild(requiredSpan);
+          
+          inputDiv.appendChild(labelP);
+          
+          // 입력 요소 생성
+          const inputElement = document.createElement('input');
+          inputElement.type = item.type === 'number' ? 'number' : 'text';
+          
+          // 중요: ID를 namespace.id 형태로 설정
+          const fieldId = namespace ? `${namespace}.${item.id}` : item.id;
+          
+          inputElement.id = fieldId;
+          inputElement.name = fieldId;
+          inputElement.placeholder = `Enter ${item.caption || item.id}`;
+          inputElement.required = true;
+          inputElement.setAttribute('data-caption', item.caption || item.id);
+          inputElement.setAttribute('data-original-id', item.id);
+          inputElement.setAttribute('data-namespace', namespace);
+          
+          inputDiv.appendChild(inputElement);
+          inputGroupDiv.appendChild(inputDiv);
+        });
+      }
+    });
+  }
+  
+  formDiv.appendChild(inputGroupDiv);
+  formsContainer.appendChild(formDiv);
+}
+function displayIdentificationForm() {
+  const vcSchema = document.getElementById('vcSchema').value;
+  createDynamicForm(vcSchema);
+}
+
+// 페이지 로드 시 실행
+document.addEventListener('DOMContentLoaded', async function() {
+  try {
+    showLoading();
+    
+    // VC 스키마 목록 불러오기
+    await populateVcSchemaSelect();
+    
+    // 이전에 저장된 사용자 정보로 폼 채우기
+    await populateFormWithSavedData();
+    
+    hideLoading();
+  } catch (error) {
+    hideLoading();
+    console.error('Error initializing form:', error);
+  }
+});
+
+</script>
 </body>
 </html>

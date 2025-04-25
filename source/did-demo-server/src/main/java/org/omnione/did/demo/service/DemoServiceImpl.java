@@ -17,15 +17,13 @@
 package org.omnione.did.demo.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.zxing.WriterException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.omnione.did.base.config.ConfigService;
 import org.omnione.did.crypto.enums.MultiBaseType;
-import org.omnione.did.crypto.util.MultiBaseUtils;
-import org.omnione.did.demo.api.CasFeign;
-import org.omnione.did.demo.api.IssuerFeign;
-import org.omnione.did.demo.api.TasFeign;
-import org.omnione.did.demo.api.VerifierFeign;
+import org.omnione.did.demo.api.*;
 import org.omnione.did.base.exception.ErrorCode;
 import org.omnione.did.base.exception.OpenDidException;
 import org.omnione.did.demo.dto.*;
@@ -38,8 +36,11 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.security.SecureRandom;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 
 import static org.omnione.did.demo.util.QrMaker.*;
@@ -57,7 +58,11 @@ public class DemoServiceImpl implements DemoService{
     private final TasFeign tasFeign;
     private final CasFeign casFeign;
     private final IssuerFeign issuerFeign;
+    private final IssuerAdminFeign issuerAdminFeign;
     private final DemoProperty demoProperty;
+    private final ConfigService configService;
+    private final ListFeign listFeign;
+    private final ObjectMapper objectMapper;
 
     /**
      * Refreshes the Verifiable Presentation (VP) offer.
@@ -71,7 +76,7 @@ public class DemoServiceImpl implements DemoService{
         log.debug("\t Make VP Offer Request");
         try {
             RequestVpOfferReqDto offerReqDto = RequestVpOfferReqDto.builder()
-                    .policyId(demoProperty.getPolicyId())
+                    .policyId(configService.getConfig().getCurrentVpPolicy())
                     .build();
             log.debug("\t Request VP Offer QR : " + offerReqDto.toString());
             RequestVpOfferResDto requestVpOfferResDto = verifierFeign.requestVpOfferQR(offerReqDto);
@@ -117,8 +122,8 @@ public class DemoServiceImpl implements DemoService{
         log.debug("=== Starting VcOfferRefresh ===");
         log.debug("\t Make VC Offer Request");
         RequestVcOfferReqDto vcOfferReqDto = RequestVcOfferReqDto.builder()
-                .vcPlanId(demoProperty.getVcPlanId())
-                .issuer(demoProperty.getIssuer())
+                .vcPlanId(configService.getConfig().getCurrentVcPlan())
+                .issuer(configService.getConfig().getIssuer())
                 .build();
 
         log.debug("\t Request VC Offer to TAS");
@@ -212,12 +217,17 @@ public class DemoServiceImpl implements DemoService{
                             .firstname(saveUserInfoReqDto.getFirstname())
                             .lastname(saveUserInfoReqDto.getLastname())
                             .build());
+
             byte[] hashedDataBytes = BaseDigestUtil.generateHash(json.getBytes(StandardCharsets.UTF_8));
-            String encode = BaseMultibaseUtil.encode(hashedDataBytes, MultiBaseType.base64);
-            log.info("encode : {}", encode);
             String hexStringPii = HexUtil.toHexString(hashedDataBytes);
             saveUserInfoReqDto.setPii(hexStringPii);
 
+            Map<String, String> fields = saveUserInfoReqDto.getFields();
+            if (fields != null) {
+                ObjectMapper objectMapper = new ObjectMapper();
+                String userInfoJson = objectMapper.writeValueAsString(fields);
+                saveUserInfoReqDto.setUserInfo(userInfoJson);
+            }
             SecureRandom random = new SecureRandom();
             String userId = new UUID(random.nextLong(), random.nextLong()).toString().substring(0, 8);
 
@@ -226,7 +236,10 @@ public class DemoServiceImpl implements DemoService{
                     .pii(hexStringPii)
                     .build());
 
-            issuerFeign.saveUserInfo(saveUserInfoReqDto);
+            issuerAdminFeign.saveUserInfo(saveUserInfoReqDto);
+
+            saveUserInfoToConfig(saveUserInfoReqDto, userId, hexStringPii);
+
 
             return SaveUserInfoResDto.builder()
                     .userId(userId)
@@ -239,6 +252,31 @@ public class DemoServiceImpl implements DemoService{
         } catch (Exception e) {
             log.error("saveUserInfo error : {}", e.getMessage());
             throw new OpenDidException(ErrorCode.VC_SAVE_FAILED);
+        }
+    }
+    private void saveUserInfoToConfig(SaveUserInfoReqDto dto, String userId, String pii) {
+        try {
+            Map<String, Object> userInfoMap = new HashMap<>();
+
+            userInfoMap.put("firstname", dto.getFirstname());
+            userInfoMap.put("lastname", dto.getLastname());
+            userInfoMap.put("did", dto.getDid());
+            userInfoMap.put("email", dto.getEmail());
+            userInfoMap.put("userId", userId);
+            userInfoMap.put("pii", pii);
+
+            userInfoMap.put("vcSchemaId", dto.getVcSchemaId());
+            userInfoMap.put("vcSchemaTitle", dto.getVcSchemaTitle());
+            userInfoMap.put("vcSchemaIndex", dto.getVcSchemaIndex());
+
+            if (dto.getFields() != null) {
+                userInfoMap.put("fields", dto.getFields());
+            }
+            configService.saveUserInfo(userInfoMap);
+
+        } catch (Exception e) {
+            // config.json 저장 실패해도 전체 프로세스는 계속 진행
+            log.error("Failed to save user information to config.json: {}", e.getMessage());
         }
     }
 
@@ -293,6 +331,54 @@ public class DemoServiceImpl implements DemoService{
     public ConfirmVerifyResDto confirmVerify(ConfirmVerifyReqDto confirmVerifyReqDto) {
         return verifierFeign.confirmVerify(confirmVerifyReqDto);
     }
+
+    @Override
+    public VcSchemaResponseDto getVcSchemas() {
+        try {
+            String jsonString = listFeign.requestVcSchemaList();
+
+            return objectMapper.readValue(jsonString, VcSchemaResponseDto.class);
+
+        } catch (JsonProcessingException e) {
+            throw new OpenDidException(ErrorCode.VC_SCHEMA_NOT_FOUND);
+        }
+    }
+
+    @Override
+    public VcSchemaResponseDto.VcSchemaDto getVcSchema(String schemaName) {
+        try {
+            String jsonString = listFeign.requestVcSchemaList();
+            VcSchemaResponseDto vcSchemas = objectMapper.readValue(jsonString, VcSchemaResponseDto.class);
+
+            // 스키마 name 파라미터 값으로 스키마 찾기
+            return vcSchemas.getVcSchemaList().stream()
+                    .filter(schema -> {
+                        try {
+                            // URL에서 name 파라미터 추출
+                            URL url = new URL(schema.getSchemaId());
+                            String queryParams = url.getQuery();
+                            if (queryParams != null) {
+                                String[] params = queryParams.split("&");
+                                for (String param : params) {
+                                    String[] keyValue = param.split("=");
+                                    if (keyValue.length == 2 && "name".equals(keyValue[0]) && schemaName.equals(keyValue[1])) {
+                                        return true;
+                                    }
+                                }
+                            }
+                            return false;
+                        } catch (Exception e) {
+                            return schema.getSchemaId().contains("name=" + schemaName);
+                        }
+                    })
+                    .findFirst()
+                    .orElseThrow(() -> new OpenDidException(ErrorCode.VC_SCHEMA_NOT_FOUND));
+
+        } catch (JsonProcessingException e) {
+            throw new OpenDidException(ErrorCode.VC_SCHEMA_NOT_FOUND);
+        }
+    }
+
 
 }
 
