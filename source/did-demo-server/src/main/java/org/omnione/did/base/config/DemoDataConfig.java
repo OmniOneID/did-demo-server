@@ -19,6 +19,7 @@ public class DemoDataConfig {
         private String vcPlanId;
         private String name;
         private String description;
+        private String manager;
     }
 
     private List<VpPolicy> vpPolicies;

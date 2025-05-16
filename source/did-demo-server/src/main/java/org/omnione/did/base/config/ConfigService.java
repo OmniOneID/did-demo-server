@@ -27,7 +27,7 @@ import java.util.stream.Collectors;
 @Slf4j
 @Profile("!sample")
 public class ConfigService {
-    private static final String CONFIG_FILE = "source/did-demo-server/src/main/resources/config/config.json";
+    private static final String CONFIG_FILE = "src/main/resources/config/config.json";
     private final ObjectMapper objectMapper = new ObjectMapper();
     private final ListFeign listFeign;
     private final VerifierFeign verifierFeign;
@@ -44,7 +44,7 @@ public class ConfigService {
                 initialConfig.putArray("vcPlans");
                 initialConfig.putArray("vpPolicies");
                 initialConfig.putObject("serverSettings");
-                initialConfig.putObject("userInfo"); // 사용자 정보를 저장할 객체 추가
+                initialConfig.putObject("userInfo"); //
                 objectMapper.writerWithDefaultPrettyPrinter().writeValue(configFile, initialConfig);
             } catch (IOException e) {
                 log.error("Failed to create config file", e);
@@ -74,6 +74,7 @@ public class ConfigService {
                         node.put("vcPlanId", plan.getVcPlanId());  // id 대신 vcPlanId 사용
                         node.put("name", plan.getName());
                         node.put("description", plan.getDescription());
+                        node.put("manager", plan.getManager());
                         return node;
                     })
                     .collect(Collectors.toList());
@@ -120,11 +121,12 @@ public class ConfigService {
         }
     }
 
-    public void updateCurrentVcPlan(String vcPlanId) {
+    public void updateCurrentVcPlan(String vcPlanId, String manager) {
         try {
             ObjectNode configNode = (ObjectNode) objectMapper.readTree(configFile);
 
             configNode.put("currentVcPlan", vcPlanId);
+            configNode.put("issuer", manager);
 
             objectMapper.writerWithDefaultPrettyPrinter().writeValue(configFile, configNode);
         } catch (IOException e) {

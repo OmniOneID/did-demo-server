@@ -125,11 +125,13 @@ public class DemoServiceImpl implements DemoService{
                 .vcPlanId(configService.getConfig().getCurrentVcPlan())
                 .issuer(configService.getConfig().getIssuer())
                 .build();
+        log.debug("\t Request VC Offer QR : " + vcOfferReqDto.toString());
 
         log.debug("\t Request VC Offer to TAS");
 
         RequestVcOfferResDto requestVcOfferResDto = tasFeign.requestVcOfferQR(vcOfferReqDto);
         String jsonString = JsonUtil.serializeAndSort(requestVcOfferResDto.getIssueOfferPayload());
+        log.debug("\t Serialize and Encode VC Offer Payload" + jsonString);
         String encDataPayload = BaseMultibaseUtil.encode(jsonString.getBytes(), MultiBaseType.base64);
         VcResultDto vcResultDto = VcResultDto.builder()
                 .payloadType("ISSUE_VC")
@@ -236,7 +238,10 @@ public class DemoServiceImpl implements DemoService{
                     .pii(hexStringPii)
                     .build());
 
-            issuerAdminFeign.saveUserInfo(saveUserInfoReqDto);
+            if(saveUserInfoReqDto.getVcSchemaId() != null && !saveUserInfoReqDto.getVcSchemaId().isEmpty()) {
+                issuerAdminFeign.saveUserInfo(saveUserInfoReqDto);
+            }
+
 
             saveUserInfoToConfig(saveUserInfoReqDto, userId, hexStringPii);
 

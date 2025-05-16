@@ -27,6 +27,7 @@ public class VcPlanResponseDto {
         private String vcPlanId;
         private String name;
         private String description;
+        private String manager;
         private List<String> tags;
     }
 }

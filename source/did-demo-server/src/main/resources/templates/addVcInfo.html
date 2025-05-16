@@ -102,95 +102,95 @@
       return false;
     }
 
-    // 날짜 형식 검사 (YYYY-MM-DD)
-    if (fieldId === 'birthdate' || fieldId === 'issueDate' || fieldId === 'expiryDate') {
-      const datePattern = /^\d{4}-\d{2}-\d{2}$/;
-      if (!datePattern.test(value)) {
-        errorElement.textContent = 'Please enter a date in the format YYYY-MM-DD';
-        errorElement.style.display = 'block';
-        return false;
-      }
-    }
-
     errorElement.style.display = 'none';
     return true;
   }
 
   // 동적 폼 생성 함수
   function createDynamicForm(schema) {
-    const formContainer = document.getElementById('dynamicForm');
-    formContainer.innerHTML = ''; // 기존 내용 초기화
+  const formContainer = document.getElementById('dynamicForm');
+  formContainer.innerHTML = ''; // 기존 내용 초기화
 
-    // 폼 제목 업데이트
-    document.getElementById('formTitle').textContent = schema.title || 'Identification Information';
+  // 폼 제목 업데이트
+  document.getElementById('formTitle').textContent = schema.title || 'Identification Information';
 
-    // 모든 claims 내의 모든 items를 추출
-    const allItems = [];
-    if (schema.vcSchema && schema.vcSchema.credentialSubject && schema.vcSchema.credentialSubject.claims) {
-      schema.vcSchema.credentialSubject.claims.forEach(claim => {
-        if (claim.items && Array.isArray(claim.items)) {
-          claim.items.forEach(item => {
-            allItems.push({
-              id: item.id,
-              caption: item.caption,
-              type: item.type,
-              required: item.required !== false // 기본적으로 필수로 가정
-            });
+  // 모든 claims 내의 모든 items를 추출
+  const allItems = [];
+  if (schema.vcSchema && schema.vcSchema.credentialSubject && schema.vcSchema.credentialSubject.claims) {
+    schema.vcSchema.credentialSubject.claims.forEach(claim => {
+      console.log(claim);
+      const namespace = claim.namespace.id || 'default';
+      
+      if (claim.items && Array.isArray(claim.items)) {
+        claim.items.forEach(item => {
+          allItems.push({
+            id: item.id,
+            namespace: namespace, // 네임스페이스 추가
+            caption: item.caption,
+            type: item.type,
+            required: item.required !== false // 기본적으로 필수로 가정
           });
-        }
-      });
-    }
-
-    // 입력 필드 생성
-    allItems.forEach(item => {
-      const inputDiv = document.createElement('div');
-      inputDiv.className = 'input';
-
-      // 라벨 생성
-      const labelP = document.createElement('p');
-      labelP.textContent = item.caption;
-
-      // 필수 표시
-      if (item.required) {
-        const requiredSpan = document.createElement('span');
-        requiredSpan.className = 'color-error';
-        requiredSpan.textContent = '*';
-        labelP.appendChild(requiredSpan);
+        });
       }
-
-      inputDiv.appendChild(labelP);
-
-      // 입력 요소 생성
-      const inputElement = document.createElement('input');
-      inputElement.type = item.type === 'date' ? 'text' : (item.type || 'text');
-      inputElement.id = item.id;
-      inputElement.name = item.id;
-      inputElement.placeholder = `Enter ${item.caption}`;
-      inputElement.required = item.required;
-      inputElement.setAttribute('data-caption', item.caption);
-
-      // 날짜 형식 필드에 대한 속성 추가
-      if (item.type === 'date') {
-        inputElement.pattern = "\\d{4}-\\d{2}-\\d{2}";
-        inputElement.title = "Please enter a date in the format YYYY-MM-DD";
-        inputElement.placeholder = "YYYY-MM-DD";
-      }
-
-      inputDiv.appendChild(inputElement);
-      formContainer.appendChild(inputDiv);
-
-      // 에러 메시지 요소 추가
-      const errorDiv = document.createElement('div');
-      errorDiv.id = `${item.id}Error`;
-      errorDiv.className = 'error-valid-message';
-      formContainer.appendChild(errorDiv);
-
-      // 입력 이벤트 리스너 추가
-      inputElement.addEventListener('blur', function() {
-        validateField(item.id, this.value);
-      });
     });
   }
+
+  // 입력 필드 생성
+  allItems.forEach(item => {
+    const inputDiv = document.createElement('div');
+    inputDiv.className = 'input';
+
+    // 라벨 생성
+    const labelP = document.createElement('p');
+    labelP.textContent = item.caption;
+
+    // 필수 표시
+    if (item.required) {
+      const requiredSpan = document.createElement('span');
+      requiredSpan.className = 'color-error';
+      requiredSpan.textContent = '*';
+      labelP.appendChild(requiredSpan);
+    }
+
+    inputDiv.appendChild(labelP);
+
+    // 입력 요소 생성
+    const inputElement = document.createElement('input');
+    inputElement.type = item.type === 'date' ? 'text' : (item.type || 'text');
+    
+    // 네임스페이스가 있는 ID 생성
+    const fieldId = `${item.namespace}.${item.id}`;
+    inputElement.id = fieldId;
+    inputElement.name = fieldId;
+    
+    inputElement.placeholder = `Enter ${item.caption}`;
+    inputElement.required = item.required;
+    inputElement.setAttribute('data-caption', item.caption);
+    inputElement.setAttribute('data-original-id', item.id); // 원본 ID 저장
+    inputElement.setAttribute('data-namespace', item.namespace); // 네임스페이스 저장
+
+    // 날짜 형식 필드에 대한 속성 추가
+    // if (item.type === 'date') {
+    //   inputElement.pattern = "\\d{4}-\\d{2}-\\d{2}";
+    //   inputElement.title = "Please enter a date in the format YYYY-MM-DD";
+    //   inputElement.placeholder = "YYYY-MM-DD";
+    // }
+
+    inputDiv.appendChild(inputElement);
+    formContainer.appendChild(inputDiv);
+
+    // 에러 메시지 요소 추가
+    const errorDiv = document.createElement('div');
+    errorDiv.id = `${fieldId}Error`;
+    errorDiv.className = 'error-valid-message';
+    formContainer.appendChild(errorDiv);
+
+
+    inputElement.addEventListener('blur', function() {
+      validateField(fieldId, this.value);
+    });
+  });
+}
 
   // VC Schema 가져오기
   async function fetchVcSchema(schemaId) {
@@ -209,55 +209,50 @@
 
   // 데이터 저장
   async function saveVcInfo() {
-    alert('Saving information...');
-    // 모든 입력 필드 가져오기
-    const inputs = document.querySelectorAll('#dynamicForm input');
-    let isValid = true;
-    const dynamicFields = {};
+  
+  
+  const inputs = document.querySelectorAll('#dynamicForm input');
+  let isValid = true;
+  const dynamicFields = {};
 
-    // 각 필드의 유효성 검사
-    inputs.forEach(input => {
-      const isFieldValid = validateField(input.id, input.value);
-      if (!isFieldValid) {
-        isValid = false;
-      }
-
-      if (input.id) {
-        dynamicFields[input.id] = input.value;
-      }
-    });
-
-    if (!isValid) {
-      alert('Please check the form for errors and try again.');
-      return;
+  // 각 필드의 유효성 검사
+  inputs.forEach(input => {
+    const isFieldValid = validateField(input.id, input.value);
+    if (!isFieldValid) {
+      isValid = false;
     }
 
-    // 기본 필드 값 가져오기
-    const did = document.getElementById('did').value;
-    const userName = document.getElementById('userName').value;
-    const vcSchemaId = document.getElementById('vcSchemaId').value;
-
-    if (!did || !userName || !vcSchemaId) {
-      alert('Required information is missing. Please try again.');
-      return;
+    if (input.id) {      
+      dynamicFields[input.id] = input.value;
     }
+  });
 
-    const data = {
-      did,
-      userName,
-      vcSchemaId,
-      fields: dynamicFields
-    };
+  if (!isValid) {
+    alert('Please check the form for errors and try again.');
+    return;
+  }
 
-    try {
-      document.getElementById('loadingOverlay').style.display = 'flex';
+  // 기본 필드 값 가져오기
+  const did = document.getElementById('did').value;
+  const userName = document.getElementById('userName').value;
+  const vcSchemaId = document.getElementById('vcSchemaId').value;
 
-      const response = await fetch('/demo/api/save-user-info', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(data)
+  const data = {
+    did,
+    userName,
+    vcSchemaId,
+    fields: dynamicFields
+  };  
+
+  try {
+    document.getElementById('loadingOverlay').style.display = 'flex';
+
+    const response = await fetch('/demo/api/save-user-info', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(data)    
       }).then(response => {
             if (!response.ok) {
                 return response.json().then(err => { throw err; });
@@ -278,13 +273,13 @@
                     }
                 } else if (isMobile.iOS()) {
                     // iOS 네이티브 앱에 완료 메시지 전송
-                    alert('The ID information has been saved');
+                    alert('information has been saved');
                     if (window.webkit && window.webkit.messageHandlers && window.webkit.messageHandlers.onCompletedAddVcUpload) {
                         window.webkit.messageHandlers.onCompletedAddVcUpload.postMessage("success");
                     }
                 }
             } else {
-                alert('ID information has been saved');
+                alert('information has been saved');
             }
         })
         .catch(error => {         
@@ -317,19 +312,6 @@
         throw new Error('Failed to save VC information');
       }
 
-      // // 안드로이드 앱에 저장 완료 신호 전송
-      // if (window.Android) {
-      //   window.Android.onVcInfoSaved(JSON.stringify(data));
-      // }
-
-      // alert('Information saved successfully!');
-
-      // // 저장 성공 후 창 닫기 또는 이전 페이지로 이동
-      // if (window.Android) {
-      //   window.Android.finishWebView();
-      // } else {
-      //   window.history.back();
-      // }
     } catch (error) {
       console.error('Error saving VC information:', error);
       alert('Failed to save information. Please try again.');
@@ -365,7 +347,7 @@
       const defaultForm = `
         <div class="input">
           <p>Birthdate<span class="color-error">*</span></p>
-          <input id="birthdate" type="text" placeholder="YYYY-MM-DD" pattern="\\d{4}-\\d{2}-\\d{2}" title="Please enter a date in the format YYYY-MM-DD" required />
+          <input id="birthdate" type="text" placeholder="YYYY-MM-DD" required />
         </div>
         <div id="birthdateError" class="error-valid-message"></div>
 
@@ -383,17 +365,16 @@
 
         <div class="input">
           <p>Issue Date<span class="color-error">*</span></p>
-          <input id="issueDate" type="text" placeholder="YYYY-MM-DD" pattern="\\d{4}-\\d{2}-\\d{2}" title="Please enter a date in the format YYYY-MM-DD" required />
+          <input id="issueDate" type="text" placeholder="YYYY-MM-DD" required />
         </div>
         <div id="issueDateError" class="error-valid-message"></div>
       `;
 
       document.getElementById('dynamicForm').innerHTML = defaultForm;
 
-      // 로딩 인디케이터 숨기기
+
       document.getElementById('loadingOverlay').style.display = 'none';
 
-      // 입력 이벤트 리스너 추가
       document.querySelectorAll('#dynamicForm input').forEach(input => {
         input.addEventListener('blur', function() {
           validateField(this.id, this.value);

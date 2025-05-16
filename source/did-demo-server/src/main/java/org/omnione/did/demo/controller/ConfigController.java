@@ -37,8 +37,10 @@ public class ConfigController {
 
     @PostMapping("/current-vc-plan")
     public ResponseEntity<?> updateCurrentVcPlan(@RequestBody Map<String, String> body) {
+
         String vcPlanId = body.get("vcPlanId");
-        configService.updateCurrentVcPlan(vcPlanId);
+        String manager = body.get("manager");
+        configService.updateCurrentVcPlan(vcPlanId, manager);
         return ResponseEntity.ok().build();
     }
     @GetMapping("/vp-policies")
