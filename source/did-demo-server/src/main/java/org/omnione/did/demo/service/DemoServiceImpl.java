@@ -352,7 +352,7 @@ public class DemoServiceImpl implements DemoService{
     @Override
     public VcSchemaResponseDto.VcSchemaDto getVcSchema(String schemaName) {
         try {
-            String jsonString = listFeign.requestVcSchemaList();
+            String jsonString = listFeign.  requestVcSchemaList();
             VcSchemaResponseDto vcSchemas = objectMapper.readValue(jsonString, VcSchemaResponseDto.class);
 
             return vcSchemas.getVcSchemaList().stream()
@@ -383,9 +383,8 @@ public class DemoServiceImpl implements DemoService{
         }
     }
 
-    // DemoServiceImpl에 구현
     @Override
-    public VcPlanResponseDto getVcPlans() {
+    public VcPlanResponseDto getAllVcPlans() {
         try {
             String jsonString = listFeign.requestVcPlanList();
             return objectMapper.readValue(jsonString, VcPlanResponseDto.class);

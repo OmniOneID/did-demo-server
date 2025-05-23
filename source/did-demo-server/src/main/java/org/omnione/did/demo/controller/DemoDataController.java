@@ -98,10 +98,10 @@ public class DemoDataController {
         return demoService.getVcSchema(schemaId);
     }
 
-    @RequestMapping(value = "/api/vc-plans", method = RequestMethod.GET)
+    @RequestMapping(value = "/api/all-vc-plans", method = RequestMethod.GET)
     @ResponseBody
-    public VcPlanResponseDto getVcPlans() {
-        return demoService.getVcPlans();
+    public VcPlanResponseDto getAllVcPlans() {
+        return demoService.getAllVcPlans();
     }
 
     @RequestMapping(value = "/api/credential-schema", method = RequestMethod.GET)

@@ -3,13 +3,14 @@ const AppState = {
   userInfo: null,
   serverSettings: null,
   vcSchemaData: null,
+  vcPlanData: null, 
   
-  // 앱 초기화 함수
+
   async init() {
     try {
       await this.loadUserInfo();
       await this.loadServerSettings();
-      await this.loadVcSchemas();
+      await this.loadVcPlans(); 
       console.log('App state initialized successfully');
       return true;
     } catch (error) {
@@ -17,8 +18,22 @@ const AppState = {
       return false;
     }
   },
-  
-  // 사용자 정보 로드
+
+  async loadVcPlans() {
+    try {
+      const response = await fetch('/demo/api/all-vc-plans');
+      if (!response.ok) throw new Error('Failed to fetch VC Plans');
+      
+      const data = await response.json();
+      this.vcPlanData = data.items || [];
+      return this.vcPlanData;
+    } catch (error) {
+      console.error('Error fetching VC plans:', error);
+      this.vcPlanData = [];
+      return [];
+    }
+  },
+
   async loadUserInfo() {
     try {
       const response = await fetch('/demo/api/user-info');
@@ -93,7 +108,6 @@ const AppState = {
   }
 };
 
-// 모바일 감지
 let isMobile = false;
 
 function checkMobile() {
@@ -102,21 +116,17 @@ function checkMobile() {
   console.log("isMobile", isMobile);
 }
 
-// 페이지 로드 시 초기화 함수
 async function initPage() {
   showLoading();
   
   try {
-    // 앱 상태 초기화
     await AppState.init();
     
-    // UI 요소 초기화
     updateUserGreeting();
-    populateVcSchemaSelect();
+    populateVcPlanSelect(); 
     populateFormWithSavedData();
     populateServerSettingsForm();
     
-    // UI 이벤트 리스너 설정
     setupEventListeners();
   } catch (error) {
     console.error('Error initializing page:', error);
@@ -125,15 +135,12 @@ async function initPage() {
   }
 }
 
-// UI 이벤트 리스너 설정
 function setupEventListeners() {
-  // 메뉴 선택 리스너
   const btnSelect = document.querySelectorAll(".btn-select");
   btnSelect.forEach((item) => {
     item.addEventListener("click", handleMenuSelection);
   });
   
-  // 탭 선택 리스너
   const btnTab = document.querySelectorAll(".btn-tab");
   btnTab.forEach((item) => {
     item.addEventListener("click", handleTabSelection);
@@ -215,24 +222,21 @@ function updateUserGreeting() {
   }
 }
 
-// VC Schema 선택 상자 채우기
-function populateVcSchemaSelect() {
-  const schemas = AppState.vcSchemaData;
-  if (!schemas || schemas.length === 0) return;
+function populateVcPlanSelect() {
+  const plans = AppState.vcPlanData;
+  if (!plans || plans.length === 0) return;
   
-  const selectElement = document.getElementById('vcSchema');
+  const selectElement = document.getElementById('vcSchema'); 
   if (!selectElement) return;
   
-  // 기존 옵션 초기화 (첫 번째 기본 옵션은 유지)
   while (selectElement.options.length > 1) {
     selectElement.remove(1);
   }
   
-  // 새 옵션 추가
-  schemas.forEach((schema, index) => {
+  plans.forEach((plan, index) => {
     const option = document.createElement('option');
-    option.value = index; // 인덱스를 값으로 사용
-    option.textContent = schema.title;
+    option.value = index;
+    option.textContent = plan.name;
     selectElement.appendChild(option);
   });
 }
@@ -395,31 +399,193 @@ function createDynamicForm(schemaIndex) {
   formsContainer.appendChild(formDiv);
 }
 
-function displayIdentificationForm() {
-  const vcSchema = document.getElementById('vcSchema').value;
-  createDynamicForm(vcSchema);
+async function displayIdentificationForm() {
+  const vcPlanSelect = document.getElementById('vcSchema');
+  const planIndex = vcPlanSelect.value;
+  
+  if (!planIndex || planIndex === "") {
+    const formsContainer = document.getElementById('identificationForms');
+    if (formsContainer) formsContainer.style.display = 'none';
+    return;
+  }
+  
+  const plan = AppState.vcPlanData[planIndex];
+  if (!plan) return;
+  
+  showLoading();
+  
+  try {
+    await createCredentialSchemaForm(plan);
+    
+    if (plan.credentialDefinition && plan.credentialDefinition.schemaId) {
+      await createCredentialDefinitionForm(plan.credentialDefinition.schemaId);
+    }
+  } catch (error) {
+    console.error('Error creating dynamic forms:', error);
+    alert('Failed to load form fields. Please try again.');
+  } finally {
+    hideLoading();
+  }
 }
 
-// 사용자 정보 저장
+async function createCredentialSchemaForm(plan) {
+  console.log(plan);
+  const schemaUrl = plan.credentialSchema.id;
+  const schemaName = extractSchemaName(schemaUrl);
+  
+  if (!schemaName) {
+    console.error('Failed to extract schema name from URL:', schemaUrl);
+    return;
+  }
+  
+  try {
+    const response = await fetch(`/demo/api/vc-schema/${schemaName}`);
+    if (!response.ok) throw new Error('Failed to fetch schema details');
+    
+    const schemaData = await response.json();
+    
+
+    const formsContainer = document.getElementById('identificationForms');
+    formsContainer.style.display = 'block';
+    formsContainer.innerHTML = ''; 
+
+    const schemaSection = document.createElement('div');
+    schemaSection.className = 'credential-section';
+    schemaSection.innerHTML = `
+      <div class="credential-section-title">${schemaData.title || 'Credential Information'}</div>
+    `;
+    
+    const inputGroupDiv = document.createElement('div');
+    inputGroupDiv.className = 'input-group';
+
+    if (schemaData.vcSchema && schemaData.vcSchema.credentialSubject && schemaData.vcSchema.credentialSubject.claims) {
+      schemaData.vcSchema.credentialSubject.claims.forEach(claim => {
+        const namespace = claim.namespace ? claim.namespace.id : '';
+        
+        if (claim.items && Array.isArray(claim.items)) {
+          claim.items.forEach(item => {
+            const inputDiv = createInputField(item, namespace, 'schema');
+            inputGroupDiv.appendChild(inputDiv);
+          });
+        }
+      });
+    }
+    
+    schemaSection.appendChild(inputGroupDiv);
+    formsContainer.appendChild(schemaSection);
+    
+  } catch (error) {
+    console.error('Error creating credential schema form:', error);
+    throw error;
+  }
+}
+
+function extractSchemaName(schemaUrl) {
+  try {
+    const url = new URL(schemaUrl);
+    const params = new URLSearchParams(url.search);
+    return params.get('name');
+  } catch (e) {
+    const match = schemaUrl.match(/name=([^&]+)/);
+    return match ? match[1] : null;
+  }
+}
+
+function createInputField(item, namespace, source) {
+  const inputDiv = document.createElement('div');
+  inputDiv.className = 'input';
+  
+  const labelP = document.createElement('p');
+  labelP.textContent = item.caption || item.label || item.id;
+  
+  const requiredSpan = document.createElement('span');
+  requiredSpan.className = 'color-error';
+  requiredSpan.textContent = '*';
+  labelP.appendChild(requiredSpan);
+  
+  inputDiv.appendChild(labelP);
+  
+  const inputElement = document.createElement('input');
+  
+  const itemType = (item.type || 'STRING').toUpperCase();
+  inputElement.type = itemType === 'NUMBER' ? 'number' : 'text';
+  
+  const fieldId = namespace ? `${namespace}.${item.label || item.id}` : (item.label || item.id);
+  
+  inputElement.id = fieldId;
+  inputElement.name = fieldId;
+  inputElement.placeholder = `Enter ${item.caption || item.label || item.id}`;
+  inputElement.required = true;
+  inputElement.setAttribute('data-source', source);
+  inputElement.setAttribute('data-caption', item.caption || item.label || item.id);
+  inputElement.setAttribute('data-namespace', namespace);
+  
+  inputDiv.appendChild(inputElement);
+  return inputDiv;
+}
+
+async function createCredentialDefinitionForm(schemaId) {
+  try {
+
+    const response = await fetch(`/demo/api/credential-schema?credentialSchemaId=${encodeURIComponent(schemaId)}`);
+    if (!response.ok) throw new Error('Failed to fetch credential definition');
+    
+    const definitionData = await response.json();
+    
+    const formsContainer = document.getElementById('identificationForms');
+    
+
+    const definitionSection = document.createElement('div');
+    definitionSection.className = 'credential-section';
+    definitionSection.style.marginTop = '20px';
+    definitionSection.innerHTML = `
+      <div class="credential-section-title">Zkp Information</div>
+    `;
+    
+    const inputGroupDiv = document.createElement('div');
+    inputGroupDiv.className = 'input-group';
+
+    if (definitionData.attrTypes && Array.isArray(definitionData.attrTypes)) {
+      definitionData.attrTypes.forEach(attrType => {
+        const namespace = attrType.namespace ? attrType.namespace.id : '';
+        
+        if (attrType.items && Array.isArray(attrType.items)) {
+          attrType.items.forEach(item => {
+            const inputDiv = createInputField(item, namespace, 'definition');
+            inputGroupDiv.appendChild(inputDiv);
+          });
+        }
+      });
+    }
+    
+    definitionSection.appendChild(inputGroupDiv);
+    formsContainer.appendChild(definitionSection);
+    
+  } catch (error) {
+    console.error('Error creating credential definition form:', error);
+  
+  }
+}
+
+// saveUserInfo 함수에서 vcPlan 정보 저장하도록 수정
 async function saveUserInfo() {
-  const schemaSelect = document.getElementById('vcSchema');
-  if (!schemaSelect) return;
+  const planSelect = document.getElementById('vcSchema');
+  if (!planSelect) return;
   
-  const schemaIndex = schemaSelect.value;
+  const planIndex = planSelect.value;
   
-  // 스키마가 선택되지 않은 경우
-  if (!schemaIndex || schemaIndex === "") {
+  if (!planIndex || planIndex === "") {
     alert('Please select a credential type');
     return;
   }
   
-  const schemas = AppState.vcSchemaData;
-  if (!schemas || !schemas[schemaIndex]) {
+  const plans = AppState.vcPlanData;
+  if (!plans || !plans[planIndex]) {
     alert('Invalid credential type');
     return;
   }
   
-  const schema = schemas[schemaIndex];
+  const plan = plans[planIndex];
   
   // 기본 사용자 정보
   const firstname = document.getElementById('firstname')?.value || '';
@@ -427,35 +593,37 @@ async function saveUserInfo() {
   const did = document.getElementById('did')?.value || '';
   const email = document.getElementById('email')?.value || '';
   
-  // 기본 유효성 검사
   if (!firstname || !lastname) {
     alert('Please enter required user information');
     return;
   }
   
-  // 사용자 정보 객체 생성
   const userInfo = {
     firstname,
     lastname,
     did,
     email,
-    vcSchemaId: schema.schemaId,
-    vcSchemaTitle: schema.title,
-    vcSchemaIndex: schemaIndex // 나중에 폼 자동 생성을 위해 인덱스 저장
+    vcPlanId: plan.vcPlanId,
+    vcPlanName: plan.name,
+    vcPlanIndex: planIndex
   };
   
   const dynamicFields = {};
   const inputs = document.querySelectorAll('#identificationForms input');
   
-  // 각 입력 필드를 순회하면서 namespace.id 형태의 키로 값을 저장
+  let hasError = false;
   inputs.forEach(input => {
+    if (input.required && !input.value) {
+      alert(`Please fill out all required fields: ${input.getAttribute('data-caption')}`);
+      hasError = true;
+      return;
+    }
     if (input.id && input.value) {
       dynamicFields[input.id] = input.value;
-    } else if (input.required) {
-      alert(`Please fill out all required fields: ${input.getAttribute('data-caption') || input.name}`);
-      throw new Error('Required fields missing');
     }
   });
+  
+  if (hasError) return;
   
   userInfo.fields = dynamicFields;
   
@@ -475,16 +643,13 @@ async function saveUserInfo() {
       throw new Error(errorData.message || 'Failed to save user information');
     }
     
-    // 로컬 상태 업데이트
     AppState.userInfo = userInfo;
     updateUserGreeting();
     
     alert('User information saved successfully!');
   } catch (error) {
     console.error('Error saving user information:', error);
-    if (error.message !== 'Required fields missing') {
-      alert('Failed to save user information. Please try again.');
-    }
+    alert('Failed to save user information. Please try again.');
   } finally {
     hideLoading();
   }
