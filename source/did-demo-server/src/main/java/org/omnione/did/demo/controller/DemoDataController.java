@@ -98,5 +98,19 @@ public class DemoDataController {
         return demoService.getVcSchema(schemaId);
     }
 
+    @RequestMapping(value = "/api/vc-plans", method = RequestMethod.GET)
+    @ResponseBody
+    public VcPlanResponseDto getVcPlans() {
+        return demoService.getVcPlans();
+    }
+
+    @RequestMapping(value = "/api/credential-schema", method = RequestMethod.GET)
+    @ResponseBody
+    public CredentialSchemaDto getCredentialSchema(@RequestParam String credentialSchemaId) {
+        return demoService.getCredentialSchema(credentialSchemaId);
+    }
+
+
+
 
 }

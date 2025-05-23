@@ -1,4 +1,4 @@
-// 앱 상태 관리를 위한 네임스페이스 객체
+
 const AppState = {
   userInfo: null,
   serverSettings: null,
@@ -395,7 +395,6 @@ function createDynamicForm(schemaIndex) {
   formsContainer.appendChild(formDiv);
 }
 
-// displayIdentificationForm 함수 - 사용자가 스키마 선택 시 호출
 function displayIdentificationForm() {
   const vcSchema = document.getElementById('vcSchema').value;
   createDynamicForm(vcSchema);

@@ -19,7 +19,7 @@ public class SaveUserInfoReqDto {
 
     private String vcSchemaId;
     private String vcSchemaTitle;
-    private String vcSchemaIndex; // 프론트엔드에서 선택한 스키마 인덱스
+    private String vcSchemaIndex;
 
     private Map<String, String> fields;
 

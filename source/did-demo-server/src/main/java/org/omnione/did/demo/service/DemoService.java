@@ -37,4 +37,7 @@ public interface DemoService {
     VcSchemaResponseDto getVcSchemas();
     VcSchemaResponseDto.VcSchemaDto getVcSchema(String schemaId);
 
+    VcPlanResponseDto getVcPlans();
+    CredentialSchemaDto getCredentialSchema(String credentialSchemaId);
+
 }

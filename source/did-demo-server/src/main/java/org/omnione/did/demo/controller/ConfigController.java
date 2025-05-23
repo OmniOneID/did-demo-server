@@ -23,11 +23,6 @@ public class ConfigController {
         return configService.getConfig();
     }
 
-    @PostMapping("/vc-plans")
-    public ResponseEntity<?> updateVcPlan(@RequestBody Map<String, String> body) {
-
-        return ResponseEntity.ok().build();
-    }
 
     @GetMapping("/vc-plans")
     public ResponseEntity<?> getVcPlan() {

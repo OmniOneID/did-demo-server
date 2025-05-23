@@ -355,7 +355,6 @@ public class DemoServiceImpl implements DemoService{
             String jsonString = listFeign.requestVcSchemaList();
             VcSchemaResponseDto vcSchemas = objectMapper.readValue(jsonString, VcSchemaResponseDto.class);
 
-            // 스키마 name 파라미터 값으로 스키마 찾기
             return vcSchemas.getVcSchemaList().stream()
                     .filter(schema -> {
                         try {
@@ -381,6 +380,27 @@ public class DemoServiceImpl implements DemoService{
 
         } catch (JsonProcessingException e) {
             throw new OpenDidException(ErrorCode.VC_SCHEMA_NOT_FOUND);
+        }
+    }
+
+    // DemoServiceImpl에 구현
+    @Override
+    public VcPlanResponseDto getVcPlans() {
+        try {
+            String jsonString = listFeign.requestVcPlanList();
+            return objectMapper.readValue(jsonString, VcPlanResponseDto.class);
+        } catch (JsonProcessingException e) {
+            throw new OpenDidException(ErrorCode.VC_PLAN_NOT_FOUND);
+        }
+    }
+
+    @Override
+    public CredentialSchemaDto getCredentialSchema(String credentialSchemaId) {
+        try {
+            String jsonString = listFeign.requestCredentialSchemaList(credentialSchemaId);
+            return objectMapper.readValue(jsonString, CredentialSchemaDto.class);
+        } catch (JsonProcessingException e) {
+            throw new OpenDidException(ErrorCode.CREDENTIAL_SCHEMA_NOT_FOUND);
         }
     }
 
