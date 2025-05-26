@@ -33,7 +33,7 @@ public interface VerifierFeign {
     @RequestMapping(value = "/api/v1/confirm-verify", method = RequestMethod.POST)
     ConfirmVerifyResDto confirmVerify(@RequestBody ConfirmVerifyReqDto confirmVerifyReqDto);
 
-    @RequestMapping(value = "/admin/v1/policies", method = RequestMethod.GET)
+    @RequestMapping(value = "/admin/v1/policies/all", method = RequestMethod.GET)
     List<VpPolicyResponseDto> getPolicies();
 
 }

@@ -402,21 +402,30 @@ function createDynamicForm(schemaIndex) {
 async function displayIdentificationForm() {
   const vcPlanSelect = document.getElementById('vcSchema');
   const planIndex = vcPlanSelect.value;
-  
+
+  // 모든 동적 섹션 숨기기
+  const schemaSection = document.getElementById('credentialSchemaSection');
+  const definitionSection = document.getElementById('credentialDefinitionSection');
+
+  if (schemaSection) schemaSection.style.display = 'none';
+  if (definitionSection) definitionSection.style.display = 'none';
+
   if (!planIndex || planIndex === "") {
-    const formsContainer = document.getElementById('identificationForms');
-    if (formsContainer) formsContainer.style.display = 'none';
     return;
   }
-  
+
   const plan = AppState.vcPlanData[planIndex];
   if (!plan) return;
-  
+
   showLoading();
-  
+
   try {
-    await createCredentialSchemaForm(plan);
-    
+    // credentialSchema 처리
+    if (plan.credentialSchema && plan.credentialSchema.id) {
+      await createCredentialSchemaForm(plan);
+    }
+
+    // credentialDefinition 처리 (있는 경우만)
     if (plan.credentialDefinition && plan.credentialDefinition.schemaId) {
       await createCredentialDefinitionForm(plan.credentialDefinition.schemaId);
     }
@@ -429,39 +438,44 @@ async function displayIdentificationForm() {
 }
 
 async function createCredentialSchemaForm(plan) {
-  console.log(plan);
+  // credentialSchema.id에서 schema name 추출
   const schemaUrl = plan.credentialSchema.id;
   const schemaName = extractSchemaName(schemaUrl);
-  
+
   if (!schemaName) {
     console.error('Failed to extract schema name from URL:', schemaUrl);
     return;
   }
-  
+
   try {
+    // VC Schema 데이터 가져오기
     const response = await fetch(`/demo/api/vc-schema/${schemaName}`);
     if (!response.ok) throw new Error('Failed to fetch schema details');
-    
+
     const schemaData = await response.json();
-    
 
-    const formsContainer = document.getElementById('identificationForms');
-    formsContainer.style.display = 'block';
-    formsContainer.innerHTML = ''; 
+    // 폼 컨테이너 준비
+    const schemaSection = document.getElementById('credentialSchemaSection');
+    if (!schemaSection) return;
 
-    const schemaSection = document.createElement('div');
-    schemaSection.className = 'credential-section';
-    schemaSection.innerHTML = `
-      <div class="credential-section-title">${schemaData.title || 'Credential Information'}</div>
-    `;
-    
+    // 섹션 초기화 및 표시
+    schemaSection.style.display = 'block';
+    schemaSection.innerHTML = '';
+
+    // 제목 추가
+    const titleDiv = document.createElement('div');
+    titleDiv.className = 'credential-section-title';
+    titleDiv.textContent = schemaData.title || 'Credential Information';
+    schemaSection.appendChild(titleDiv);
+
     const inputGroupDiv = document.createElement('div');
     inputGroupDiv.className = 'input-group';
 
+    // Schema의 claims 처리
     if (schemaData.vcSchema && schemaData.vcSchema.credentialSubject && schemaData.vcSchema.credentialSubject.claims) {
       schemaData.vcSchema.credentialSubject.claims.forEach(claim => {
         const namespace = claim.namespace ? claim.namespace.id : '';
-        
+
         if (claim.items && Array.isArray(claim.items)) {
           claim.items.forEach(item => {
             const inputDiv = createInputField(item, namespace, 'schema');
@@ -470,10 +484,9 @@ async function createCredentialSchemaForm(plan) {
         }
       });
     }
-    
+
     schemaSection.appendChild(inputGroupDiv);
-    formsContainer.appendChild(schemaSection);
-    
+
   } catch (error) {
     console.error('Error creating credential schema form:', error);
     throw error;
@@ -526,29 +539,34 @@ function createInputField(item, namespace, source) {
 
 async function createCredentialDefinitionForm(schemaId) {
   try {
-
+    // Credential Definition 데이터 가져오기
     const response = await fetch(`/demo/api/credential-schema?credentialSchemaId=${encodeURIComponent(schemaId)}`);
     if (!response.ok) throw new Error('Failed to fetch credential definition');
-    
-    const definitionData = await response.json();
-    
-    const formsContainer = document.getElementById('identificationForms');
-    
 
-    const definitionSection = document.createElement('div');
-    definitionSection.className = 'credential-section';
-    definitionSection.style.marginTop = '20px';
-    definitionSection.innerHTML = `
-      <div class="credential-section-title">Zkp Information</div>
-    `;
-    
+    const definitionData = await response.json();
+
+    // 폼 컨테이너 준비
+    const definitionSection = document.getElementById('credentialDefinitionSection');
+    if (!definitionSection) return;
+
+    // 섹션 초기화 및 표시
+    definitionSection.style.display = 'block';
+    definitionSection.innerHTML = '';
+
+    // 제목 추가 (적절한 제목으로 변경 가능)
+    const titleDiv = document.createElement('div');
+    titleDiv.className = 'credential-section-title';
+    titleDiv.textContent = 'ZKP Information'; // 또는 definitionData에서 제목 가져오기
+    definitionSection.appendChild(titleDiv);
+
     const inputGroupDiv = document.createElement('div');
     inputGroupDiv.className = 'input-group';
 
+    // attrTypes 처리
     if (definitionData.attrTypes && Array.isArray(definitionData.attrTypes)) {
       definitionData.attrTypes.forEach(attrType => {
         const namespace = attrType.namespace ? attrType.namespace.id : '';
-        
+
         if (attrType.items && Array.isArray(attrType.items)) {
           attrType.items.forEach(item => {
             const inputDiv = createInputField(item, namespace, 'definition');
@@ -557,13 +575,12 @@ async function createCredentialDefinitionForm(schemaId) {
         }
       });
     }
-    
+
     definitionSection.appendChild(inputGroupDiv);
-    formsContainer.appendChild(definitionSection);
-    
+
   } catch (error) {
     console.error('Error creating credential definition form:', error);
-  
+    // Definition이 없어도 에러로 처리하지 않음
   }
 }
 
@@ -571,33 +588,33 @@ async function createCredentialDefinitionForm(schemaId) {
 async function saveUserInfo() {
   const planSelect = document.getElementById('vcSchema');
   if (!planSelect) return;
-  
+
   const planIndex = planSelect.value;
-  
+
   if (!planIndex || planIndex === "") {
     alert('Please select a credential type');
     return;
   }
-  
+
   const plans = AppState.vcPlanData;
   if (!plans || !plans[planIndex]) {
     alert('Invalid credential type');
     return;
   }
-  
+
   const plan = plans[planIndex];
-  
+
   // 기본 사용자 정보
   const firstname = document.getElementById('firstname')?.value || '';
   const lastname = document.getElementById('lastname')?.value || '';
   const did = document.getElementById('did')?.value || '';
   const email = document.getElementById('email')?.value || '';
-  
+
   if (!firstname || !lastname) {
     alert('Please enter required user information');
     return;
   }
-  
+
   const userInfo = {
     firstname,
     lastname,
@@ -605,14 +622,19 @@ async function saveUserInfo() {
     email,
     vcPlanId: plan.vcPlanId,
     vcPlanName: plan.name,
-    vcPlanIndex: planIndex
+    vcPlanIndex: planIndex,
+    vcSchemaId: plan.credentialSchema.id,
   };
-  
+
+  // 동적 필드 수집 부분 수정
   const dynamicFields = {};
-  const inputs = document.querySelectorAll('#identificationForms input');
-  
+  const schemaInputs = document.querySelectorAll('#credentialSchemaSection input');
+  const definitionInputs = document.querySelectorAll('#credentialDefinitionSection input');
+
   let hasError = false;
-  inputs.forEach(input => {
+
+// Schema 필드 수집
+  schemaInputs.forEach(input => {
     if (input.required && !input.value) {
       alert(`Please fill out all required fields: ${input.getAttribute('data-caption')}`);
       hasError = true;
@@ -622,14 +644,26 @@ async function saveUserInfo() {
       dynamicFields[input.id] = input.value;
     }
   });
-  
+
+// Definition 필드 수집
+  definitionInputs.forEach(input => {
+    if (input.required && !input.value) {
+      alert(`Please fill out all required fields: ${input.getAttribute('data-caption')}`);
+      hasError = true;
+      return;
+    }
+    if (input.id && input.value) {
+      dynamicFields[input.id] = input.value;
+    }
+  });
+
   if (hasError) return;
-  
+
   userInfo.fields = dynamicFields;
-  
+
   try {
     showLoading();
-    
+
     const response = await fetch('/demo/api/save-user-info', {
       method: 'POST',
       headers: {
@@ -637,15 +671,15 @@ async function saveUserInfo() {
       },
       body: JSON.stringify(userInfo)
     });
-    
+
     if (!response.ok) {
       const errorData = await response.json();
       throw new Error(errorData.message || 'Failed to save user information');
     }
-    
+
     AppState.userInfo = userInfo;
     updateUserGreeting();
-    
+
     alert('User information saved successfully!');
   } catch (error) {
     console.error('Error saving user information:', error);

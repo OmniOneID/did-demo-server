@@ -238,11 +238,9 @@ public class DemoServiceImpl implements DemoService{
                     .pii(hexStringPii)
                     .build());
 
-            if(saveUserInfoReqDto.getVcSchemaId() != null && !saveUserInfoReqDto.getVcSchemaId().isEmpty()) {
+            if(saveUserInfoReqDto.getVcSchemaId() != null){
                 issuerAdminFeign.saveUserInfo(saveUserInfoReqDto);
             }
-
-
             saveUserInfoToConfig(saveUserInfoReqDto, userId, hexStringPii);
 
 
