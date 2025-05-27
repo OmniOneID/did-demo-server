@@ -11,6 +11,7 @@ import org.omnione.did.demo.api.ListFeign;
 import org.omnione.did.demo.api.VerifierFeign;
 import org.omnione.did.demo.dto.VcPlanResponseDto;
 import org.omnione.did.demo.dto.VpPolicyResponseDto;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 
@@ -27,15 +28,33 @@ import java.util.stream.Collectors;
 @Slf4j
 @Profile("!sample")
 public class ConfigService {
-    private static final String CONFIG_FILE = "src/main/resources/config/config.json";
+    @Value("${app.config.file-path}")
+    private String configFilePath;
+
     private final ObjectMapper objectMapper = new ObjectMapper();
     private final ListFeign listFeign;
     private final VerifierFeign verifierFeign;
-    private final File configFile = new File(CONFIG_FILE);
+
+    private File configFile;
 
     @PostConstruct
     public void init() {
+        this.configFile = new File(configFilePath);
+        createConfigFileIfNotExists();
         loadServerSettingsToSystemProperties();
+    }
+    private void createConfigFileIfNotExists() {
+        try {
+            if (!configFile.exists()) {
+                configFile.getParentFile().mkdirs();
+                // 빈 JSON 객체로 초기화
+                objectMapper.writerWithDefaultPrettyPrinter()
+                        .writeValue(configFile, objectMapper.createObjectNode());
+                log.info("Created config file at: {}", configFile.getAbsolutePath());
+            }
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to create config file", e);
+        }
     }
 
     public DemoDataConfig getConfig() {
