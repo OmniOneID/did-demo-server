@@ -19,17 +19,7 @@ package org.omnione.did.base.datamodel.enums;
 import com.fasterxml.jackson.annotation.JsonValue;
 
 public enum OfferType {
-    ISSUE_OFFER("IssueOffer"),
-    VERIFY_OFFER("VerifyOffer");
+    VerifyProofOffer,
+    VerifyOffer;
 
-    private final String displayName;
-
-    OfferType(String displayName) {
-        this.displayName = displayName;
-    }
-    @Override
-    @JsonValue
-    public String toString() {
-        return displayName;
-    }
 }

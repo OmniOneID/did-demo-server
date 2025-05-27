@@ -3,97 +3,63 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
-    <title>Identification Information</title>
+  <title>Identification Information</title>
   <link rel="stylesheet" href="/styles/reset.css" />
   <link rel="stylesheet" href="/styles/index.css" />
-</head>
-<style>
+  <style>
     .error-valid-message {
-        color: red;
-        font-size: 0.8em;
-        margin-top: 5px;
-        display: none;
+      color: red;
+      font-size: 0.8em;
+      margin-top: 5px;
+      display: none;
     }
-</style>
+
+    .loading-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(255, 255, 255, 0.8);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 2000;
+    }
+
+    .spinner {
+      width: 50px;
+      height: 50px;
+      border: 5px solid #f3f3f3;
+      border-top: 5px solid #2F325E;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+  </style>
+</head>
 <body>
 <div class="wrapper">
   <div id="AddInformation" class="context show">
     <div class="information-field">
       <div class="item-box" data-ref="신분증정보">
         <div class="label">
-            <p>Identification Information</p>
+          <p id="formTitle">Identification Information</p>
           <div class="divider"></div>
         </div>
 
-        <div class="input-group">
-          <div class="input">
-            <p>
-                Birthdate
-              <span class="color-error">*</span>
-            </p>
-              <input
-                      id="birthdate"
-                      type="text"
-                      placeholder="YYYY-MM-DD"
-                      pattern="\d{4}-\d{2}-\d{2}"
-                      title="Please enter a date in the format YYYY-MM-DD"
-                      required
-              />
-          </div>
-            <div id="birthdateError" class="error-valid-message"></div>
-          <div class="input">
-            <p>
-                Address
-              <span class="color-error">*</span>
-            </p>
-            <input
-                    id="address"
-                    type="text"
-                    placeholder="please enter the contents."
-                    required
-
-            />
-          </div>
-            <div id="addressError" class="error-valid-message"></div>
-          <div class="input">
-            <p>
-                License Number
-              <span class="color-error">*</span>
-            </p>
-            <input
-                    id="licenseNum"
-                    type="text"
-                    placeholder="please enter the contents."
-                    required
-
-            />
-          </div>
-            <div id="licenseNumError" class="error-valid-message"></div>
-          <div class="input">
-            <p>Issue Date
-              <span class="color-error">*</span>
-            </p>
-            <input
-                    id="issueDate"
-                    type="text"
-                    placeholder="YYYY-MM-DD"
-                    pattern="\d{4}-\d{2}-\d{2}"
-                    title="Please enter a date in the format YYYY-MM-DD"
-            />
-          </div>
-            <div id="issueDateError" class="error-valid-message"></div>
+        <div id="dynamicForm" class="input-group">
+          
         </div>
       </div>
-      <input
-              id="did"
-              type="text"
-              hidden
-      />
-        <input
-                id="userName"
-                type="text"
-                hidden
-        />
+      
+      <input id="did" type="text" hidden />
+      <input id="userName" type="text" hidden />
+      <input id="vcSchemaId" type="text" hidden />
       <p class="color-info">* Indicates required input.</p>
     </div>
 
@@ -102,6 +68,302 @@
     </div>
   </div>
 </div>
-<script src="/scripts/addVcInfo.js"></script>
+
+
+<div id="loadingOverlay" class="loading-overlay">
+  <div class="spinner"></div>
+</div>
+
+<script>
+  const isMobile = {
+    Android: () => navigator.userAgent.match(/Android/i) !== null,
+    iOS: () => navigator.userAgent.match(/iPhone|iPad|iPod/i) !== null,
+    any: function() {
+        return (this.Android() || this.iOS());
+    }
+  };  
+  
+  function getUrlParameter(name) {
+    name = name.replace(/[\[]/, '\\[').replace(/[\]]/, '\\]');
+    var regex = new RegExp('[\\?&]' + name + '=([^&#]*)');
+    var results = regex.exec(location.search);
+    return results === null ? '' : decodeURIComponent(results[1].replace(/\+/g, ' '));
+  }
+
+  // 폼 필드 유효성 검사
+  function validateField(fieldId, value) {
+    const errorElement = document.getElementById(`${fieldId}Error`);
+    if (!errorElement) return true;
+
+    if (!value || value.trim() === '') {
+      errorElement.textContent = 'This field is required';
+      errorElement.style.display = 'block';
+      return false;
+    }
+
+    errorElement.style.display = 'none';
+    return true;
+  }
+
+  function createDynamicForm(schema) {
+  const formContainer = document.getElementById('dynamicForm');
+  formContainer.innerHTML = '';
+
+  document.getElementById('formTitle').textContent = schema.title || 'Identification Information';
+
+  const allItems = [];
+  if (schema.vcSchema && schema.vcSchema.credentialSubject && schema.vcSchema.credentialSubject.claims) {
+    schema.vcSchema.credentialSubject.claims.forEach(claim => {
+      console.log(claim);
+      const namespace = claim.namespace.id || 'default';
+      
+      if (claim.items && Array.isArray(claim.items)) {
+        claim.items.forEach(item => {
+          allItems.push({
+            id: item.id,
+            namespace: namespace,
+            caption: item.caption,
+            type: item.type,
+            required: item.required !== false 
+          });
+        });
+      }
+    });
+  }
+
+
+  allItems.forEach(item => {
+    const inputDiv = document.createElement('div');
+    inputDiv.className = 'input';
+
+
+    const labelP = document.createElement('p');
+    labelP.textContent = item.caption;
+
+    if (item.required) {
+      const requiredSpan = document.createElement('span');
+      requiredSpan.className = 'color-error';
+      requiredSpan.textContent = '*';
+      labelP.appendChild(requiredSpan);
+    }
+
+    inputDiv.appendChild(labelP);
+
+
+    const inputElement = document.createElement('input');
+    inputElement.type = item.type === 'date' ? 'text' : (item.type || 'text');
+    
+    
+    const fieldId = `${item.namespace}.${item.id}`;
+    inputElement.id = fieldId;
+    inputElement.name = fieldId;
+    
+    inputElement.placeholder = `Enter ${item.caption}`;
+    inputElement.required = item.required;
+    inputElement.setAttribute('data-caption', item.caption);
+    inputElement.setAttribute('data-original-id', item.id); 
+    inputElement.setAttribute('data-namespace', item.namespace); 
+
+
+
+    inputDiv.appendChild(inputElement);
+    formContainer.appendChild(inputDiv);
+
+    const errorDiv = document.createElement('div');
+    errorDiv.id = `${fieldId}Error`;
+    errorDiv.className = 'error-valid-message';
+    formContainer.appendChild(errorDiv);
+
+
+    inputElement.addEventListener('blur', function() {
+      validateField(fieldId, this.value);
+    });
+  });
+}
+
+  async function fetchVcSchema(schemaId) {
+    try {
+      const response = await fetch(`/demo/api/vc-schema/${schemaId}`);
+      if (!response.ok) {
+        throw new Error('Failed to fetch VC Schema');
+      }
+      return await response.json();
+    } catch (error) {
+      console.error('Error fetching VC schema:', error);
+      alert('Failed to load VC Schema information. Please try again later.');
+      return null;
+    }
+  }
+
+  async function saveVcInfo() {
+  
+  const inputs = document.querySelectorAll('#dynamicForm input');
+  let isValid = true;
+  const dynamicFields = {};
+
+  inputs.forEach(input => {
+    const isFieldValid = validateField(input.id, input.value);
+    if (!isFieldValid) {
+      isValid = false;
+    }
+
+    if (input.id) {      
+      dynamicFields[input.id] = input.value;
+    }
+  });
+
+  if (!isValid) {
+    alert('Please check the form for errors and try again.');
+    return;
+  }
+
+  const did = document.getElementById('did').value;
+  const userName = document.getElementById('userName').value;
+  const vcSchemaId = document.getElementById('vcSchemaId').value;
+
+  const data = {
+    did,
+    userName,
+    vcSchemaId,
+    fields: dynamicFields
+  };  
+
+  try {
+    document.getElementById('loadingOverlay').style.display = 'flex';
+
+    const response = await fetch('/demo/api/save-user-info', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(data)    
+      }).then(response => {
+            if (!response.ok) {
+                return response.json().then(err => { throw err; });
+            }
+            return response.json();
+        })
+        .then(data => {                        
+           
+            if (document.getElementById('loadingOverlay')) {
+                document.getElementById('loadingOverlay').style.display = 'none';
+            }
+
+            if (isMobile.any()) {
+                if (isMobile.Android()) {
+                    
+                    if (window.android) {
+                        window.android.onCompletedAddVcUpload();
+                    }
+                } else if (isMobile.iOS()) {
+                   
+                    alert('information has been saved');
+                    if (window.webkit && window.webkit.messageHandlers && window.webkit.messageHandlers.onCompletedAddVcUpload) {
+                        window.webkit.messageHandlers.onCompletedAddVcUpload.postMessage("success");
+                    }
+                }
+            } else {
+                alert('information has been saved');
+            }
+        })
+        .catch(error => {         
+            console.error(error);
+
+            if (document.getElementById('loadingOverlay')) {
+                document.getElementById('loadingOverlay').style.display = 'none';
+            }
+
+            if (isMobile.any()) {
+                if (isMobile.Android()) {
+                    
+                    if (window.android) {
+                        window.android.onFailedAddVcUpload();
+                    }
+                } else if (isMobile.iOS()) {
+                   
+                    alert('Failed to save ID information');
+                    if (window.webkit && window.webkit.messageHandlers && window.webkit.messageHandlers.onFailedAddVcUpload) {
+                        window.webkit.messageHandlers.onFailedAddVcUpload.postMessage("failed");
+                    }
+                }
+            } else {
+                alert(error.message || 'Failed to save ID information');
+            }
+        });
+
+      if (!response.ok) {
+        throw new Error('Failed to save VC information');
+      }
+
+    } catch (error) {
+      console.error('Error saving VC information:', error);
+      alert('Failed to save information. Please try again.');
+    } finally {
+     
+      document.getElementById('loadingOverlay').style.display = 'none';
+    }
+  }
+
+
+  document.addEventListener('DOMContentLoaded', async function() {
+  
+    const did = getUrlParameter('did');
+    const userName = getUrlParameter('userName');
+    const vcSchemaId = getUrlParameter('vcSchemaId');
+
+    if (did) document.getElementById('did').value = did;
+    if (userName) document.getElementById('userName').value = userName;
+    if (vcSchemaId) document.getElementById('vcSchemaId').value = vcSchemaId;
+
+    if (vcSchemaId) {
+
+      const schema = await fetchVcSchema(vcSchemaId);
+      if (schema) {
+
+        createDynamicForm(schema);
+
+        document.getElementById('loadingOverlay').style.display = 'none';
+      }
+    } else {
+
+      const defaultForm = `
+        <div class="input">
+          <p>Birthdate<span class="color-error">*</span></p>
+          <input id="birthdate" type="text" placeholder="YYYY-MM-DD" required />
+        </div>
+        <div id="birthdateError" class="error-valid-message"></div>
+
+        <div class="input">
+          <p>Address<span class="color-error">*</span></p>
+          <input id="address" type="text" placeholder="please enter the contents." required />
+        </div>
+        <div id="addressError" class="error-valid-message"></div>
+
+        <div class="input">
+          <p>License Number<span class="color-error">*</span></p>
+          <input id="licenseNum" type="text" placeholder="please enter the contents." required />
+        </div>
+        <div id="licenseNumError" class="error-valid-message"></div>
+
+        <div class="input">
+          <p>Issue Date<span class="color-error">*</span></p>
+          <input id="issueDate" type="text" placeholder="YYYY-MM-DD" required />
+        </div>
+        <div id="issueDateError" class="error-valid-message"></div>
+      `;
+
+      document.getElementById('dynamicForm').innerHTML = defaultForm;
+
+
+      document.getElementById('loadingOverlay').style.display = 'none';
+
+      document.querySelectorAll('#dynamicForm input').forEach(input => {
+        input.addEventListener('blur', function() {
+          validateField(this.id, this.value);
+        });
+      });
+    }
+  });
+</script>
 </body>
 </html>

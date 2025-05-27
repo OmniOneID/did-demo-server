@@ -22,8 +22,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.omnione.did.demo.dto.*;
 import org.omnione.did.demo.service.DemoService;
 import org.springframework.web.bind.annotation.*;
-
 import java.io.IOException;
+
 
 /**
  * Demo data controller for handling Verifiable Credentials (VCs) and Verifiable Presentations (VPs)
@@ -63,7 +63,6 @@ public class DemoDataController {
         return demoService.vcOfferEmail(requestVcOfferReqDto);
     }
 
-
     @RequestMapping(value = "/api/save-user-info", method = RequestMethod.POST)
     @ResponseBody
     public SaveUserInfoResDto saveUserInfo(@RequestBody SaveUserInfoReqDto saveUserInfoReqDto) {
@@ -87,7 +86,29 @@ public class DemoDataController {
     public ConfirmVerifyResDto confirmVerify(@RequestBody ConfirmVerifyReqDto confirmVerifyReqDto) {
         return demoService.confirmVerify(confirmVerifyReqDto);
     }
+    @RequestMapping(value = "/api/vc-schemas", method = RequestMethod.GET)
+    @ResponseBody
+    public VcSchemaResponseDto getVcSchemas() {
+        return demoService.getVcSchemas();
+    }
 
+    @RequestMapping(value = "/api/vc-schema/{schemaId}", method = RequestMethod.GET)
+    @ResponseBody
+    public VcSchemaResponseDto.VcSchemaDto getVcSchema(@PathVariable("schemaId") String schemaId) {
+        return demoService.getVcSchema(schemaId);
+    }
+
+    @RequestMapping(value = "/api/all-vc-plans", method = RequestMethod.GET)
+    @ResponseBody
+    public VcPlanResponseDto getAllVcPlans() {
+        return demoService.getAllVcPlans();
+    }
+
+    @RequestMapping(value = "/api/credential-schema", method = RequestMethod.GET)
+    @ResponseBody
+    public CredentialSchemaDto getCredentialSchema(@RequestParam String credentialSchemaId) {
+        return demoService.getCredentialSchema(credentialSchemaId);
+    }
 
 
 

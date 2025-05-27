@@ -6,10 +6,10 @@ plugins {
 }
 
 group = 'org.omnione.did.demo'
-version = '1.0.1'
+version = '2.0.0'
 
 java {
-    sourceCompatibility = '17'
+    sourceCompatibility = '21'
 }
 
 configurations {
