@@ -1,11 +1,17 @@
 package org.omnione.did.demo.controller;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.omnione.did.base.config.ConfigService;
 import org.omnione.did.base.config.DemoDataConfig;
 import org.omnione.did.demo.dto.ServerSettingsDto;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.HttpServerErrorException;
+import org.springframework.web.client.ResourceAccessException;
+import org.springframework.web.client.RestTemplate;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -15,6 +21,7 @@ import java.util.Map;
 @RestController
 @RequestMapping("/demo/api")
 @RequiredArgsConstructor
+@Slf4j
 public class ConfigController {
     private final ConfigService configService;
 
@@ -71,16 +78,54 @@ public class ConfigController {
 
         Map<String, Object> result = new HashMap<>();
         List<Map<String, Object>> results = new ArrayList<>();
+        boolean allSuccess = true;
 
-        results.add(Map.of("server", "TAS Server", "success", true));
-        results.add(Map.of("server", "Issuer Server", "success", true));
-        results.add(Map.of("server", "CA Server", "success", true));
-        results.add(Map.of("server", "Verifier Server", "success", true));
+        results.add(testServerConnection("TAS Server", dto.getTasServer()));
+        results.add(testServerConnection("Issuer Server", dto.getIssuerServer()));
+        results.add(testServerConnection("CA Server", dto.getCaServer()));
+        results.add(testServerConnection("Verifier Server", dto.getVerifierServer()));
+
+        allSuccess = results.stream().allMatch(r -> (Boolean) r.get("success"));
 
         result.put("results", results);
-        result.put("allSuccess", true);
+        result.put("allSuccess", allSuccess);
 
         return ResponseEntity.ok(result);
+    }
+
+    private Map<String, Object> testServerConnection(String serverName, String baseUrl) {
+        Map<String, Object> result = new HashMap<>();
+        result.put("server", serverName);
+
+        try {
+            RestTemplate restTemplate = new RestTemplate();
+
+            SimpleClientHttpRequestFactory factory = new SimpleClientHttpRequestFactory();
+            factory.setConnectTimeout(3000);
+            factory.setReadTimeout(3000);
+            restTemplate.setRequestFactory(factory);
+
+            restTemplate.headForHeaders(baseUrl);
+
+            result.put("success", true);
+            result.put("message", "Connection successful");
+
+        } catch (ResourceAccessException e) {
+            result.put("success", false);
+            result.put("message", "Connection failed: Server unreachable");
+            log.warn("Connection test failed for {}: {}", serverName, e.getMessage());
+
+        } catch (HttpClientErrorException | HttpServerErrorException e) {
+            result.put("success", true);
+            result.put("message", "Connection successful (Server responded)");
+
+        } catch (Exception e) {
+            result.put("success", false);
+            result.put("message", "Connection failed: " + e.getMessage());
+            log.error("Unexpected error testing connection for {}", serverName, e);
+        }
+
+        return result;
     }
 
     @GetMapping("/user-info")
