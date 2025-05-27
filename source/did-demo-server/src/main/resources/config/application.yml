@@ -9,7 +9,7 @@ spring:
           - spring-docs
           - demo
   jackson:
-    default-property-inclusion: non-null
+    default-property-inclusion: non_null
 
 tas:
   url: http://127.0.0.1:8090
