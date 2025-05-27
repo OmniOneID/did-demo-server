@@ -12,7 +12,6 @@ import org.omnione.did.demo.api.VerifierFeign;
 import org.omnione.did.demo.dto.VcPlanResponseDto;
 import org.omnione.did.demo.dto.VpPolicyResponseDto;
 import org.springframework.context.annotation.Profile;
-import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
@@ -28,38 +27,14 @@ import java.util.stream.Collectors;
 @Slf4j
 @Profile("!sample")
 public class ConfigService {
+    private static final String CONFIG_FILE = "src/main/resources/config/config.json";
     private final ObjectMapper objectMapper = new ObjectMapper();
     private final ListFeign listFeign;
     private final VerifierFeign verifierFeign;
-    private static final String CONFIG_FILE = "config/config.json";
-    private File configFile; // final 제거
+    private final File configFile = new File(CONFIG_FILE);
 
     @PostConstruct
     public void init() {
-<<<<<<< Updated upstream
-        try {
-            ClassPathResource resource = new ClassPathResource(CONFIG_FILE);
-            this.configFile = resource.getFile();
-
-            if (!configFile.exists()) {
-                configFile.getParentFile().mkdirs();
-                configFile.createNewFile();
-
-                // 초기 JSON 구조 생성
-                ObjectNode initialConfig = objectMapper.createObjectNode();
-                initialConfig.putArray("vcPlans");
-                initialConfig.putArray("vpPolicies");
-                initialConfig.putObject("serverSettings");
-                initialConfig.putObject("userInfo");
-                objectMapper.writerWithDefaultPrettyPrinter().writeValue(configFile, initialConfig);
-            }
-        } catch (IOException e) {
-            log.error("Failed to create config file", e);
-            throw new RuntimeException("Failed to initialize config file", e);
-        }
-
-=======
->>>>>>> Stashed changes
         loadServerSettingsToSystemProperties();
     }
 
@@ -228,6 +203,9 @@ public class ConfigService {
         }
     }
 
+    /**
+     * config.json의 serverSettings를 System Property로 설정
+     */
     private void loadServerSettingsToSystemProperties() {
         Map<String, String> serverSettings = getServerSettings();
 
