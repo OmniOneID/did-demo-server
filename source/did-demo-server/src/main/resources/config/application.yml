@@ -15,13 +15,13 @@ tas:
   url: http://127.0.0.1:8090
 
 issuer:
-  url: http://127.0.0.1:8091/issuer
+  url: http://127.0.0.1:8091
 
 verifier:
-  url: http://127.0.0.1:8092/verifier
+  url: http://127.0.0.1:8092
 
 cas:
-  url: http://127.0.0.1:8094/cas
+  url: http://127.0.0.1:8094
 
 server:
   port: 8099

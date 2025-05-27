@@ -4,7 +4,7 @@ document.getElementById("vpSubmitButton").addEventListener("click", function(eve
 
     if (vcPopup && !vcPopup.closed) {
         vcPopup.focus();
-        vcPopup.document.body.innerHTML = ''; // 기존 내용을 지움
+        vcPopup.document.body.innerHTML = ''; 
     } else {
         vcPopup = window.open('/vpPopup', 'popupWindow', 'width=700,height=900,scrollbars=yes');
     }

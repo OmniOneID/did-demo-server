@@ -51,6 +51,7 @@ public class ConfigService {
                 throw new RuntimeException("Failed to initialize config file", e);
             }
         }
+        loadServerSettingsToSystemProperties();
     }
 
     public DemoDataConfig getConfig() {
@@ -147,6 +148,14 @@ public class ConfigService {
             configNode.set("serverSettings", serverSettings);
 
             objectMapper.writerWithDefaultPrettyPrinter().writeValue(configFile, configNode);
+
+            setSystemPropertyIfNotEmpty(tasServer, "tas.url");
+            setSystemPropertyIfNotEmpty(issuerServer, "issuer.url");
+            setSystemPropertyIfNotEmpty(caServer, "cas.url");
+            setSystemPropertyIfNotEmpty(verifierServer, "verifier.url");
+
+            log.info("Server settings updated in both config.json and system properties");
+
         } catch (IOException e) {
             throw new RuntimeException("Failed to update server settings", e);
         }
@@ -209,4 +218,33 @@ public class ConfigService {
             throw new RuntimeException("Failed to get user information", e);
         }
     }
+
+    /**
+     * config.json의 serverSettings를 System Property로 설정
+     */
+    private void loadServerSettingsToSystemProperties() {
+        try {
+            Map<String, String> serverSettings = getServerSettings();
+
+            setSystemPropertyIfNotEmpty(serverSettings.get("tasServer"), "tas.url");
+            setSystemPropertyIfNotEmpty(serverSettings.get("issuerServer"), "issuer.url");
+            setSystemPropertyIfNotEmpty(serverSettings.get("verifierServer"), "verifier.url");
+            setSystemPropertyIfNotEmpty(serverSettings.get("caServer"), "cas.url");
+
+            log.info("Server settings loaded from config.json to system properties");
+
+        } catch (Exception e) {
+            log.warn("Failed to load server settings from config.json, using default yml values", e);
+        }
+    }
+
+    private void setSystemPropertyIfNotEmpty(String value, String systemPropertyKey) {
+        if (value != null && !value.trim().isEmpty()) {
+            System.setProperty(systemPropertyKey, value.trim());
+            log.info("Set {} = {}", systemPropertyKey, value.trim());
+        }
+    }
+
+
+
 }

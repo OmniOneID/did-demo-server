@@ -53,10 +53,10 @@
         </div>
 
         <div id="dynamicForm" class="input-group">
-          <!-- 동적으로 폼이 여기에 생성됩니다 -->
+          
         </div>
       </div>
-      <!-- 히든 필드 -->
+      
       <input id="did" type="text" hidden />
       <input id="userName" type="text" hidden />
       <input id="vcSchemaId" type="text" hidden />
@@ -69,7 +69,7 @@
   </div>
 </div>
 
-<!-- 로딩 인디케이터 -->
+
 <div id="loadingOverlay" class="loading-overlay">
   <div class="spinner"></div>
 </div>
@@ -82,7 +82,7 @@
         return (this.Android() || this.iOS());
     }
   };  
-  // URL에서 파라미터를 가져오는 함수
+  
   function getUrlParameter(name) {
     name = name.replace(/[\[]/, '\\[').replace(/[\]]/, '\\]');
     var regex = new RegExp('[\\?&]' + name + '=([^&#]*)');
@@ -95,7 +95,6 @@
     const errorElement = document.getElementById(`${fieldId}Error`);
     if (!errorElement) return true;
 
-    // 필드별 유효성 검사 규칙
     if (!value || value.trim() === '') {
       errorElement.textContent = 'This field is required';
       errorElement.style.display = 'block';
@@ -106,15 +105,12 @@
     return true;
   }
 
-  // 동적 폼 생성 함수
   function createDynamicForm(schema) {
   const formContainer = document.getElementById('dynamicForm');
-  formContainer.innerHTML = ''; // 기존 내용 초기화
+  formContainer.innerHTML = '';
 
-  // 폼 제목 업데이트
   document.getElementById('formTitle').textContent = schema.title || 'Identification Information';
 
-  // 모든 claims 내의 모든 items를 추출
   const allItems = [];
   if (schema.vcSchema && schema.vcSchema.credentialSubject && schema.vcSchema.credentialSubject.claims) {
     schema.vcSchema.credentialSubject.claims.forEach(claim => {
@@ -125,26 +121,25 @@
         claim.items.forEach(item => {
           allItems.push({
             id: item.id,
-            namespace: namespace, // 네임스페이스 추가
+            namespace: namespace,
             caption: item.caption,
             type: item.type,
-            required: item.required !== false // 기본적으로 필수로 가정
+            required: item.required !== false 
           });
         });
       }
     });
   }
 
-  // 입력 필드 생성
+
   allItems.forEach(item => {
     const inputDiv = document.createElement('div');
     inputDiv.className = 'input';
 
-    // 라벨 생성
+
     const labelP = document.createElement('p');
     labelP.textContent = item.caption;
 
-    // 필수 표시
     if (item.required) {
       const requiredSpan = document.createElement('span');
       requiredSpan.className = 'color-error';
@@ -154,11 +149,11 @@
 
     inputDiv.appendChild(labelP);
 
-    // 입력 요소 생성
+
     const inputElement = document.createElement('input');
     inputElement.type = item.type === 'date' ? 'text' : (item.type || 'text');
     
-    // 네임스페이스가 있는 ID 생성
+    
     const fieldId = `${item.namespace}.${item.id}`;
     inputElement.id = fieldId;
     inputElement.name = fieldId;
@@ -166,20 +161,14 @@
     inputElement.placeholder = `Enter ${item.caption}`;
     inputElement.required = item.required;
     inputElement.setAttribute('data-caption', item.caption);
-    inputElement.setAttribute('data-original-id', item.id); // 원본 ID 저장
-    inputElement.setAttribute('data-namespace', item.namespace); // 네임스페이스 저장
+    inputElement.setAttribute('data-original-id', item.id); 
+    inputElement.setAttribute('data-namespace', item.namespace); 
 
-    // 날짜 형식 필드에 대한 속성 추가
-    // if (item.type === 'date') {
-    //   inputElement.pattern = "\\d{4}-\\d{2}-\\d{2}";
-    //   inputElement.title = "Please enter a date in the format YYYY-MM-DD";
-    //   inputElement.placeholder = "YYYY-MM-DD";
-    // }
+
 
     inputDiv.appendChild(inputElement);
     formContainer.appendChild(inputDiv);
 
-    // 에러 메시지 요소 추가
     const errorDiv = document.createElement('div');
     errorDiv.id = `${fieldId}Error`;
     errorDiv.className = 'error-valid-message';
@@ -192,7 +181,6 @@
   });
 }
 
-  // VC Schema 가져오기
   async function fetchVcSchema(schemaId) {
     try {
       const response = await fetch(`/demo/api/vc-schema/${schemaId}`);
@@ -207,15 +195,12 @@
     }
   }
 
-  // 데이터 저장
   async function saveVcInfo() {
-  
   
   const inputs = document.querySelectorAll('#dynamicForm input');
   let isValid = true;
   const dynamicFields = {};
 
-  // 각 필드의 유효성 검사
   inputs.forEach(input => {
     const isFieldValid = validateField(input.id, input.value);
     if (!isFieldValid) {
@@ -232,7 +217,6 @@
     return;
   }
 
-  // 기본 필드 값 가져오기
   const did = document.getElementById('did').value;
   const userName = document.getElementById('userName').value;
   const vcSchemaId = document.getElementById('vcSchemaId').value;
@@ -260,19 +244,19 @@
             return response.json();
         })
         .then(data => {                        
-            // 로딩 숨기기
+           
             if (document.getElementById('loadingOverlay')) {
                 document.getElementById('loadingOverlay').style.display = 'none';
             }
 
             if (isMobile.any()) {
                 if (isMobile.Android()) {
-                    // Android 네이티브 앱에 완료 메시지 전송
+                    
                     if (window.android) {
                         window.android.onCompletedAddVcUpload();
                     }
                 } else if (isMobile.iOS()) {
-                    // iOS 네이티브 앱에 완료 메시지 전송
+                   
                     alert('information has been saved');
                     if (window.webkit && window.webkit.messageHandlers && window.webkit.messageHandlers.onCompletedAddVcUpload) {
                         window.webkit.messageHandlers.onCompletedAddVcUpload.postMessage("success");
@@ -285,19 +269,18 @@
         .catch(error => {         
             console.error(error);
 
-            // 로딩 숨기기
             if (document.getElementById('loadingOverlay')) {
                 document.getElementById('loadingOverlay').style.display = 'none';
             }
 
             if (isMobile.any()) {
                 if (isMobile.Android()) {
-                    // Android 네이티브 앱에 실패 메시지 전송
+                    
                     if (window.android) {
                         window.android.onFailedAddVcUpload();
                     }
                 } else if (isMobile.iOS()) {
-                    // iOS 네이티브 앱에 실패 메시지 전송
+                   
                     alert('Failed to save ID information');
                     if (window.webkit && window.webkit.messageHandlers && window.webkit.messageHandlers.onFailedAddVcUpload) {
                         window.webkit.messageHandlers.onFailedAddVcUpload.postMessage("failed");
@@ -316,34 +299,33 @@
       console.error('Error saving VC information:', error);
       alert('Failed to save information. Please try again.');
     } finally {
-      // 로딩 인디케이터 숨기기
+     
       document.getElementById('loadingOverlay').style.display = 'none';
     }
   }
 
-  // 페이지 로드 시 실행
+
   document.addEventListener('DOMContentLoaded', async function() {
-    // URL 파라미터 가져오기
+  
     const did = getUrlParameter('did');
     const userName = getUrlParameter('userName');
     const vcSchemaId = getUrlParameter('vcSchemaId');
 
-    // 히든 필드에 값 설정
     if (did) document.getElementById('did').value = did;
     if (userName) document.getElementById('userName').value = userName;
     if (vcSchemaId) document.getElementById('vcSchemaId').value = vcSchemaId;
 
     if (vcSchemaId) {
-      // VC Schema 정보 가져오기
+
       const schema = await fetchVcSchema(vcSchemaId);
       if (schema) {
-        // 동적 폼 생성
+
         createDynamicForm(schema);
-        // 로딩 인디케이터 숨기기
+
         document.getElementById('loadingOverlay').style.display = 'none';
       }
     } else {
-      // 기본 NationalId 폼 표시 (스키마 ID가 없는 경우)
+
       const defaultForm = `
         <div class="input">
           <p>Birthdate<span class="color-error">*</span></p>

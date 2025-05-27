@@ -16,20 +16,18 @@
 
 package org.omnione.did.demo.api;
 
-import org.omnione.did.demo.dto.IssueVcResultResDto;
 import org.omnione.did.demo.dto.SaveUserInfoReqDto;
-import org.omnione.did.demo.dto.SaveVcInfoReqDto;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
+
 
 /**
  * The IssuerFeign interface is a Feign client that provides endpoints for saving user information and vc information.
  * It is used to communicate with the Issuer service.
  */
-@FeignClient(value = "IssuerAdmin", url = "${issuer.url}", path = "/admin/v1")
+@FeignClient(value = "IssuerAdmin", url = "${issuer.url}", path = "/issuer/admin/v1")
 public interface IssuerAdminFeign {
     @RequestMapping(value = "/users/demo", method = RequestMethod.POST)
     void saveUserInfo(@RequestBody SaveUserInfoReqDto saveUserInfoReqDto);

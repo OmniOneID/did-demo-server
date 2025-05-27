@@ -250,13 +250,15 @@ public class DemoServiceImpl implements DemoService{
                     .build();
 
         } catch (JsonProcessingException e) {
-            log.error("Json Processing error : " + e.getMessage());
+            log.error("Json Processing error : {}", e.getMessage());
             throw new OpenDidException(ErrorCode.JSON_PROCESSING_ERROR);
         } catch (Exception e) {
             log.error("saveUserInfo error : {}", e.getMessage());
             throw new OpenDidException(ErrorCode.VC_SAVE_FAILED);
         }
     }
+
+
     private void saveUserInfoToConfig(SaveUserInfoReqDto dto, String userId, String pii) {
         try {
             Map<String, Object> userInfoMap = new HashMap<>();
@@ -278,7 +280,6 @@ public class DemoServiceImpl implements DemoService{
             configService.saveUserInfo(userInfoMap);
 
         } catch (Exception e) {
-            // config.json 저장 실패해도 전체 프로세스는 계속 진행
             log.error("Failed to save user information to config.json: {}", e.getMessage());
         }
     }
@@ -356,7 +357,6 @@ public class DemoServiceImpl implements DemoService{
             return vcSchemas.getVcSchemaList().stream()
                     .filter(schema -> {
                         try {
-                            // URL에서 name 파라미터 추출
                             URL url = new URL(schema.getSchemaId());
                             String queryParams = url.getQuery();
                             if (queryParams != null) {

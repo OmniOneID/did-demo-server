@@ -46,12 +46,12 @@ const AppState = {
       return this.userInfo;
     } catch (error) {
       console.error('Error loading user information:', error);
-      this.userInfo = {}; // 기본값 설정
+      this.userInfo = {}; 
       return null;
     }
   },
   
-  // 서버 설정 로드
+  
   async loadServerSettings() {
     try {
       const response = await fetch('/demo/api/server-settings');
@@ -64,12 +64,12 @@ const AppState = {
       return this.serverSettings;
     } catch (error) {
       console.error('Error loading server settings:', error);
-      this.serverSettings = {}; // 기본값 설정
+      this.serverSettings = {}; 
       return null;
     }
   },
   
-  // VC Schema 데이터 로드
+  
   async loadVcSchemas() {
     try {
       const response = await fetch('/demo/api/vc-schemas');
@@ -85,7 +85,7 @@ const AppState = {
     }
   },
   
-  // getter 메서드들
+  
   getDid() {
     return this.userInfo?.did || '';
   },
@@ -146,14 +146,14 @@ function setupEventListeners() {
     item.addEventListener("click", handleTabSelection);
   });
   
-  // VC Schema 변경 리스너
+  
   const vcSchemaSelect = document.getElementById('vcSchema');
   if (vcSchemaSelect) {
     vcSchemaSelect.addEventListener('change', displayIdentificationForm);
   }
 }
 
-// 메뉴 선택 처리
+
 function handleMenuSelection(e) {
   const btnSelect = document.querySelectorAll(".btn-select");
   const context = document.querySelector(".context");
@@ -188,7 +188,7 @@ function handleMenuSelection(e) {
   });
 }
 
-// 탭 선택 처리
+
 function handleTabSelection(e) {
   const btnTab = document.querySelectorAll(".btn-tab");
   btnTab.forEach((btn) => {
@@ -209,7 +209,7 @@ function handleTabSelection(e) {
   });
 }
 
-// 사용자 환영 메시지 업데이트
+
 function updateUserGreeting() {
   const greetingElement = document.getElementById('userGreeting');
   if (!greetingElement) return;
@@ -241,12 +241,12 @@ function populateVcPlanSelect() {
   });
 }
 
-// 저장된 사용자 정보로 폼 채우기
+
 function populateFormWithSavedData() {
   const userInfo = AppState.userInfo;
   if (!userInfo || !userInfo.firstname) return;
   
-  // 기본 사용자 정보 채우기
+
   const firstnameInput = document.getElementById('firstname');
   const lastnameInput = document.getElementById('lastname');
   const didInput = document.getElementById('did');
@@ -257,7 +257,7 @@ function populateFormWithSavedData() {
   if (didInput) didInput.value = userInfo.did || '';
   if (emailInput) emailInput.value = userInfo.email || '';
   
-  // 스키마 선택 및 동적 폼 생성
+  
   if (userInfo.vcSchemaId && AppState.vcSchemaData) {
     let schemaIndex = userInfo.vcSchemaIndex;
     
@@ -272,7 +272,7 @@ function populateFormWithSavedData() {
         selectElement.value = schemaIndex;
         createDynamicForm(schemaIndex);
         
-        // 필드 값 채우기
+        
         setTimeout(() => {
           if (userInfo.fields) {
             Object.keys(userInfo.fields).forEach(key => {
@@ -288,7 +288,7 @@ function populateFormWithSavedData() {
   }
 }
 
-// 서버 설정 폼 채우기
+
 function populateServerSettingsForm() {
   const settings = AppState.serverSettings;
   if (!settings) return;
@@ -314,11 +314,11 @@ function populateServerSettingsForm() {
   }
 }
 
-// 동적 폼 생성
+
 function createDynamicForm(schemaIndex) {
   const schemas = AppState.vcSchemaData;
   
-  // 선택된 스키마가 없거나 잘못된 경우 처리
+
   if (!schemas || schemaIndex === "" || !schemas[schemaIndex]) {
     const formsContainer = document.getElementById('identificationForms');
     if (formsContainer) formsContainer.style.display = 'none';
@@ -329,15 +329,15 @@ function createDynamicForm(schemaIndex) {
   const formsContainer = document.getElementById('identificationForms');
   if (!formsContainer) return;
   
-  // 폼 컨테이너 표시
-  formsContainer.style.display = 'block';
-  formsContainer.innerHTML = ''; // 기존 내용 초기화
   
-  // 폼 생성
+  formsContainer.style.display = 'block';
+  formsContainer.innerHTML = ''; 
+  
+  
   const formDiv = document.createElement('div');
   formDiv.className = 'identification-form';
   
-  // 제목 추가
+  
   const titleDiv = document.createElement('div');
   titleDiv.className = 'label';
   titleDiv.innerHTML = `
@@ -346,14 +346,14 @@ function createDynamicForm(schemaIndex) {
   `;
   formDiv.appendChild(titleDiv);
   
-  // 입력 필드 그룹 생성
+  
   const inputGroupDiv = document.createElement('div');
   inputGroupDiv.className = 'input-group';
   
-  // 모든 클레임과 네임스페이스 정보 수집
+  
   if (schema.vcSchema && schema.vcSchema.credentialSubject && schema.vcSchema.credentialSubject.claims) {
     schema.vcSchema.credentialSubject.claims.forEach(claim => {
-      // 네임스페이스 정보 가져오기
+      
       const namespace = claim.namespace ? claim.namespace.id : '';
       
       if (claim.items && Array.isArray(claim.items)) {
@@ -361,11 +361,11 @@ function createDynamicForm(schemaIndex) {
           const inputDiv = document.createElement('div');
           inputDiv.className = 'input';
           
-          // 라벨 생성
+          
           const labelP = document.createElement('p');
           labelP.textContent = item.caption || item.id;
           
-          // 필수 표시 (모든 필드를 필수로 가정)
+          
           const requiredSpan = document.createElement('span');
           requiredSpan.className = 'color-error';
           requiredSpan.textContent = '*';
@@ -373,11 +373,11 @@ function createDynamicForm(schemaIndex) {
           
           inputDiv.appendChild(labelP);
           
-          // 입력 요소 생성
+          
           const inputElement = document.createElement('input');
           inputElement.type = item.type === 'number' ? 'number' : 'text';
           
-          // 중요: ID를 namespace.id 형태로 설정
+          
           const fieldId = namespace ? `${namespace}.${item.id}` : item.id;
           
           inputElement.id = fieldId;
@@ -403,7 +403,7 @@ async function displayIdentificationForm() {
   const vcPlanSelect = document.getElementById('vcSchema');
   const planIndex = vcPlanSelect.value;
 
-  // 모든 동적 섹션 숨기기
+  
   const schemaSection = document.getElementById('credentialSchemaSection');
   const definitionSection = document.getElementById('credentialDefinitionSection');
 
@@ -420,12 +420,12 @@ async function displayIdentificationForm() {
   showLoading();
 
   try {
-    // credentialSchema 처리
+    
     if (plan.credentialSchema && plan.credentialSchema.id) {
       await createCredentialSchemaForm(plan);
     }
 
-    // credentialDefinition 처리 (있는 경우만)
+    
     if (plan.credentialDefinition && plan.credentialDefinition.schemaId) {
       await createCredentialDefinitionForm(plan.credentialDefinition.schemaId);
     }
@@ -438,7 +438,7 @@ async function displayIdentificationForm() {
 }
 
 async function createCredentialSchemaForm(plan) {
-  // credentialSchema.id에서 schema name 추출
+  
   const schemaUrl = plan.credentialSchema.id;
   const schemaName = extractSchemaName(schemaUrl);
 
@@ -448,21 +448,21 @@ async function createCredentialSchemaForm(plan) {
   }
 
   try {
-    // VC Schema 데이터 가져오기
+    
     const response = await fetch(`/demo/api/vc-schema/${schemaName}`);
     if (!response.ok) throw new Error('Failed to fetch schema details');
 
     const schemaData = await response.json();
 
-    // 폼 컨테이너 준비
+    
     const schemaSection = document.getElementById('credentialSchemaSection');
     if (!schemaSection) return;
 
-    // 섹션 초기화 및 표시
+    
     schemaSection.style.display = 'block';
     schemaSection.innerHTML = '';
 
-    // 제목 추가
+    
     const titleDiv = document.createElement('div');
     titleDiv.className = 'credential-section-title';
     titleDiv.textContent = schemaData.title || 'Credential Information';
@@ -471,7 +471,7 @@ async function createCredentialSchemaForm(plan) {
     const inputGroupDiv = document.createElement('div');
     inputGroupDiv.className = 'input-group';
 
-    // Schema의 claims 처리
+    
     if (schemaData.vcSchema && schemaData.vcSchema.credentialSubject && schemaData.vcSchema.credentialSubject.claims) {
       schemaData.vcSchema.credentialSubject.claims.forEach(claim => {
         const namespace = claim.namespace ? claim.namespace.id : '';
@@ -539,30 +539,30 @@ function createInputField(item, namespace, source) {
 
 async function createCredentialDefinitionForm(schemaId) {
   try {
-    // Credential Definition 데이터 가져오기
+  
     const response = await fetch(`/demo/api/credential-schema?credentialSchemaId=${encodeURIComponent(schemaId)}`);
     if (!response.ok) throw new Error('Failed to fetch credential definition');
 
     const definitionData = await response.json();
 
-    // 폼 컨테이너 준비
+
     const definitionSection = document.getElementById('credentialDefinitionSection');
     if (!definitionSection) return;
 
-    // 섹션 초기화 및 표시
+
     definitionSection.style.display = 'block';
     definitionSection.innerHTML = '';
 
-    // 제목 추가 (적절한 제목으로 변경 가능)
+ 
     const titleDiv = document.createElement('div');
     titleDiv.className = 'credential-section-title';
-    titleDiv.textContent = 'ZKP Information'; // 또는 definitionData에서 제목 가져오기
+    titleDiv.textContent = 'ZKP Information'; 
     definitionSection.appendChild(titleDiv);
 
     const inputGroupDiv = document.createElement('div');
     inputGroupDiv.className = 'input-group';
 
-    // attrTypes 처리
+
     if (definitionData.attrTypes && Array.isArray(definitionData.attrTypes)) {
       definitionData.attrTypes.forEach(attrType => {
         const namespace = attrType.namespace ? attrType.namespace.id : '';
@@ -580,11 +580,10 @@ async function createCredentialDefinitionForm(schemaId) {
 
   } catch (error) {
     console.error('Error creating credential definition form:', error);
-    // Definition이 없어도 에러로 처리하지 않음
   }
 }
 
-// saveUserInfo 함수에서 vcPlan 정보 저장하도록 수정
+
 async function saveUserInfo() {
   const planSelect = document.getElementById('vcSchema');
   if (!planSelect) return;
@@ -604,7 +603,6 @@ async function saveUserInfo() {
 
   const plan = plans[planIndex];
 
-  // 기본 사용자 정보
   const firstname = document.getElementById('firstname')?.value || '';
   const lastname = document.getElementById('lastname')?.value || '';
   const did = document.getElementById('did')?.value || '';
@@ -626,14 +624,12 @@ async function saveUserInfo() {
     vcSchemaId: plan.credentialSchema.id,
   };
 
-  // 동적 필드 수집 부분 수정
   const dynamicFields = {};
   const schemaInputs = document.querySelectorAll('#credentialSchemaSection input');
   const definitionInputs = document.querySelectorAll('#credentialDefinitionSection input');
 
   let hasError = false;
 
-// Schema 필드 수집
   schemaInputs.forEach(input => {
     if (input.required && !input.value) {
       alert(`Please fill out all required fields: ${input.getAttribute('data-caption')}`);
@@ -645,7 +641,6 @@ async function saveUserInfo() {
     }
   });
 
-// Definition 필드 수집
   definitionInputs.forEach(input => {
     if (input.required && !input.value) {
       alert(`Please fill out all required fields: ${input.getAttribute('data-caption')}`);
@@ -689,15 +684,12 @@ async function saveUserInfo() {
   }
 }
 
-// 서버 설정 저장
 async function saveServerSettings() {
-  // 서버 설정 값 가져오기
   const tasServer = document.getElementById('tasServer')?.value || '';
   const issuerServer = document.getElementById('issuerServer')?.value || '';
   const caServer = document.getElementById('caServer')?.value || '';
   const verifierServer = document.getElementById('verifierServer')?.value || '';
   
-  // 정책 설정 값 가져오기
   const vcPlanInput = document.getElementById('vcPlanIssuance');
   const vpPolicyInput = document.getElementById('vpPolicySubmission');
   
@@ -707,13 +699,11 @@ async function saveServerSettings() {
   const vpPolicy = vpPolicyInput ? vpPolicyInput.getAttribute('data-id') || vpPolicyInput.value : '';
   const vpPolicyName = vpPolicyInput ? vpPolicyInput.value : '';
 
-  // 기본 유효성 검사
   if (!tasServer || !issuerServer || !caServer || !verifierServer) {
     alert('Please enter all server URLs');
     return;
   }
 
-  // 설정 객체 생성
   const settings = {
     tasServer,
     issuerServer,
@@ -740,7 +730,6 @@ async function saveServerSettings() {
       throw new Error('Failed to save server settings');
     }
     
-    // 로컬 상태 업데이트
     AppState.serverSettings = settings;
     
     alert('Server settings saved successfully!');
@@ -752,7 +741,6 @@ async function saveServerSettings() {
   }
 }
 
-// 연결 테스트
 async function testConnection() {
   const tasServer = document.getElementById('tasServer')?.value || '';
   const issuerServer = document.getElementById('issuerServer')?.value || '';
@@ -804,7 +792,6 @@ async function testConnection() {
   }
 }
 
-// VC Plan 검색
 async function searchVcPlanIssuance() {
   try {
     showLoading();
@@ -822,7 +809,6 @@ async function searchVcPlanIssuance() {
       return;
     }
     
-    // 검색 팝업 생성
     const popup = document.createElement('div');
     popup.className = 'search-popup';
     
@@ -835,7 +821,7 @@ async function searchVcPlanIssuance() {
         <div class="search-results" id="vcPlanResults">
     `;
     
-    // 각 VC Plan에 대한 옵션 추가
+    
     vcPlans.forEach((plan, index) => {
       const displayName = plan.name || plan.vcPlanId;
       popupContent += `
@@ -858,7 +844,7 @@ async function searchVcPlanIssuance() {
     popup.innerHTML = popupContent;
     document.body.appendChild(popup);
     
-    // 팝업 데이터 저장
+    
     window._popupData = {
       items: vcPlans,
       type: 'vcplan'
@@ -871,7 +857,7 @@ async function searchVcPlanIssuance() {
   }
 }
 
-// VC Plan 선택
+
 function selectVcPlan() {
   if (!window._popupData || window._popupData.type !== 'vcplan') return;
   
@@ -889,14 +875,14 @@ function selectVcPlan() {
     return;
   }
   
-  // UI 업데이트
+  
   const vcPlanInput = document.getElementById('vcPlanIssuance');
   if (vcPlanInput) {
     vcPlanInput.value = plan.name || plan.vcPlanId;
     vcPlanInput.setAttribute('data-id', plan.vcPlanId);
   }
   
-  // 서버에 현재 VC Plan 저장
+  
   saveCurrentVcPlan(plan);
   
   closeSearchPopup();
@@ -921,7 +907,7 @@ async function saveCurrentVcPlan(plan) {
       throw new Error('Failed to update current VC Plan');
     }
     
-    // AppState 객체 업데이트 (있는 경우)
+    
     if (typeof AppState !== 'undefined') {
       if (!AppState.serverSettings) AppState.serverSettings = {};
       AppState.serverSettings.vcPlan = plan.vcPlanId;
@@ -954,7 +940,7 @@ async function searchVpPolicy() {
       return;
     }
     
-    // 검색 팝업 생성
+    
     const popup = document.createElement('div');
     popup.className = 'search-popup';
     
@@ -967,7 +953,7 @@ async function searchVpPolicy() {
         <div class="search-results" id="vpPolicyResults">
     `;
     
-    // 각 VP Policy에 대한 옵션 추가
+    
     vpPolicies.forEach((policy, index) => {
       const displayName = policy.policyTitle || policy.policyId;
       popupContent += `
@@ -990,7 +976,7 @@ async function searchVpPolicy() {
     popup.innerHTML = popupContent;
     document.body.appendChild(popup);
     
-    // 팝업 데이터 저장
+    
     window._popupData = {
       items: vpPolicies,
       type: 'vppolicy'
@@ -1020,14 +1006,14 @@ function selectVpPolicy() {
     return;
   }
   
-  // UI 업데이트
+  
   const vpPolicyInput = document.getElementById('vpPolicySubmission');
   if (vpPolicyInput) {
     vpPolicyInput.value = policy.policyTitle || policy.policyId;
     vpPolicyInput.setAttribute('data-id', policy.policyId);
   }
   
-  // 서버에 현재 VP Policy 저장
+  
   saveCurrentVpPolicy(policy);
   
   closeSearchPopup();
@@ -1051,7 +1037,7 @@ async function saveCurrentVpPolicy(policy) {
       throw new Error('Failed to update current VP Policy');
     }
     
-    // AppState 객체 업데이트 (있는 경우)
+    
     if (typeof AppState !== 'undefined') {
       if (!AppState.serverSettings) AppState.serverSettings = {};
       AppState.serverSettings.vpPolicy = policy.policyId;
@@ -1067,12 +1053,12 @@ async function saveCurrentVpPolicy(policy) {
   }
 }
 
-// VC Plan 선택 처리
+
 async function handleVcPlanSelection(plan) {
   const vcPlanInput = document.getElementById('vcPlanIssuance');
   if (!vcPlanInput) return;
   
-  // UI 업데이트
+  
   vcPlanInput.value = plan.name || plan.vcPlanId;
   vcPlanInput.setAttribute('data-id', plan.vcPlanId);
   
@@ -1092,7 +1078,7 @@ async function handleVcPlanSelection(plan) {
       throw new Error('Failed to update current VC Plan');
     }
     
-    // 앱 상태 업데이트
+    
     if (!AppState.serverSettings) AppState.serverSettings = {};
     AppState.serverSettings.vcPlan = plan.vcPlanId;
     AppState.serverSettings.vcPlanName = plan.name || plan.vcPlanId;
@@ -1103,7 +1089,7 @@ async function handleVcPlanSelection(plan) {
     alert('Failed to save VC Plan selection. Please try again.');
   }
 }
-// VC Plan 필터링
+
 function filterVcPlans() {
   const searchTerm = document.getElementById('vcPlanSearch').value.toLowerCase();
   const options = document.querySelectorAll('#vcPlanResults .search-option');
@@ -1118,12 +1104,12 @@ function filterVcPlans() {
   });
 }
 
-// VP Policy 선택 처리
+
 async function handleVpPolicySelection(policy) {
   const vpPolicyInput = document.getElementById('vpPolicySubmission');
   if (!vpPolicyInput) return;
   
-  // UI 업데이트
+  
   vpPolicyInput.value = policy.policyTitle || policy.policyId;
   vpPolicyInput.setAttribute('data-id', policy.policyId);
   
@@ -1140,7 +1126,7 @@ async function handleVpPolicySelection(policy) {
       throw new Error('Failed to update current VP Policy');
     }
     
-    // 앱 상태 업데이트
+    
     if (!AppState.serverSettings) AppState.serverSettings = {};
     AppState.serverSettings.vpPolicy = policy.policyId;
     AppState.serverSettings.vpPolicyName = policy.policyTitle || policy.policyId;
@@ -1152,7 +1138,7 @@ async function handleVpPolicySelection(policy) {
   }
 }
 
-// VP Policy 필터링
+
 function filterVpPolicies() {
   const searchTerm = document.getElementById('vpPolicySearch').value.toLowerCase();
   const options = document.querySelectorAll('#vpPolicyResults .search-option');
@@ -1167,7 +1153,7 @@ function filterVpPolicies() {
   });
 }
 
-// 검색 팝업 생성
+
 function createSearchPopup(title, items, valueGetter, displayGetter, onSelect) {
   hideLoading();
   
@@ -1207,14 +1193,14 @@ function createSearchPopup(title, items, valueGetter, displayGetter, onSelect) {
   popup.innerHTML = popupContent;
   document.body.appendChild(popup);
   
-  // 저장: 항목 목록과 선택 핸들러를 전역 변수에 저장
+  
   window._popupData = {
     items,
     onSelect
   };
 }
 
-// 팝업 항목 필터링
+
 function filterPopupItems() {
   const searchTerm = document.getElementById('popupSearch').value.toLowerCase();
   const options = document.querySelectorAll('#popupResults .search-option');
@@ -1229,7 +1215,7 @@ function filterPopupItems() {
   });
 }
 
-// 팝업 항목 선택
+
 function selectPopupItem() {
   const selected = document.querySelector('input[name="popupSelection"]:checked');
   if (!selected) {
@@ -1244,7 +1230,7 @@ function selectPopupItem() {
   window._popupData.onSelect(selectedItem);
 }
 
-// 검색 팝업 닫기
+
 function closeSearchPopup() {
   const popup = document.querySelector('.search-popup');
   if (popup) {
@@ -1254,7 +1240,7 @@ function closeSearchPopup() {
 }
 
 
-// VC 발급창 열기
+
 async function openVCPopup() {
   if (isMobile) {
     try {
@@ -1277,7 +1263,7 @@ async function openVCPopup() {
     }
   } else {
     try {
-      // 먼저 사용자 정보 확인
+      
       if (!AppState.userInfo || !AppState.userInfo.firstname) {
         alert("User information is missing. Please ensure you have completed the registration process.");
         return;
@@ -1299,7 +1285,7 @@ async function openVCPopup() {
   }
 }
 
-// 푸시 알림창 열기
+
 async function openPushPopup() {
   try {
     const response = await fetch("/qrPush");
@@ -1321,7 +1307,7 @@ async function openPushPopup() {
   }
 }
 
-// 이메일 인증창 열기
+
 async function openEmailPopup() {
   try {
     const response = await fetch("/sendEmail");
@@ -1347,7 +1333,7 @@ async function openEmailPopup() {
   }
 }
 
-// VP 제출창 열기
+
 async function openVPPopup() {
   try {
     const response = await fetch("/vpPopup");
@@ -1365,12 +1351,12 @@ async function openVPPopup() {
   }
 }
 
-// 팝업 닫기
+
 function closePopup() {
   document.getElementById("PopupArea").innerHTML = "";
 }
 
-// QR 푸시 알림 제출
+
 function qrPushSubmit() {
   const didElement = document.getElementById("didDisplay");
   if (!didElement) return;
@@ -1414,7 +1400,7 @@ function qrPushSubmit() {
     });
 }
 
-// 이메일 전송
+
 function sendEmail() {
   const emailElement = document.getElementById("emailDisplay");
   if (!emailElement) return;
@@ -1460,7 +1446,7 @@ function sendEmail() {
     });
 }
 
-// 인증서 제출
+
 async function submitCertificate() {
   if (!window.vcOfferId) {
     alert("No active offer ID found. Please refresh the QR code.");
@@ -1487,7 +1473,7 @@ async function submitCertificate() {
     if (data.result) {
       alert("Mobile ID Issued Successfully");
       
-      // 성공 페이지 로드
+      
       const externalResponse = await fetch("/vcSuccess");
       if (externalResponse.ok) {
         const externalHTML = await externalResponse.text();
@@ -1506,7 +1492,7 @@ async function submitCertificate() {
   }
 }
 
-// VP 검증 결과 제출
+
 async function submitVPComplete() {
   if (!window.vpOfferId) {
     alert("No active offer ID found. Please refresh the QR code.");
@@ -1533,7 +1519,7 @@ async function submitVPComplete() {
     if (data.result) {
       alert("ID submission completed.");
       
-      // 성공 페이지 로드
+      
       const externalResponse = await fetch("/success");
       if (externalResponse.ok) {
         const externalHTML = await externalResponse.text();
@@ -1553,7 +1539,6 @@ async function submitVPComplete() {
   }
 }
 
-// 성공 다이얼로그 업데이트
 function updateSuccessDialog(data) {
   const infoTable = document.querySelector('.info-table');
   if (!infoTable) {
@@ -1579,7 +1564,6 @@ function updateSuccessDialog(data) {
   infoTable.innerHTML = tableHTML;
 }
 
-// VC Offer QR 코드 갱신
 function vcOfferRefresh() {
   window.vcOfferId = "";
   
@@ -1595,13 +1579,13 @@ function vcOfferRefresh() {
     .then((data) => {
       hideLoading();
       
-      // 응답 텍스트 영역 업데이트 (디버그용)
+    
       const responseTextArea = document.getElementById("responseTextArea");
       if (responseTextArea) {
         responseTextArea.value = JSON.stringify(data, null, 2);
       }
       
-      // QR 이미지 업데이트
+    
       const imageData = data.qrImage;
       if (imageData) {
         const qrContainer = document.querySelector('.qr-img');
@@ -1615,12 +1599,11 @@ function vcOfferRefresh() {
             vcQrImage.style.height = 'auto';
           }
           vcQrImage.src = "data:image/png;base64," + imageData;
-          qrContainer.innerHTML = ''; // 기존 내용 삭제
+          qrContainer.innerHTML = ''; 
           qrContainer.appendChild(vcQrImage);
         }
       }
       
-      // Offer ID 및 카운트다운 설정
       const validUntil = data.validUntil;
       window.vcOfferId = data.offerId;
       startCountdown(validUntil, "vc");
@@ -1636,7 +1619,6 @@ function vcOfferRefresh() {
     });
 }
 
-// VP QR 코드 갱신
 function refreshImage() {
   window.vpOfferId = "";
   
@@ -1647,13 +1629,13 @@ function refreshImage() {
     .then((data) => {
       hideLoading();
       
-      // 응답 텍스트 영역 업데이트 (디버그용)
+
       const responseTextArea = document.getElementById("responseTextArea");
       if (responseTextArea) {
         responseTextArea.value = JSON.stringify(data, null, 2);
       }
       
-      // QR 이미지 업데이트
+
       const imageData = data.qrImage;
       if (imageData) {
         const qrContainer = document.querySelector('.qr-img');
@@ -1667,12 +1649,12 @@ function refreshImage() {
             qrImage.style.height = 'auto';
           }
           qrImage.src = "data:image/png;base64," + imageData;
-          qrContainer.innerHTML = ''; // 기존 내용 삭제
+          qrContainer.innerHTML = '';
           qrContainer.appendChild(qrImage);
         }
       }
       
-      // Offer ID 및 카운트다운 설정
+      
       const validUntil = data.validUntil;
       window.vpOfferId = data.offerId;
       startCountdown(validUntil, "vp");
@@ -1688,7 +1670,7 @@ function refreshImage() {
     });
 }
 
-// QR 코드 카운트다운 시작
+
 function startCountdown(validUntil, type) {
   let countdownElement;
   let qrImage;
@@ -1725,11 +1707,11 @@ function startCountdown(validUntil, type) {
     clearInterval(window.qrCountdownTimer);
   }
 
-  updateCountdown(); // 즉시 한 번 실행
-  window.qrCountdownTimer = setInterval(updateCountdown, 1000); // 1초마다 업데이트
+  updateCountdown(); 
+  window.qrCountdownTimer = setInterval(updateCountdown, 1000); 
 }
 
-// 푸시 버튼 타이머 시작
+
 function startTimer(duration) {
   const pushButton = document.getElementById("pushButton");
   const timerDisplay = document.getElementById("timer");
@@ -1761,11 +1743,11 @@ function startTimer(duration) {
   }, 1000);
 }
 
-// 로딩 표시
+
 function showLoading() {
   let loadingOverlay = document.getElementById('loadingOverlay');
   
-  // 로딩 오버레이가 없으면 생성
+  
   if (!loadingOverlay) {
     loadingOverlay = document.createElement('div');
     loadingOverlay.id = 'loadingOverlay';
@@ -1777,7 +1759,7 @@ function showLoading() {
   loadingOverlay.style.display = 'flex';
 }
 
-// 로딩 숨기기
+
 function hideLoading() {
   const loadingOverlay = document.getElementById('loadingOverlay');
   if (loadingOverlay) {
@@ -1785,24 +1767,24 @@ function hideLoading() {
   }
 }
 
-// 페이지 리로드
+
 function handleReload() {
   location.reload();
 }
 
-// 모바일 확인 및 이벤트 바인딩
+
 window.addEventListener("resize", checkMobile);
 checkMobile();
 
-// 페이지 로드 시 초기화
+
 document.addEventListener('DOMContentLoaded', initPage);
 
-// 스키마 선택기 열기 (모바일용)
+
 async function openVcSchemaSelector() {
   try {
     showLoading();
     
-    // VC Schema 목록이 없으면 로드
+    
     if (!AppState.vcSchemaData || AppState.vcSchemaData.length === 0) {
       await AppState.loadVcSchemas();
     }
@@ -1829,9 +1811,9 @@ async function openVcSchemaSelector() {
   }
 }
 
-// 스키마 선택 처리 (모바일용)
+
 function handleSchemaSelection(schema) {
-  // 선택된 스키마로 addVcInfo 페이지 열기
+
   const userInfo = AppState.userInfo || {};
   const did = userInfo.did || '';
   const userName = AppState.getUserName();
@@ -1839,14 +1821,12 @@ function handleSchemaSelection(schema) {
   window.open(`/addVcInfo?did=${encodeURIComponent(did)}&userName=${encodeURIComponent(userName)}&vcSchemaId=${encodeURIComponent(schema.schemaId)}`, "popup", "width=480,height=768");
 }
 
-// 정보 입력 처리 (모바일용)
 function handleEnterInfo(type) {
   switch (type) {
     case "사용자정보":
       window.open("/addUserInfo", "popup", "width=480,height=768");
       break;
-    case "신분증정보":
-      // 모바일 환경에서는 먼저 신분증 종류 선택 팝업을 보여줌
+    case "신분증정보":      
       if (isMobile) {
         openVcSchemaSelector();
       } else {
