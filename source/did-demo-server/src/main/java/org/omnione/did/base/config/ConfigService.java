@@ -36,6 +36,7 @@ public class ConfigService {
 
     @PostConstruct
     public void init() {
+<<<<<<< Updated upstream
         try {
             ClassPathResource resource = new ClassPathResource(CONFIG_FILE);
             this.configFile = resource.getFile();
@@ -57,6 +58,8 @@ public class ConfigService {
             throw new RuntimeException("Failed to initialize config file", e);
         }
 
+=======
+>>>>>>> Stashed changes
         loadServerSettingsToSystemProperties();
     }
 
