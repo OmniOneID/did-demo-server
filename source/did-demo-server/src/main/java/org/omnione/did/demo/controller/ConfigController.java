@@ -130,12 +130,8 @@ public class ConfigController {
 
     @GetMapping("/user-info")
     public ResponseEntity<Map<String, Object>> getUserInfo() {
-        try {
-            Map<String, Object> userInfo = configService.getUserInfo();
-            return ResponseEntity.ok(userInfo);
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
-        }
+        Map<String, Object> userInfo = configService.getUserInfo();
+        return ResponseEntity.ok(userInfo);
     }
 
 }

@@ -31,11 +31,10 @@ public class ConfigService {
     private final ObjectMapper objectMapper = new ObjectMapper();
     private final ListFeign listFeign;
     private final VerifierFeign verifierFeign;
-    private File configFile;
+    private final File configFile = new File(CONFIG_FILE);
 
     @PostConstruct
     public void init() {
-        this.configFile = new File(CONFIG_FILE);
         if (!configFile.exists()) {
             try {
                 configFile.createNewFile();
@@ -223,19 +222,14 @@ public class ConfigService {
      * config.json의 serverSettings를 System Property로 설정
      */
     private void loadServerSettingsToSystemProperties() {
-        try {
-            Map<String, String> serverSettings = getServerSettings();
+        Map<String, String> serverSettings = getServerSettings();
 
-            setSystemPropertyIfNotEmpty(serverSettings.get("tasServer"), "tas.url");
-            setSystemPropertyIfNotEmpty(serverSettings.get("issuerServer"), "issuer.url");
-            setSystemPropertyIfNotEmpty(serverSettings.get("verifierServer"), "verifier.url");
-            setSystemPropertyIfNotEmpty(serverSettings.get("caServer"), "cas.url");
+        setSystemPropertyIfNotEmpty(serverSettings.get("tasServer"), "tas.url");
+        setSystemPropertyIfNotEmpty(serverSettings.get("issuerServer"), "issuer.url");
+        setSystemPropertyIfNotEmpty(serverSettings.get("verifierServer"), "verifier.url");
+        setSystemPropertyIfNotEmpty(serverSettings.get("caServer"), "cas.url");
 
-            log.info("Server settings loaded from config.json to system properties");
-
-        } catch (Exception e) {
-            log.warn("Failed to load server settings from config.json, using default yml values", e);
-        }
+        log.info("Server settings loaded from config.json to system properties");
     }
 
     private void setSystemPropertyIfNotEmpty(String value, String systemPropertyKey) {

@@ -36,6 +36,7 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.security.SecureRandom;
@@ -101,12 +102,9 @@ public class DemoServiceImpl implements DemoService{
         } catch (OpenDidException e){
             log.error("OpenDidException occurred during Requesting VP Offer: {}", e.getErrorCode().getMessage());
             throw e;
-        } catch (JsonProcessingException e) {
+        } catch (IOException | WriterException e) {
             log.error("JsonProcessingException occurred during Requesting VP Offer: {}", e.getMessage());
             throw new OpenDidException(ErrorCode.JSON_PROCESSING_ERROR);
-        } catch (Exception e) {
-            log.error("Exception occurred during Requesting VP Offer: {}", e.getMessage(), e);
-            throw new OpenDidException(ErrorCode.UNKNOWN_SERVER_ERROR);
         }
 
     }
@@ -252,36 +250,30 @@ public class DemoServiceImpl implements DemoService{
         } catch (JsonProcessingException e) {
             log.error("Json Processing error : {}", e.getMessage());
             throw new OpenDidException(ErrorCode.JSON_PROCESSING_ERROR);
-        } catch (Exception e) {
-            log.error("saveUserInfo error : {}", e.getMessage());
-            throw new OpenDidException(ErrorCode.VC_SAVE_FAILED);
         }
     }
 
 
     private void saveUserInfoToConfig(SaveUserInfoReqDto dto, String userId, String pii) {
-        try {
-            Map<String, Object> userInfoMap = new HashMap<>();
 
-            userInfoMap.put("firstname", dto.getFirstname());
-            userInfoMap.put("lastname", dto.getLastname());
-            userInfoMap.put("did", dto.getDid());
-            userInfoMap.put("email", dto.getEmail());
-            userInfoMap.put("userId", userId);
-            userInfoMap.put("pii", pii);
+        Map<String, Object> userInfoMap = new HashMap<>();
 
-            userInfoMap.put("vcSchemaId", dto.getVcSchemaId());
-            userInfoMap.put("vcSchemaTitle", dto.getVcSchemaTitle());
-            userInfoMap.put("vcSchemaIndex", dto.getVcSchemaIndex());
+        userInfoMap.put("firstname", dto.getFirstname());
+        userInfoMap.put("lastname", dto.getLastname());
+        userInfoMap.put("did", dto.getDid());
+        userInfoMap.put("email", dto.getEmail());
+        userInfoMap.put("userId", userId);
+        userInfoMap.put("pii", pii);
 
-            if (dto.getFields() != null) {
-                userInfoMap.put("fields", dto.getFields());
-            }
-            configService.saveUserInfo(userInfoMap);
+        userInfoMap.put("vcSchemaId", dto.getVcSchemaId());
+        userInfoMap.put("vcSchemaTitle", dto.getVcSchemaTitle());
+        userInfoMap.put("vcSchemaIndex", dto.getVcSchemaIndex());
 
-        } catch (Exception e) {
-            log.error("Failed to save user information to config.json: {}", e.getMessage());
+        if (dto.getFields() != null) {
+            userInfoMap.put("fields", dto.getFields());
         }
+        configService.saveUserInfo(userInfoMap);
+
     }
 
 
@@ -304,8 +296,6 @@ public class DemoServiceImpl implements DemoService{
                     .result(true)
                     .build();
         } catch (OpenDidException e) {
-            throw e;
-        } catch (Exception e) {
             log.error("saveVcInfo error : {}", e.getMessage(), e);
             throw new OpenDidException(ErrorCode.VC_SAVE_FAILED);
         }
@@ -356,24 +346,24 @@ public class DemoServiceImpl implements DemoService{
 
             return vcSchemas.getVcSchemaList().stream()
                     .filter(schema -> {
+                        URL url = null;
                         try {
-                            URL url = new URL(schema.getSchemaId());
-                            String queryParams = url.getQuery();
-                            if (queryParams != null) {
-                                String[] params = queryParams.split("&");
-                                for (String param : params) {
-                                    String[] keyValue = param.split("=");
-                                    if (keyValue.length == 2 && "name".equals(keyValue[0]) && schemaName.equals(keyValue[1])) {
-                                        return true;
-                                    }
+                            url = new URL(schema.getSchemaId());
+                        } catch (MalformedURLException e) {
+                            throw new RuntimeException(e);
+                        }
+                        String queryParams = url.getQuery();
+                        if (queryParams != null) {
+                            String[] params = queryParams.split("&");
+                            for (String param : params) {
+                                String[] keyValue = param.split("=");
+                                if (keyValue.length == 2 && "name".equals(keyValue[0]) && schemaName.equals(keyValue[1])) {
+                                    return true;
                                 }
                             }
-                            return false;
-                        } catch (Exception e) {
-                            return schema.getSchemaId().contains("name=" + schemaName);
                         }
-                    })
-                    .findFirst()
+                        return false;
+                    }).findFirst()
                     .orElseThrow(() -> new OpenDidException(ErrorCode.VC_SCHEMA_NOT_FOUND));
 
         } catch (JsonProcessingException e) {
