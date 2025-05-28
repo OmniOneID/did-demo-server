@@ -11,6 +11,7 @@ spring:
   jackson:
     default-property-inclusion: non_null
 
+
 tas:
   url: http://127.0.0.1:8090
 
@@ -38,3 +39,6 @@ management:
       show-details: "never"
     shutdown:
       enabled: true
+app:
+  config:
+    file-path: ${CONFIG_FILE_PATH:./config/config.json}
