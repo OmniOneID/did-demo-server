@@ -18,8 +18,8 @@ puppeteer:
 Open DID Demo Server Installation And Operation Guide
 ==
 
-- Date: 2025-04-25
-- Version: v1.0.0
+- Date: 2025-05-30
+- Version: v2.0.0
 
 목차
 ==
@@ -76,12 +76,12 @@ OpenDID의 전체 설치에 대한 가이드는 [Open DID Installation Guide]를
 ## 1.2. Demo 서버 정의
 
 Demo 서버는 Open DID에서 제공하는 데모 프로젝트입니다.<br>
-VC 발급, VP 제출, 사용자 등록 기능을 테스트할 수 있는 화면을 제공합니다.
+VC 발급, 제출, 사용자 등록, 서버세팅 기능을 테스트할 수 있는 화면을 제공합니다.
 
 <br/>
 
 ## 1.3. 시스템 요구 사항
-- **Java 17** 이상
+- **Java 21** 이상
 - **Gradle 7.0** 이상
 - **Docker** 및 **Docker Compose** (Docker 사용 시)
 - 최소 **2GB RAM** 및 **10GB 디스크 공간**
@@ -150,7 +150,7 @@ did-demo-server
     └── demo
         ├── gradle
         ├── libs
-            └── did-crypto-sdk-server-1.0.0.jar
+            └── did-crypto-sdk-server-2.0.0.jar
         └── src
         └── build.gradle
         └── README.md
@@ -248,7 +248,7 @@ IntelliJ IDEA는 Java 개발에 널리 사용되는 통합 개발 환경(IDE)으
       cd build/libs
       ls
     ```
-- 이 명령어는 `did-demo-server-1.0.0.jar` 파일을 생성합니다.
+- 이 명령어는 `did-demo-server-2.0.0.jar` 파일을 생성합니다.
 
 <br/>
 
@@ -256,7 +256,7 @@ IntelliJ IDEA는 Java 개발에 널리 사용되는 통합 개발 환경(IDE)으
 빌드된 JAR 파일을 사용하여 서버를 구동합니다:
 
 ```bash
-java -jar did-demo-server-1.0.0.jar
+java -jar did-demo-server-2.0.0.jar
 ```
 
 - 서버가 정상적으로 구동되면, 브라우저에서 http://localhost:8099/swagger-ui/index.html 주소로 이동하여 Swagger UI를 통해 API 문서가 제대로 표시되는지 확인합니다.
@@ -487,11 +487,12 @@ VP(Verifiable Presentation, 검증가능한 제시)를 제출하는 과정은 �
 | 이메일 전송 실패 | 잘못된 이메일 주소 | 사용자 정보의 이메일 주소 확인 |
 | VC 발급 실패 | 필수 정보 누락 또는 서버 오류 | 모든 필수 정보 입력 확인 및 서버 로그 확인 |
 | VP 제출 실패 | 발급된 VC 없음 또는 VP 정책 문제 | VC 발급 여부 확인 및 VP 정책 설정 검토 |
+| 서버 연동 실패 | 서버 주소값 설정 오류 | 서버 주소 확인 필요 |
 
 
 
 
-[Open DID Installation Guide]: https://github.com/OmniOneID/did-release/blob/develop/unrelease-V1.0.1.0/OepnDID_Installation_Guide-V1.0.1.0_ko.md
+[Open DID Installation Guide]: https://github.com/OmniOneID/did-release/blob/develop/release-V2.0.0.0/OpenDID_Installation_Guide-V2.0.0.0_ko.md
 
 [Open DID Software Architecture]: https://omnioneid.github.io/?locale=ko&version=V1.0.0
 [Verifier Admin Guide]: https://github.com/OmniOneID/did-verifier-server/blob/develop/docs/admin/OpenDID_VerifierAdmin_Operation_Guide_ko.md

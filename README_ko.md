@@ -51,7 +51,7 @@ did-demo-server
     └── demo
         ├── gradle
         ├── libs
-            └── did-crypto-sdk-server-1.0.0.jar
+            └── did-crypto-sdk-server-2.0.0.jar
         └── src
         └── build.gradle
         └── README.md
@@ -92,7 +92,7 @@ did-demo-server
 
 1. **Open DID 라이브러리**: 이 라이브러리들은 Open DID 프로젝트에서 개발되었으며 [libs 폴더](source/did-demo-server/libs)에서 사용할 수 있습니다. 포함된 항목:
 
-   - `did-crypto-sdk-server-1.0.0.jar`
+   - `did-crypto-sdk-server-2.0.0.jar`
 
 2. **서드파티 라이브러리**: 이 라이브러리들은 [build.gradle](source/did-demo-server/build.gradle) 파일을 통해 관리되는 오픈소스 의존성입니다. 서드파티 라이브러리 및 해당 라이선스에 대한 자세한 목록은 [dependencies-license.md](dependencies-license.md) 파일을 참조하세요.
 

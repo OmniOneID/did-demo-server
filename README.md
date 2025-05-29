@@ -51,7 +51,7 @@ did-demo-server
     └── demo
         ├── gradle
         ├── libs
-            └── did-crypto-sdk-server-1.0.0.jar
+            └── did-crypto-sdk-server-2.0.0.jar
         └── src
         └── build.gradle
         └── README.md
