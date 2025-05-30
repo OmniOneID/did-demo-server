@@ -4,6 +4,16 @@ Demo Server
 Welcome to the Demo Server Repository. <br>
 This repository contains the source code, documentation, and related resources for the Demo Server.
 
+## S/W Specifications
+| Category           | Details                                         |
+|--------------------|-------------------------------------------------|
+| OS                 | macOS / Linux / Windows 10 or higher            |
+| Language           | Java 21 or higher                               |
+| IDE                | IntelliJ IDEA                                   |
+| Build System       | Gradle 7.0 or higher                            |
+| Compatibility      | Requires JDK 21 or higher                       |
+| Other Requirements | Minimum 2GB RAM and 10GB of disk space required |
+
 # OpenDID Demonstration Videos
 
 The OpenDID demonstration videos include the following four key scenarios:

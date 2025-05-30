@@ -4,6 +4,16 @@
 데모 서버 저장소에 오신 것을 환영합니다. <br>
 이 저장소는 데모 서버의 소스 코드, 문서, 그리고 관련 리소스를 포함하고 있습니다.
 
+## S/W 사양
+| 구분              | 내용                                 |
+|-------------------|--------------------------------------|
+| OS                | macOS / Linux / Windows 10 이상       |
+| Language          | Java 21 이상                          |
+| IDE               | IntelliJ IDEA                         |
+| Build System      | Gradle 7.0 이상                        |
+| Compatibility     | JDK 21 이상                            |
+| 기타 요구사항      | 최소 2GB RAM, 10GB 디스크 공간 이상     |
+
 # OpenDID 시연 영상
 
 OpenDID 시연 영상은 다음 네 가지 주요 시나리오를 포함합니다:
