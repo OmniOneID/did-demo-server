@@ -6,6 +6,7 @@ In this project, the following versions have undergone security vulnerability as
 | Version | Supported          |
 | ------- | ------------------ |
 | 1.0.0   | ✅                 |
+| 2.0.0   | ✅                 |
 
 ## Reporting a Vulnerability
 If you discover a new security vulnerability, please report it via [technology@omnione.net](mailto:technology@omnione.net).
