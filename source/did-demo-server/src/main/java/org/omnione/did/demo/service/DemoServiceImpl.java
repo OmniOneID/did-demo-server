@@ -27,7 +27,7 @@ import org.omnione.did.demo.api.*;
 import org.omnione.did.base.exception.ErrorCode;
 import org.omnione.did.base.exception.OpenDidException;
 import org.omnione.did.demo.dto.*;
-import org.omnione.did.base.property.DemoProperty;
+
 import org.omnione.did.demo.util.BaseDigestUtil;
 import org.omnione.did.demo.util.BaseMultibaseUtil;
 import org.omnione.did.demo.util.HexUtil;
@@ -60,7 +60,6 @@ public class DemoServiceImpl implements DemoService{
     private final CasFeign casFeign;
     private final IssuerFeign issuerFeign;
     private final IssuerAdminFeign issuerAdminFeign;
-    private final DemoProperty demoProperty;
     private final ConfigService configService;
     private final ListFeign listFeign;
     private final ObjectMapper objectMapper;
@@ -73,18 +72,14 @@ public class DemoServiceImpl implements DemoService{
      */
     @Override
     public VpResultDto vpOfferRefresh(){
-        log.debug("=== Starting VpOfferRefresh ===");
-        log.debug("\t Make VP Offer Request");
         try {
             RequestVpOfferReqDto offerReqDto = RequestVpOfferReqDto.builder()
                     .policyId(configService.getConfig().getCurrentVpPolicy())
                     .build();
-            log.debug("\t Request VP Offer QR : " + offerReqDto.toString());
             RequestVpOfferResDto requestVpOfferResDto = verifierFeign.requestVpOfferQR(offerReqDto);
             if (requestVpOfferResDto == null) {
                 throw new OpenDidException(ErrorCode.VP_OFFER_NOT_FOUND);
             }
-            log.debug("\t Serialize and Encode VP Offer Payload");
             String jsonString = JsonUtil.serializeAndSort(requestVpOfferResDto.getPayload());
             String encDataPayload = BaseMultibaseUtil.encode(jsonString.getBytes(), MultiBaseType.base64);
             VpResultDto vpResultDto = VpResultDto.builder()
@@ -92,18 +87,14 @@ public class DemoServiceImpl implements DemoService{
                     .payload(encDataPayload)
                     .validUntil(requestVpOfferResDto.getPayload().getValidUntil())
                     .build();
-            log.debug("\t Make QR Image");
             QrImageData qrImageData = makeQrImage(vpResultDto);
             vpResultDto.setQrImage(qrImageData.getQrIamge());
             vpResultDto.setOfferId(requestVpOfferResDto.getPayload().getOfferId());
-            log.debug("=== End VpOfferRefresh ===");
             return vpResultDto;
 
         } catch (OpenDidException e){
-            log.error("OpenDidException occurred during Requesting VP Offer: {}", e.getErrorCode().getMessage());
             throw e;
         } catch (IOException | WriterException e) {
-            log.error("JsonProcessingException occurred during Requesting VP Offer: {}", e.getMessage());
             throw new OpenDidException(ErrorCode.JSON_PROCESSING_ERROR);
         }
 
@@ -117,30 +108,22 @@ public class DemoServiceImpl implements DemoService{
      */
     @Override
     public VcResultDto vcOfferRefresh() throws IOException, WriterException {
-        log.debug("=== Starting VcOfferRefresh ===");
-        log.debug("\t Make VC Offer Request");
         RequestVcOfferReqDto vcOfferReqDto = RequestVcOfferReqDto.builder()
                 .vcPlanId(configService.getConfig().getCurrentVcPlan())
                 .issuer(configService.getConfig().getIssuer())
                 .build();
-        log.debug("\t Request VC Offer QR : " + vcOfferReqDto.toString());
-
-        log.debug("\t Request VC Offer to TAS");
 
         RequestVcOfferResDto requestVcOfferResDto = tasFeign.requestVcOfferQR(vcOfferReqDto);
         String jsonString = JsonUtil.serializeAndSort(requestVcOfferResDto.getIssueOfferPayload());
-        log.debug("\t Serialize and Encode VC Offer Payload" + jsonString);
         String encDataPayload = BaseMultibaseUtil.encode(jsonString.getBytes(), MultiBaseType.base64);
         VcResultDto vcResultDto = VcResultDto.builder()
                 .payloadType("ISSUE_VC")
                 .payload(encDataPayload)
                 .build();
-        log.debug("\t Make VcPayload data to QR Image");
         QrImageData qrImageData = makeQrImage(vcResultDto);
         vcResultDto.setQrImage(qrImageData.getQrIamge());
         vcResultDto.setValidUntil(requestVcOfferResDto.getValidUntil());
         vcResultDto.setOfferId(requestVcOfferResDto.getOfferId());
-        log.debug("=== End VcOfferRefresh ===");
         return vcResultDto;
     }
 
@@ -153,7 +136,6 @@ public class DemoServiceImpl implements DemoService{
      */
     @Override
     public RequestVcSubmitResDto vcOfferSubmit(RequestVcSubmitReqDto requestVcSubmitReqDto) {
-        log.debug("requestVcSubmitReqDto : {}", requestVcSubmitReqDto);
         return tasFeign.requestVcSubmitConfirm(requestVcSubmitReqDto);
     }
 
@@ -166,18 +148,16 @@ public class DemoServiceImpl implements DemoService{
      */
     @Override
     public VcOfferPushResDto vcOfferPush(RequestVcOfferReqDto requestVcOfferReqDto) {
-        log.debug("requestVcOfferReqDto : {}", requestVcOfferReqDto);
         String messageId = new UUID(new SecureRandom().nextLong(), new SecureRandom().nextLong()).toString().substring(0, 8);
         VcOfferPushResDto vcOfferPushResDto = tasFeign.requestVcOfferPush(RequestVcOfferReqDto.builder()
                 .holder(requestVcOfferReqDto.getDid())
-                .issuer(demoProperty.getIssuer())
+                .issuer(configService.getConfig().getIssuer())
                 .id(messageId)
-                .vcPlanId(demoProperty.getVcPlanId())
+                .vcPlanId(configService.getConfig().getCurrentVcPlan())
                 .build());
         if(vcOfferPushResDto != null){
             vcOfferPushResDto.setResult("success");
         }
-        log.debug("requestVcOfferReqDto : {}", requestVcOfferReqDto);
         return vcOfferPushResDto;
     }
 
@@ -193,8 +173,8 @@ public class DemoServiceImpl implements DemoService{
         RequestVcOfferResDto requestVcOfferResDto =
                 tasFeign.requestVcOfferEmail(RequestVcOfferReqDto.builder()
                 .email(requestVcOfferReqDto.getEmail())
-                .vcPlanId(demoProperty.getVcPlanId())
-                .issuer(demoProperty.getIssuer())
+                .vcPlanId(configService.getConfig().getCurrentVcPlan())
+                .issuer(configService.getConfig().getIssuer())
                 .build());
 
         if(requestVcOfferResDto != null){
@@ -248,7 +228,6 @@ public class DemoServiceImpl implements DemoService{
                     .build();
 
         } catch (JsonProcessingException e) {
-            log.error("Json Processing error : {}", e.getMessage());
             throw new OpenDidException(ErrorCode.JSON_PROCESSING_ERROR);
         }
     }
@@ -286,7 +265,6 @@ public class DemoServiceImpl implements DemoService{
      */
     @Override
     public SaveUserInfoResDto saveVcInfo(SaveVcInfoReqDto saveVcInfoReqDto) {
-        log.info("saveVcInfoReqDto : {}", saveVcInfoReqDto.toString());
         try {
             if (saveVcInfoReqDto.getDid() == null || saveVcInfoReqDto.getDid().isEmpty()) {
                 throw new OpenDidException(ErrorCode.VC_INVALID_FORMAT);
@@ -296,7 +274,6 @@ public class DemoServiceImpl implements DemoService{
                     .result(true)
                     .build();
         } catch (OpenDidException e) {
-            log.error("saveVcInfo error : {}", e.getMessage(), e);
             throw new OpenDidException(ErrorCode.VC_SAVE_FAILED);
         }
     }

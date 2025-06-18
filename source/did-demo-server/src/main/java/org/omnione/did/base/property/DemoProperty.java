@@ -31,5 +31,6 @@ public class DemoProperty {
     private String vcPlanId;
     private String issuer;
     private String policyId;
+    private String currentVcPlan;
 }
 

@@ -214,7 +214,6 @@ public class ConfigService {
             if (userInfoNode == null) {
                 return new HashMap<>();
             }
-
             return objectMapper.convertValue(userInfoNode, Map.class);
         } catch (IOException e) {
             log.error("Failed to get user information", e);
