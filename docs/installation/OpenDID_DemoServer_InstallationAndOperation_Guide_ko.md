@@ -117,7 +117,7 @@ git --version
 터미널을 열고 다음 명령어를 실행하여 DEMO 서버의 리포지토리를 로컬 컴퓨터에 복사합니다.
 ```bash
 # Git 저장소에서 리포지토리 복제
-git clone http://gitlab.raondevops.com/opensourcernd/source/server/did-demo-server.git
+git clone https://github.com/OmniOneID/did-demo-server.git
 
 # 복제한 리포지토리로 이동
 cd did-demo-server

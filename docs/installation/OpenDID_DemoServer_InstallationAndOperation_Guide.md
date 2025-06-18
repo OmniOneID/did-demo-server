@@ -114,7 +114,7 @@ The `git clone` command is used to clone source code from a remote repository ho
 Open a terminal and execute the following commands to copy the DEMO server repository to your local computer:
 ```bash
 # Clone repository from Git repository
-git clone http://gitlab.raondevops.com/opensourcernd/source/server/did-demo-server.git
+git clone https://github.com/OmniOneID/did-demo-server.git
 
 # Navigate to the cloned repository
 cd did-demo-server
