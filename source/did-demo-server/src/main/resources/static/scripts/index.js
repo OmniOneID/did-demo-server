@@ -668,19 +668,24 @@ async function saveUserInfo() {
 }
 
 async function saveServerSettings() {
-  const tasServer = document.getElementById('tasServer')?.value || '';
-  const issuerServer = document.getElementById('issuerServer')?.value || '';
-  const caServer = document.getElementById('caServer')?.value || '';
-  const verifierServer = document.getElementById('verifierServer')?.value || '';
-  const vcPlanInput = document.getElementById('vcPlanIssuance');
-  const vpPolicyInput = document.getElementById('vpPolicySubmission');
-  const vcPlan = vcPlanInput ? vcPlanInput.getAttribute('data-id') || vcPlanInput.value : '';
+  const tasServer = document.getElementById('tasServer')?.value?.trim() || '';
+  const issuerServer = document.getElementById('issuerServer')?.value?.trim() || '';
+  const caServer = document.getElementById('caServer')?.value?.trim() || '';
+  const verifierServer = document.getElementById('verifierServer')?.value?.trim() || '';
   
-  const vpPolicy = vpPolicyInput ? vpPolicyInput.getAttribute('data-id') || vpPolicyInput.value : '';
-  const vpPolicyName = vpPolicyInput ? vpPolicyInput.value : '';
+  // VC Plan 정보 - 선택사항
+  const vcPlanInput = document.getElementById('vcPlanIssuance');
+  const vcPlan = vcPlanInput ? (vcPlanInput.getAttribute('data-id') || vcPlanInput.value?.trim() || '') : '';
+  const vcPlanName = vcPlanInput ? (vcPlanInput.value?.trim() || '') : '';
+  
+  // VP Policy 정보 - 선택사항  
+  const vpPolicyInput = document.getElementById('vpPolicySubmission');
+  const vpPolicy = vpPolicyInput ? (vpPolicyInput.getAttribute('data-id') || vpPolicyInput.value?.trim() || '') : '';
+  const vpPolicyName = vpPolicyInput ? (vpPolicyInput.value?.trim() || '') : '';
 
+  // 필수 서버 URL 검증
   if (!tasServer || !issuerServer || !caServer || !verifierServer) {
-    alert('Please enter all server URLs');
+    alert('Please enter all required server URLs (TAS, Issuer, CA, Verifier)');
     return;
   }
 
