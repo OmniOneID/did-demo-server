@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 /**
  * ListFeign This class is a Feign client for the TAS API.
  */
-@FeignClient(value = "List", url = "${tas.url}", path = "/list/api/v1")
+@FeignClient(value = "List", url = "${dynamic.tas.url:${tas.url}}", path = "/list/api/v1")
 public interface ListFeign {
 
     @GetMapping("/vcplan/list/issuer")

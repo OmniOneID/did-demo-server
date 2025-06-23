@@ -25,7 +25,7 @@ import java.util.List;
  * The VerifierFeign interface is a Feign client that provides endpoints for requesting a VP offer and submitting a VP.
  * It is used to communicate with the Verifier service.
  */
-@FeignClient(value = "Verifier", url = "${verifier.url}", path = "/verifier")
+@FeignClient(value = "Verifier", url = "${dynamic.verifier.url:${verifier.url}}", path = "/verifier")
 public interface VerifierFeign {
     @RequestMapping(value = "/api/v1/request-offer-qr", method = RequestMethod.POST)
     RequestVpOfferResDto requestVpOfferQR(@RequestBody RequestVpOfferReqDto requestVpOfferReqDto);

@@ -673,17 +673,14 @@ async function saveServerSettings() {
   const caServer = document.getElementById('caServer')?.value?.trim() || '';
   const verifierServer = document.getElementById('verifierServer')?.value?.trim() || '';
   
-  // VC Plan 정보 - 선택사항
   const vcPlanInput = document.getElementById('vcPlanIssuance');
   const vcPlan = vcPlanInput ? (vcPlanInput.getAttribute('data-id') || vcPlanInput.value?.trim() || '') : '';
   const vcPlanName = vcPlanInput ? (vcPlanInput.value?.trim() || '') : '';
   
-  // VP Policy 정보 - 선택사항  
   const vpPolicyInput = document.getElementById('vpPolicySubmission');
   const vpPolicy = vpPolicyInput ? (vpPolicyInput.getAttribute('data-id') || vpPolicyInput.value?.trim() || '') : '';
   const vpPolicyName = vpPolicyInput ? (vpPolicyInput.value?.trim() || '') : '';
 
-  // 필수 서버 URL 검증
   if (!tasServer || !issuerServer || !caServer || !verifierServer) {
     alert('Please enter all required server URLs (TAS, Issuer, CA, Verifier)');
     return;
@@ -712,15 +709,28 @@ async function saveServerSettings() {
     });
 
     if (!response.ok) {
-      throw new Error('Failed to save server settings');
+      const errorData = await response.json();
+      throw new Error(errorData.message || 'Failed to save server settings');
     }
     
+    const result = await response.json();
     AppState.serverSettings = settings;
     
-    alert('Server settings saved successfully!');
+    if (result.success) {
+      alert('Server settings saved successfully!\n\n' + 
+            'Changes have been applied immediately - no restart required.\n\n' +
+            'Current URLs:\n' +
+            `TAS: ${result.currentUrls?.tasServer || tasServer}\n` +
+            `Issuer: ${result.currentUrls?.issuerServer || issuerServer}\n` +
+            `CA: ${result.currentUrls?.caServer || caServer}\n` +
+            `Verifier: ${result.currentUrls?.verifierServer || verifierServer}`);
+    } else {
+      alert('Server settings saved but there might be issues: ' + (result.message || 'Unknown error'));
+    }
+    
   } catch (error) {
     console.error('Error saving server settings:', error);
-    alert('Failed to save server settings. Please try again.');
+    alert('Failed to save server settings: ' + error.message);
   } finally {
     hideLoading();
   }
@@ -762,16 +772,32 @@ async function testConnection() {
     const results = await response.json();
 
     if (results.allSuccess) {
-      alert('All server connections successful!');
+      alert('✅ All server connections successful!\n\n' + 
+            results.message + '\n\n' +
+            'The URLs have been applied and are ready for use.');
     } else {
       const failedServers = results.results
         .filter(result => !result.success)
+        .map(result => `${result.server}: ${result.message}`);
+      
+      const successServers = results.results
+        .filter(result => result.success)
         .map(result => result.server);
-      alert(`Connection failed for: ${failedServers.join(', ')}. Please check your server settings and try again.`);
+        
+      let message = '❌ Connection test results:\n\n';
+      
+      if (successServers.length > 0) {
+        message += '✅ Successful: ' + successServers.join(', ') + '\n\n';
+      }
+      
+      message += '❌ Failed:\n' + failedServers.join('\n');
+      message += '\n\nPlease check the failed URLs and try again.';
+      
+      alert(message);
     }
   } catch (error) {
     console.error('Error testing connections:', error);
-    alert('Failed to test connections. Please try again.');
+    alert('Failed to test connections: ' + error.message + '\n\nPlease check your network connection and try again.');
   } finally {
     hideLoading();
   }
