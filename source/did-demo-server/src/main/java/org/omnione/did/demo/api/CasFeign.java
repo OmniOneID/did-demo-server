@@ -26,7 +26,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
  * The CasFeign interface is a Feign client that provides endpoints for saving user information.
  * It is used to communicate with the CAS service.
  */
-@FeignClient(value = "Cas", url = "${cas.url}", path = "/cas/api/v1")
+@FeignClient(value = "Cas", url = "${dynamic.cas.url:${cas.url}}", path = "/cas/api/v1")
 public interface CasFeign {
         @RequestMapping(value = "/save-user-info", method = RequestMethod.POST)
         void saveUserInfo(@RequestBody SaveUserInfoResDto saveUserInfoResDto);

@@ -37,7 +37,7 @@ Libraries used in this project are organized into two main categories:
 
 1. **Open DID Libraries**: These libraries are developed by the Open DID project and are available in the [libs folder](libs). They include:
 
-   - `did-crypto-sdk-server-1.0.0.jar`
+   - `did-crypto-sdk-server-2.0.0.jar`
 
 2. **Third-Party Libraries**: These libraries are open-source dependencies managed via the [build.gradle](build.gradle) file. For a detailed list of third-party libraries and their licenses, please refer to the [dependencies-license.md](../../dependencies-license.md) file.
 

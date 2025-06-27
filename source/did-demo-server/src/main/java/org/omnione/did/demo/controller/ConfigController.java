@@ -59,36 +59,81 @@ public class ConfigController {
 
     @PostMapping("/server-settings")
     public ResponseEntity<?> updateServerSettings(@RequestBody ServerSettingsDto dto) {
-        configService.updateServerSettings(
-                dto.getTasServer(),
-                dto.getIssuerServer(),
-                dto.getCaServer(),
-                dto.getVerifierServer()
-        );
-        return ResponseEntity.ok().build();
+        try {
+            configService.updateServerSettings(
+                    dto.getTasServer(),
+                    dto.getIssuerServer(),
+                    dto.getCaServer(),
+                    dto.getVerifierServer()
+            );
+            
+            return ResponseEntity.ok(Map.of(
+                "success", true, 
+                "message", "Server settings updated successfully. Changes applied immediately.",
+                "requiresRestart", false,
+                "currentUrls", configService.getCurrentServerUrls()
+            ));
+            
+        } catch (Exception e) {
+            log.error("Failed to update server settings", e);
+            return ResponseEntity.status(500).body(Map.of(
+                "success", false,
+                "message", "Failed to update server settings: " + e.getMessage()
+            ));
+        }
     }
 
     @GetMapping("/server-settings")
     public ResponseEntity<?> getServerSettings() {
-        return ResponseEntity.ok(configService.getServerSettings());
+        try {
+            // 현재 동적으로 설정된 URL들과 기타 설정 정보 반환
+            Map<String, Object> allSettings = configService.getServerSettings();
+            
+            return ResponseEntity.ok(allSettings);
+            
+        } catch (Exception e) {
+            log.error("Failed to get server settings", e);
+            return ResponseEntity.status(500).body(Map.of(
+                "error", "Failed to get server settings: " + e.getMessage()
+            ));
+        }
     }
 
     @PostMapping("/test-connection")
     public ResponseEntity<?> testConnection(@RequestBody ServerSettingsDto dto) {
-
         Map<String, Object> result = new HashMap<>();
         List<Map<String, Object>> results = new ArrayList<>();
-        boolean allSuccess = true;
 
-        results.add(testServerConnection("TAS Server", dto.getTasServer()));
-        results.add(testServerConnection("Issuer Server", dto.getIssuerServer()));
-        results.add(testServerConnection("CA Server", dto.getCaServer()));
-        results.add(testServerConnection("Verifier Server", dto.getVerifierServer()));
+        // 테스트를 위해 임시로 URL 업데이트
+        try {
+            configService.updateServerUrls(
+                    dto.getTasServer(),
+                    dto.getIssuerServer(),
+                    dto.getCaServer(),
+                    dto.getVerifierServer()
+            );
+            
+            // 각 서버 연결 테스트
+            results.add(testServerConnection("TAS Server", dto.getTasServer()));
+            results.add(testServerConnection("Issuer Server", dto.getIssuerServer()));
+            results.add(testServerConnection("CA Server", dto.getCaServer()));
+            results.add(testServerConnection("Verifier Server", dto.getVerifierServer()));
 
-        allSuccess = results.stream().allMatch(r -> (Boolean) r.get("success"));
+            boolean allSuccess = results.stream().allMatch(r -> (Boolean) r.get("success"));
 
-        result.put("results", results);
-        result.put("allSuccess", allSuccess);
+            result.put("results", results);
+            result.put("allSuccess", allSuccess);
+            result.put("message", allSuccess ? 
+                "All connections successful. Settings have been applied and are ready to use." : 
+                "Some connections failed. Please check the URLs and try again.");
+            result.put("appliedUrls", configService.getCurrentServerUrls());
+
+        } catch (Exception e) {
+            log.error("Failed to test connections", e);
+            result.put("results", results);
+            result.put("allSuccess", false);
+            result.put("message", "Failed to test connections: " + e.getMessage());
+        }
 
         return ResponseEntity.ok(result);
     }

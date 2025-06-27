@@ -18,15 +18,16 @@ puppeteer:
 Open DID Demo Server Installation And Operation Guide
 ==
 
-- Date: 2024-09-02
-- Version: v1.0.0
+- Date: 2025-05-30
+- Version: v2.0.0
 
 Table of Contents
 ==
 
-- [1. Introduction](#1-introduction) 
+- [Table of Contents](#table-of-contents)
+- [1. Introduction](#1-introduction)
   - [1.1. Overview](#11-overview)
-  - [1.2. Demo Server Definition](#12-demo-server-definition)  
+  - [1.2. Demo Server Definition](#12-demo-server-definition)
   - [1.3. System Requirements](#13-system-requirements)
 - [2. Prerequisites](#2-prerequisites)
   - [2.1. Git Installation](#21-git-installation)
@@ -40,39 +41,45 @@ Table of Contents
     - [4.1.3. Gradle Build](#413-gradle-build)
     - [4.1.4. Server Startup](#414-server-startup)
     - [4.1.5. Server Configuration](#415-server-configuration)
-  - [4.2. Running via Console Commands](#42-running-via-console-commands)
+  - [4.2. Running with Console Commands](#42-running-with-console-commands)
     - [4.2.1. Gradle Build Commands](#421-gradle-build-commands)
     - [4.2.2. Server Startup Method](#422-server-startup-method)
-    - [4.2.3. Server Configuration](#423-server-configuration)
+    - [4.2.3. Server Configuration Method](#423-server-configuration-method)
 - [5. Configuration Guide](#5-configuration-guide)
   - [5.1. application.yml](#51-applicationyml)
     - [5.1.1. Spring Basic Configuration](#511-spring-basic-configuration)
     - [5.1.2. Jackson Basic Configuration](#512-jackson-basic-configuration)
-    - [5.1.3. Server Configuration](#513-server-configuration)
-    - [5.1.4. Open DID Server Communication Configuration](#514-open-did-server-communication-configuration)
+    - [5.1.3. Server Configuration](#513-server-configuration)    
   - [5.2. application-logging.yml](#52-application-loggingyml)
-    - [5.2.1. Logging Configuration](#521-logging-configuration)
-  - [5.3. application-demo.yml](#53-application-demoyml)
-  - [5.4. application-spring-docs.yml](#54-application-spring-docsyml)
-    
+    - [5.2.1. Logging Configuration](#521-logging-configuration)  
+  - [5.3. application-spring-docs.yml](#53-application-spring-docsyml)
+- [6. Demo Operation Guide](#6-demo-operation-guide)
+  - [6.1. Screen Layout](#61-screen-layout)
+  - [6.2. Operation Server Configuration](#62-operation-server-configuration)
+  - [6.3. User Information Input](#63-user-information-input)
+  - [6.4. VC Issuance](#64-vc-issuance)
+  - [6.5. VP Submission](#65-vp-submission)
+  - [6.6. Server Connection Test](#66-server-connection-test)
+  - [6.7. Major Error Situations and Solutions](#67-major-error-situations-and-solutions)
 
 # 1. Introduction
 
 ## 1.1. Overview
-This document provides a guide for installing and operating the Demo server. It explains the installation process, configuration methods, and operation procedures step by step to help users efficiently install and manage the system.
+This document provides a guide for installing and operating the Demo server. It explains the installation process, configuration methods, and startup procedures step by step to help users efficiently install and operate the system.
 
-For the complete installation guide of OpenDID, please refer to the [Open DID Installation Guide].
+For the overall installation guide of OpenDID, please refer to the [Open DID Installation Guide].
 
 <br/>
 
 ## 1.2. Demo Server Definition
+
 The Demo server is a demo project provided by Open DID.<br>
-It provides screens for testing VC issuance, VP submission, and user registration functions.
+It provides a screen where you can test VC issuance, submission, user registration, and server setting functions.
 
 <br/>
 
 ## 1.3. System Requirements
-- **Java 17** or higher
+- **Java 21** or higher
 - **Gradle 7.0** or higher
 - **Docker** and **Docker Compose** (when using Docker)
 - Minimum **2GB RAM** and **10GB disk space**
@@ -81,13 +88,13 @@ It provides screens for testing VC issuance, VP submission, and user registratio
 
 # 2. Prerequisites
 
-This chapter guides you through the necessary preparations before installing the components of the Open DID project.
+This chapter guides you through the prerequisite items needed before installing the components of the Open DID project.
 
 ## 2.1. Git Installation
 
-`Git` is a distributed version control system that tracks changes in source code and supports collaboration among multiple developers. Git is essential for managing and versioning the source code of the Open DID project.
+`Git` is a distributed version control system that tracks changes in source code and supports collaboration among multiple developers. Git is essential for managing the source code of the Open DID project and version control.
 
-After successful installation, you can verify the Git version using the following command:
+If the installation is successful, you can check the Git version using the following command:
 
 ```bash
 git --version
@@ -96,21 +103,20 @@ git --version
 > **Reference Links**
 > - [Git Installation Guide](https://docs.github.com/en/repositories/creating-and-managing-repositories/cloning-a-repository)
 
-
 <br/>
 
 # 3. Cloning Source Code from GitHub
 
 ## 3.1. Source Code Cloning
 
-The `git clone` command is used to clone source code from a remote repository hosted on GitHub to your local computer. This command allows you to work with the entire project's source code and related files locally. After cloning, you can proceed with necessary work within the repository, and changes can be pushed back to the remote repository.
+The `git clone` command is used to clone source code from a remote repository hosted on GitHub to your local computer. Using this command allows you to work with the entire source code and related files of the project locally. After cloning, you can perform necessary work within the repository and push changes back to the remote repository.
 
-Open a terminal and run the following commands to copy the DEMO server repository to your local computer:
+Open a terminal and execute the following commands to copy the DEMO server repository to your local computer:
 ```bash
-# Clone the repository from Git storage
+# Clone repository from Git repository
 git clone https://github.com/OmniOneID/did-demo-server.git
 
-# Move to the cloned repository
+# Navigate to the cloned repository
 cd did-demo-server
 ```
 
@@ -135,213 +141,180 @@ did-demo-server
 ├── RELEASE-PROCESS.md
 ├── SECURITY.md
 ├── docs
-│   └── installation
-│       └── OpenDID_DemoServer_InstallationAndOperation_Guide.md
-│       └── OpenDID_DemoServer_InstallationAndOperation_Guide_ko.md
+│   └── installation
+│       └── OpenDID_DemoServer_InstallationAndOperation_Guide.md
 └── source
     └── demo
         ├── gradle
         ├── libs
-            └── did-crypto-sdk-server-1.0.0.jar
+            └── did-crypto-sdk-server-2.0.0.jar
         └── src
         └── build.gradle
         └── README.md
 ```
 
-| Name                    | Description                                         |
-| ----------------------- | --------------------------------------------------- |
-| CHANGELOG.md            | Version changes of the project                      |
-| CODE_OF_CONDUCT.md      | Code of conduct for contributors                    |
-| CONTRIBUTING.md         | Contribution guidelines and procedures              |
-| LICENSE                 | License                                             |
-| dependencies-license.md | License information for project dependencies        |
-| MAINTAINERS.md          | Guidelines for project maintainers                  |
-| RELEASE-PROCESS.md      | Procedure for releasing new versions                |
-| SECURITY.md             | Security policy and vulnerability reporting method  |
-| docs                    | Documentation                                       |
-| ┖ api                   | API guide documents                                 |
-| ┖ errorCode             | Error codes and troubleshooting guide               |
-| ┖ installation          | Installation and setup guide                        |
-| ┖ db                    | Database ERD, table specifications                  |
-| source                  | Source code                                         |
-| ┖ did-demo-server       | DEMO server source code and build files             |
-| ┖ gradle                | Gradle build settings and scripts                   |
-| ┖ libs                  | External libraries and dependencies                 |
-| ┖ sample                | Sample files                                        |
-| ┖ src                   | Main source code directory                          |
-| ┖ build.gradle          | Gradle build configuration file                     |
-| ┖ README.md             | Source code overview and guide                      |
+| Name                    | Description                                      |
+| ----------------------- | ------------------------------------------------ |
+| CHANGELOG.md            | Version-specific changes of the project         |
+| CODE_OF_CONDUCT.md      | Code of conduct for contributors                 |
+| CONTRIBUTING.md         | Contribution guidelines and procedures           |
+| LICENSE                 | License information                              |
+| dependencies-license.md | License information of project dependencies      |
+| MAINTAINERS.md          | Guidelines for project maintainers              |
+| RELEASE-PROCESS.md      | Procedures for releasing new versions            |
+| SECURITY.md             | Security policy and vulnerability reporting      |
+| docs                    | Documentation                                    |
+| ┖ installation          | Installation and configuration guides           |
+| source                  | Source code                                      |
+| ┖ demo                  | Demo server source code and build files         |
+| ┖ gradle                | Gradle build configuration and scripts          |
+| ┖ libs                  | External libraries and dependencies              |
+| ┖ sample                | Sample files                                     |
+| ┖ src                   | Main source code directory                       |
+| ┖ build.gradle          | Gradle build configuration file                  |
+| ┖ README.md             | Source code overview and guidance                |
 
 <br/>
 
-
 # 4. Server Startup Methods
-This chapter guides you through three methods to start the server.
+This chapter guides you through two methods of starting the server.
 
-The project source is located under the `source` directory, and you need to load and configure the source from this directory according to each startup method.
+The project source is located under the `source` directory, and you need to load and configure the source from that directory according to each startup method.
 
-1. **Using an IDE**: You can open the project in an Integrated Development Environment (IDE), set up the run configuration, and directly run the server. This method is useful for quickly testing code changes during development.
+1. **Using IDE**: You can open the project in an Integrated Development Environment (IDE), set up execution configuration, and run the server directly. This method is useful for quickly testing code changes during development.
 
-2. **Using console commands after building**: You can build the project and then run the server by executing the generated JAR file with a console command (`java -jar`). This method is mainly used when deploying the server or running it in a production environment.
-
+2. **Using Build and Console Commands**: After building the project, you can start the server by executing the generated JAR file with console commands (`java -jar`). This method is mainly used when deploying the server or running it in production environments.
+   
 ## 4.1. Running with IntelliJ IDEA (Gradle Support)
 
-IntelliJ IDEA is a widely used Integrated Development Environment (IDE) for Java development, supporting build tools like Gradle, which makes project setup and dependency management very convenient. Open DID's server is built using Gradle, so you can easily set up the project and run the server in IntelliJ IDEA.
+IntelliJ IDEA is an Integrated Development Environment (IDE) widely used for Java development, supporting build tools like Gradle for easy project setup and dependency management. Since Open DID servers are built using Gradle, you can easily set up projects and run servers in IntelliJ IDEA.
 
 ### 4.1.1. IntelliJ IDEA Installation and Setup
-1. Install IntelliJ. (Refer to the link below for installation method)
+1. Install IntelliJ. (Refer to the link below for installation instructions)
 
-> **참고 링크**
+> **Reference Links**
 > - [IntelliJ IDEA Download](https://www.jetbrains.com/idea/download/)
 
 ### 4.1.2. Opening Project in IntelliJ
-- Run IntelliJ and select `File -> New -> Project from Existing Sources`. When the file selection window appears, select the 'source/did-demo-server' folder from the repository cloned in [3.1. Source Code Cloning](#31-source-code-cloning).
+- Launch IntelliJ and select `File -> New -> Project from Existing Sources`. When the file selection window appears, select the 'source/did-demo-server' folder from the repository cloned in [3.1. Source Code Cloning](#31-source-code-cloning).
 - When you open the project, the build.gradle file is automatically recognized.
-- Gradle automatically downloads the necessary dependency files, wait for this process to complete.
+- Gradle automatically downloads necessary dependency files, wait for this process to complete.
 
 ### 4.1.3. Gradle Build
-- Run `Tasks -> build -> build` in the `Gradle` tab of IntelliJ IDEA. 
-- When the build is successfully completed, the project is ready to run.
+- In IntelliJ IDEA's `Gradle` tab, execute `Tasks -> build -> build`.
+- Once the build completes successfully, the project is ready to run.
 
 ### 4.1.4. Server Startup
-- Select and run Tasks -> application -> bootRun in the Gradle tab of IntelliJ IDEA.
+- In IntelliJ IDEA's Gradle tab, select Tasks -> application -> bootRun and execute.
 - Gradle automatically builds and runs the server.
-- Check the console log for the message "Started [ApplicationName] in [time] seconds" to confirm that the server has started normally.
-- If the server starts normally, navigate to http://localhost:8099/swagger-ui/index.html in your browser to verify that the API documentation is properly displayed through Swagger UI.
+- Check the console logs for the "Started [ApplicationName] in [time] seconds" message to confirm the server started successfully.
+- Once the server is running properly, navigate to http://localhost:8099/swagger-ui/index.html in your browser to verify that the API documentation is displayed correctly through Swagger UI.
 
 <br/>
 
 ### 4.1.5. Server Configuration
-- The server must be configured according to the deployment environment to ensure stable operation. For example, this includes settings such as the address of the TAS server that will integrate with the Demo server.
-- The server's configuration files are located in the `src/main/resource/config` path.
+- The server needs to modify necessary configurations according to the deployment environment to ensure stable operation. For example, this includes the address of the TAS server to integrate with the Demo server.
+- Server configuration files are located in the `src/main/resource/config` path.
 - For detailed configuration methods, please refer to [5. Configuration Guide](#5-configuration-guide).
 
 <br/>
 
-## 4.2. Running via Console Commands
+## 4.2. Running with Console Commands
 
-This section guides you on how to run the Open DID server using console commands. It explains the process of building the project using Gradle and running the server using the generated JAR file.
+This section guides you through running the Open DID server using console commands. It explains the process of building the project using Gradle and starting the server using the generated JAR file.
 
 ### 4.2.1. Gradle Build Commands
 
-- Use gradlew to build the source:
+- Build the source using gradlew:
   ```shell
-    # Move to the source folder of the cloned repository
-    cd source/did-demo-server
+    # Navigate to the source folder of the cloned repository
+    cd source/demo
 
     # Grant execution permission to Gradle Wrapper
     chmod 755 ./gradlew
 
-    # Clean build the project (delete previous build files and build anew)
+    # Clean build the project (delete previous build files and build new ones)
     ./gradlew clean build
   ```
-  
   > Note
-  > - gradlew is short for Gradle Wrapper, a script used to run Gradle in the project. Even if Gradle is not installed locally, it automatically downloads and runs the version of Gradle specified in the project. This allows developers to build the project in the same environment regardless of whether Gradle is installed or not.
+  > - gradlew is short for Gradle Wrapper, a script used to execute Gradle in projects. Even if Gradle is not installed locally, it automatically downloads and executes the version of Gradle specified by the project. This allows developers to build projects in the same environment regardless of whether Gradle is installed.
 
-- Move to the built folder and check that the JAR file has been created.
+- Navigate to the built folder and verify that the JAR file has been created:
     ```shell
       cd build/libs
       ls
     ```
-- This command creates the `did-demo-server-1.0.0.jar` file.
+- This command creates the `did-demo-server-2.0.0.jar` file.
 
 <br/>
 
 ### 4.2.2. Server Startup Method
-Use the built JAR file to start the server:
+Start the server using the built JAR file:
 
 ```bash
-java -jar did-demo-server-1.0.0.jar
+java -jar did-demo-server-2.0.0.jar
 ```
 
-- If the server starts normally, navigate to http://localhost:8099/swagger-ui/index.html in your browser to verify that the API documentation is properly displayed through Swagger UI.
+- Once the server is running properly, navigate to http://localhost:8099/swagger-ui/index.html in your browser to verify that the API documentation is displayed correctly through Swagger UI.
 
 <br/>
 
-### 4.2.3. Server Configuration
-- The server needs to be configured according to the deployment environment, ensuring stable operation. For example, database connection information, port number, email integration information, and other components should be adjusted to fit each environment.
-- The server's configuration files are located in the `src/main/resource/config` path.
+### 4.2.3. Server Configuration Method
+- The server needs to modify necessary configurations according to the deployment environment to ensure stable operation. For example, you need to adjust components like database connection information, port numbers, and email integration information for each environment.
+- Server configuration files are located in the `src/main/resource/config` path.
 - For detailed configuration methods, please refer to [5. Configuration Guide](#5-configuration-guide).
 
 <br/>
 
-
 # 5. Configuration Guide
 
-This chapter provides guidance on each configuration value included in all server configuration files. Each setting is an important element that controls the server's behavior and environment, and appropriate settings are necessary for stable server operation. Please refer to the item-by-item explanations and examples to apply settings suitable for each environment.
+This chapter guides you through all configuration values included in the server's configuration files. Each configuration is an important element that controls the server's operation and environment, and proper configuration is necessary for stable server operation. Please refer to the item-specific descriptions and examples to apply configurations suitable for each environment.
 
-Please note that settings with the 🔒 icon are either fixed values by default or generally do not need to be modified.
+Please note that configurations with the 🔒 icon are basically fixed values or values that generally do not need to be modified.
 
 ## 5.1. application.yml
 
-- Role: The application.yml file defines the basic settings for the Spring Boot application. Through this file, you can specify various environment variables such as the application name, database settings, profile settings, etc., which have a significant impact on how the application operates.
+- Role: The application.yml file defines the basic settings for Spring Boot applications. Through this file, you can specify various environment variables such as application name, database settings, and profile settings, which significantly affect how the application operates.
 
-- 위치: `src/main/resources/`
+- Location: `src/main/resources/`
 
 ### 5.1.1. Spring Basic Configuration
 Spring's basic configuration defines the application name and profiles to activate, playing an important role in setting up the server's operating environment.
 
 * `spring.application.name`: 🔒
-    - Specifies the name of the application.
-    - Usage: Mainly used to identify the application in log messages, monitoring tools, or Spring Cloud services.
+    - Specifies the application name.
+    - Purpose: Mainly used to identify applications in log messages, monitoring tools, or Spring Cloud services
     - Example: `demo`
 
 * `spring.profiles.active`:  
-  - Defines the profile to activate. 
-  - Usage: Selects either sample or development environment to load the appropriate settings for that environment. For more details about profiles
+  - Defines the profile to activate.
+  - Purpose: Select either sample or development environment to load configurations suitable for that environment.
   - Supported profiles: dev
   - Example: `dev`
 
 * `spring.profiles.group.dev`: 🔒
   - Defines individual profiles included in the `dev` profile group.
-  - Usage: Groups settings to be used in the development environment.
-  - Profile file naming convention: Configuration files for each profile use the name defined in the group as is. For example, the auth profile is written as application-auth.yml, and the spring-docs profile as application-spring-docs.yml. The filename should be used exactly as written under group.dev.
-
-
+  - Purpose: Groups and manages configurations to be used in development environments.
+  - Profile file naming convention: Configuration files corresponding to each profile use the exact names defined within the group. For example, the logging profile is written as application-logging.yml, and the spring_docs profile is written as application-spring-docs.yml. File names must use the exact names written under group.dev.
 
 <br/>
 
 ### 5.1.2. Jackson Basic Configuration
 
-Jackson is the JSON serialization/deserialization library used by default in Spring Boot. Through Jackson's settings, you can adjust the serialization method or format of JSON data, improving performance and efficiency in data transmission.
+Jackson is the JSON serialization/deserialization library used by default in Spring Boot. Through Jackson configuration, you can adjust JSON data serialization methods or formats, improving performance and efficiency during data transmission.
 
 * `spring.jackson.default-property-inclusion`: 🔒 
-    - Sets not to serialize when property values are null.
-    - Example: non_null
-
-* `spring.jackson.default-property-inclusion`: 🔒 
-    - Sets not to cause errors when serializing empty objects.
+    - Configured to not generate errors when serializing empty objects.
     - Example: false
 
 <br/>
 
 ### 5.1.3. Server Configuration 
-Server configuration defines the port number on which the application will receive requests.
+Server configuration defines the port number where the application will receive requests.
 
 * `server.port`:  
-    - The port number on which the application will run. The default port for the DEMO server is 8099.
+    - The port number where the application will run. The default port for Demo server is 8099.
     - Value: 8099
-
-<br/>
-
-### 5.1.4. Open DID Server Communication Configuration
-The Demo service communicates with TAS, Verifier, CAS, and Issuer servers. You need to configure the address values of your directly deployed servers.
-* `tas.url`:  
-    - This is the URL for the TAS(Trust Agent Service). It calls email sending and Push services.
-    - Example: `http://localhost:8090/contextpath/tas`
-
-* `cas.url`:  
-    - This is the URL for the CAS(Certificate App Server) service. It transmits PII configuration values.
-    - Example: `http://localhost:8094/contextpath/cas`
-
-* `verifier.url`:  
-    - This is the URL for the Verifier service. It calls services for VP submission and verification.
-    - Example: `http://localhost:8093/contextpath/verifier`
-
-* `issuer.url`:  
-    - This is the URL for the Issuer service. It calls services for VC issuance requests.
-    - Example: `http://localhost:8091/contextpath/issuer`
 
 <br/>
 
@@ -352,13 +325,13 @@ The Demo service communicates with TAS, Verifier, CAS, and Issuer servers. You n
   
 ### 5.2.1. Logging Configuration
 
-- Log groups: You can group and manage desired packages under logging.group. For example, you can include the org.omnione.did.base.util package in the util group and define other packages as separate groups.
+- Log Groups: Under logging.group, you can group and manage desired packages. For example, include the org.omnione.did.base.util package in the util group and define other packages as individual groups.
 
-- Log levels: Through the logging.level setting, you can specify log levels for each group. You can set various log levels such as debug, info, warn, error to output logs at the desired level. For example, you can set the debug level for groups like tas, aop to output debug information from those packages.
+- Log Levels: Through logging.level settings, you can specify log levels for each group. You can set various log levels such as debug, info, warn, error to output logs at desired levels. For example, you can set debug level for groups like demo, aop to output debug information from those packages.
 
 * `logging.level`: 
-    - Sets the log level.
-    - By setting the level to debug, you can see all log messages at DEBUG level and above (INFO, WARN, ERROR, FATAL) for the specified packages.
+    - Sets log levels.
+    - By setting the level to debug, you can see all log messages at DEBUG level and above (INFO, WARN, ERROR, FATAL) for specified packages.
 
 Full example:
 ```yaml
@@ -369,30 +342,7 @@ logging:
 
 <br/>
 
-## 5.3. application-demo.yml
-This configuration file manages the values used for generating QR codes for VP Offers and VC issuance Offers in the Demo server. These values correspond to the VP Policy of the Verifier server and the VC plan of the Issuer server, and are implemented as demo and sample values that must match exactly with the values in this file during testing. For detailed information, please refer to the Design document's Data Specification (4.6.7.1. VerifyOfferPayload, 4.6.5.1. VcPlan) and the Presentation of VP_ko.md file.
-
-* `demo.device`: 🔒
-  - This is an identifier to determine which device of the verification provider offered the verify offer, and currently contains the value corresponding to VpPolicy.json of the Verifier server.
-  - Example: `WEB`
-
-* `demo.service`: 🔒
-  - This is an identifier for the service designated by the verification provider and the service received through VP submission. Currently, it contains the value corresponding to VpPolicy.json of the Verifier server.
-  - Example: `login`, `signup`
-
-* `demo.mode`: 🔒
-  - The submission mode is a value that determines how VP is submitted, and currently contains the value corresponding to VpPolicy.json of the Verifier server.
-  - Example: `Direct`
-
-* `demo.vcPlanId`: 🔒
-  - This is the issuer's VC plan ID value, used to find the profile in application-issue on the Issuer server. Currently, this value is set for sample and demo calls.
-  - Example: `vcplanid000000000001`
-
-* `demo.issuer`: 🔒
-  - This is the DID value of the issuer server, used to call the corresponding issuer when requesting a VC offer. Currently, this value is set for sample and demo calls.
-  - Example: `did:omn:issuer`
-
-## 5.4. application-spring-docs.yml
+## 5.3. application-spring-docs.yml
 - Role: Manages SpringDoc and Swagger UI settings in the application.
 
 - Location: `src/main/resources/`
@@ -406,7 +356,7 @@ This configuration file manages the values used for generating QR codes for VP O
   - Example: `ASC`
 
 * `springdoc.swagger-ui.operations-sorter`: 🔒
-  - Sorts API endpoints in Swagger UI based on HTTP methods.
+  - Sorts API endpoints by HTTP method in Swagger UI.
   - Example: `method`
 
 * `springdoc.swagger-ui.disable-swagger-default-url`: 🔒
@@ -426,11 +376,116 @@ This configuration file manages the values used for generating QR codes for VP O
   - Example: `true`
 
 * `springdoc.default-consumes-media-type`: 🔒
-  - Sets the default media type for request bodies in API documentation.
+  - Sets the default media type for request body in API documentation.
   - Example: `application/json`
 
 * `springdoc.default-produces-media-type`: 🔒
-  - Sets the default media type for response bodies in API documentation.
+  - Sets the default media type for response body in API documentation.
   - Example: `application/json`
 
-[Open DID Installation Guide]: https://github.com/OmniOneID/did-release/blob/develop/unrelease-V1.0.1.0/OepnDID_Installation_Guide-V1.0.1.0.md
+# 6. Demo Operation Guide
+
+This chapter guides you through all configuration values included in the server's configuration files. Each configuration is an important element that controls the server's operation and environment, and proper configuration is necessary for stable server operation. Please refer to the item-specific descriptions and examples to apply configurations suitable for each environment.
+
+This chapter provides basic guidance on operational procedures after completing all server configurations and startup. For detailed data structures and procedures, please refer to the [Open DID Software Architecture] document.
+
+## 6.1. Screen Layout
+<img src="./images/demo_main.png" width="800"/>
+The main screen is structured as shown above. The OpenDID Demo title is displayed at the top of the screen, and major functions such as VC issuance, VP submission, information input, and server settings are arranged in card format in the center.
+
+## 6.2. Operation Server Configuration
+The demo communicates with other servers for user information input, VC issuance, and VP submission. The main functions and roles of each server are as follows:
+
+| Server Name | Main Function | Role Description |
+|-------------|---------------|------------------|
+| TAS Server | Transaction Authentication | User authentication and transaction management |
+| Issuer Server | VC Issuance | Credential issuance and management |
+| CA Server | Authentication Management | Certificate issuance and verification |
+| Verifier Server | VP Verification | Verification of submitted Verifiable Presentations (VP) |
+
+For server configuration, enter the IP address of the actually running server.
+
+<img src="./images/server_settings.png" width="800"/>
+
+## 6.3. User Information Input
+To use the OpenDID demo, you must input user information.
+Since the demo issues VCs based on user information and submits VPs through them, this procedure is essential. User information includes the following items:
+
+1. Basic User Information
+   - First Name
+   - Last Name
+   - DID (User Identifier)
+   - Email
+
+2. Credential Type Selection (Example)
+   - National ID
+   - Mobile Driver's License (MDL)
+
+Depending on the selected credential type, additional information must be entered.
+
+<img src="./images/enter_information.png" width="800"/>
+
+## 6.4. VC Issuance 
+
+The process for issuing a VC (Verifiable Credential) is as follows:
+
+1. Select the credential to be issued.
+   <img src="./images/vc_plan_select.png" width="800"/>
+
+   > Note: Credential issuance is only possible when registered in the credential issuance plan (VcPlan). 
+   > For VC plan registration, please refer to the [Issuer Admin Guide] in detail.
+
+2. Click the 'Search' button to select the issuance plan through a popup for selecting the VC to be issued.
+   <img src="./images/vc_plan_popup.png" width="800"/>
+
+3. Click the 'Issuance of ID card' button to request a QR code.
+   - QR codes have a validity period and can be reset using the 'Renew' button.
+   <img src="./images/vc_qr.png" width="800"/>
+
+4. VC issuance requests can be received through various methods:
+   - QR Code Scan: Scan QR code with OpenDID app
+   - Push Notification: Send push notification using registered user's DID in the app
+   <img src="./images/vc_push.png" width="800"/>
+   - Email: Send QR code to email entered in user information
+
+## 6.5. VP Submission 
+The process for submitting a VP (Verifiable Presentation) is as follows:
+
+1. Select a VP policy.
+   <img src="./images/vp_policy.png" width="800"/>
+
+   > Note: Pre-registered VP policies are required for VP submission. For registration methods, please refer to the [Verifier Admin Guide].
+
+2. The VP submission procedure is similar to the VC issuance procedure:
+   - Select VP policy
+   - Click 'Submit your ID' button to issue QR code
+   - Scan QR code with OpenDID app to submit VP
+   - Confirm successful submission completion
+
+## 6.6. Server Connection Test
+
+After saving server settings, you can click the 'Test Connection' button to check connection status with each server. Connection testing verifies communication with the following servers:
+
+- TAS Server
+- Issuer Server
+- CA Server
+- Verifier Server
+
+If connection testing succeeds, a message confirming normal connection with all servers is displayed. If it fails, it indicates which server connection failed and guides you to recheck server settings.
+
+## 6.7. Major Error Situations and Solutions
+
+| Error Situation | Cause | Solution |
+|-----------------|-------|----------|
+| QR Code Generation Failure | Server connection issue or VC plan not selected | Check server connection status and select VC plan |
+| Push Notification Send Failure | Incorrect DID information or app not installed | Check DID information and app installation status |
+| Email Send Failure | Incorrect email address | Check email address in user information |
+| VC Issuance Failure | Missing required information or server error | Check all required information input and server logs |
+| VP Submission Failure | No issued VC or VP policy issue | Check VC issuance status and review VP policy settings |
+| Server Integration Failure | Server address setting error | Need to verify server address |
+
+[Open DID Installation Guide]: https://github.com/OmniOneID/did-release/blob/develop/release-V2.0.0.0/OpenDID_Installation_Guide-V2.0.0.0_en.md
+
+[Open DID Software Architecture]: https://omnioneid.github.io/?locale=en&version=V1.0.0
+[Verifier Admin Guide]: https://github.com/OmniOneID/did-verifier-server/blob/develop/docs/admin/OpenDID_VerifierAdmin_Operation_Guide_en.md
+[Issuer Admin Guide]: https://github.com/OmniOneID/did-issuer-server/blob/develop/docs/admin/OpenDID_IssuerAdmin_Operation_Guide_en.md

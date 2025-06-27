@@ -216,9 +216,9 @@ function updateUserGreeting() {
   
   const userName = AppState.getUserName();
   if (userName) {
-    greetingElement.textContent = `${userName} 님 반갑습니다!`;
+    greetingElement.textContent = `Hello, ${userName}`;
   } else {
-    greetingElement.textContent = '반갑습니다! 사용자 정보를 입력해주세요!';
+    greetingElement.textContent = 'Welcome! Please enter your user information!';
   }
 }
 
@@ -257,22 +257,13 @@ function populateFormWithSavedData() {
   if (didInput) didInput.value = userInfo.did || '';
   if (emailInput) emailInput.value = userInfo.email || '';
   
-  
-  if (userInfo.vcSchemaId && AppState.vcSchemaData) {
-    let schemaIndex = userInfo.vcSchemaIndex;
-    
-    if (schemaIndex === undefined || !AppState.vcSchemaData[schemaIndex] || 
-        AppState.vcSchemaData[schemaIndex].schemaId !== userInfo.vcSchemaId) {
-      schemaIndex = AppState.vcSchemaData.findIndex(schema => schema.schemaId === userInfo.vcSchemaId);
-    }
-    
-    if (schemaIndex >= 0) {
-      const selectElement = document.getElementById('vcSchema');
-      if (selectElement) {
-        selectElement.value = schemaIndex;
-        createDynamicForm(schemaIndex);
-        
-        
+
+  if (userInfo.vcPlanIndex !== undefined && AppState.vcPlanData && AppState.vcPlanData.length > 0) {
+    const selectElement = document.getElementById('vcSchema');
+    if (selectElement && userInfo.vcPlanIndex < AppState.vcPlanData.length) {
+      selectElement.value = userInfo.vcPlanIndex;
+      
+      displayIdentificationForm().then(() => {
         setTimeout(() => {
           if (userInfo.fields) {
             Object.keys(userInfo.fields).forEach(key => {
@@ -282,8 +273,10 @@ function populateFormWithSavedData() {
               }
             });
           }
-        }, 300);
-      }
+        }, 500);
+      }).catch(error => {
+        console.error('Error restoring form data:', error);
+      });
     }
   }
 }
@@ -317,7 +310,6 @@ function populateServerSettingsForm() {
 
 function createDynamicForm(schemaIndex) {
   const schemas = AppState.vcSchemaData;
-  
 
   if (!schemas || schemaIndex === "" || !schemas[schemaIndex]) {
     const formsContainer = document.getElementById('identificationForms');
@@ -331,12 +323,10 @@ function createDynamicForm(schemaIndex) {
   
   
   formsContainer.style.display = 'block';
-  formsContainer.innerHTML = ''; 
-  
+  formsContainer.innerHTML = '';
   
   const formDiv = document.createElement('div');
   formDiv.className = 'identification-form';
-  
   
   const titleDiv = document.createElement('div');
   titleDiv.className = 'label';
@@ -346,14 +336,11 @@ function createDynamicForm(schemaIndex) {
   `;
   formDiv.appendChild(titleDiv);
   
-  
   const inputGroupDiv = document.createElement('div');
   inputGroupDiv.className = 'input-group';
   
-  
   if (schema.vcSchema && schema.vcSchema.credentialSubject && schema.vcSchema.credentialSubject.claims) {
     schema.vcSchema.credentialSubject.claims.forEach(claim => {
-      
       const namespace = claim.namespace ? claim.namespace.id : '';
       
       if (claim.items && Array.isArray(claim.items)) {
@@ -361,10 +348,8 @@ function createDynamicForm(schemaIndex) {
           const inputDiv = document.createElement('div');
           inputDiv.className = 'input';
           
-          
           const labelP = document.createElement('p');
           labelP.textContent = item.caption || item.id;
-          
           
           const requiredSpan = document.createElement('span');
           requiredSpan.className = 'color-error';
@@ -373,10 +358,8 @@ function createDynamicForm(schemaIndex) {
           
           inputDiv.appendChild(labelP);
           
-          
           const inputElement = document.createElement('input');
           inputElement.type = item.type === 'number' ? 'number' : 'text';
-          
           
           const fieldId = namespace ? `${namespace}.${item.id}` : item.id;
           
@@ -403,12 +386,17 @@ async function displayIdentificationForm() {
   const vcPlanSelect = document.getElementById('vcSchema');
   const planIndex = vcPlanSelect.value;
 
-  
   const schemaSection = document.getElementById('credentialSchemaSection');
   const definitionSection = document.getElementById('credentialDefinitionSection');
 
-  if (schemaSection) schemaSection.style.display = 'none';
-  if (definitionSection) definitionSection.style.display = 'none';
+  if (schemaSection) {
+    schemaSection.style.display = 'none';
+    schemaSection.innerHTML = '';
+  }
+  if (definitionSection) {
+    definitionSection.style.display = 'none';
+    definitionSection.innerHTML = '';
+  }
 
   if (!planIndex || planIndex === "") {
     return;
@@ -420,12 +408,9 @@ async function displayIdentificationForm() {
   showLoading();
 
   try {
-    
     if (plan.credentialSchema && plan.credentialSchema.id) {
       await createCredentialSchemaForm(plan);
     }
-
-    
     if (plan.credentialDefinition && plan.credentialDefinition.schemaId) {
       await createCredentialDefinitionForm(plan.credentialDefinition.schemaId);
     }
@@ -438,7 +423,6 @@ async function displayIdentificationForm() {
 }
 
 async function createCredentialSchemaForm(plan) {
-  
   const schemaUrl = plan.credentialSchema.id;
   const schemaName = extractSchemaName(schemaUrl);
 
@@ -448,21 +432,14 @@ async function createCredentialSchemaForm(plan) {
   }
 
   try {
-    
     const response = await fetch(`/demo/api/vc-schema/${schemaName}`);
     if (!response.ok) throw new Error('Failed to fetch schema details');
 
     const schemaData = await response.json();
-
-    
     const schemaSection = document.getElementById('credentialSchemaSection');
     if (!schemaSection) return;
-
-    
     schemaSection.style.display = 'block';
     schemaSection.innerHTML = '';
-
-    
     const titleDiv = document.createElement('div');
     titleDiv.className = 'credential-section-title';
     titleDiv.textContent = schemaData.title || 'Credential Information';
@@ -471,7 +448,6 @@ async function createCredentialSchemaForm(plan) {
     const inputGroupDiv = document.createElement('div');
     inputGroupDiv.className = 'input-group';
 
-    
     if (schemaData.vcSchema && schemaData.vcSchema.credentialSubject && schemaData.vcSchema.credentialSubject.claims) {
       schemaData.vcSchema.credentialSubject.claims.forEach(claim => {
         const namespace = claim.namespace ? claim.namespace.id : '';
@@ -489,6 +465,11 @@ async function createCredentialSchemaForm(plan) {
 
   } catch (error) {
     console.error('Error creating credential schema form:', error);
+    const schemaSection = document.getElementById('credentialSchemaSection');
+    if (schemaSection) {
+      schemaSection.style.display = 'none';
+      schemaSection.innerHTML = '';
+    }
     throw error;
   }
 }
@@ -539,29 +520,21 @@ function createInputField(item, namespace, source) {
 
 async function createCredentialDefinitionForm(schemaId) {
   try {
-  
     const response = await fetch(`/demo/api/credential-schema?credentialSchemaId=${encodeURIComponent(schemaId)}`);
     if (!response.ok) throw new Error('Failed to fetch credential definition');
 
     const definitionData = await response.json();
-
-
     const definitionSection = document.getElementById('credentialDefinitionSection');
     if (!definitionSection) return;
-
-
     definitionSection.style.display = 'block';
     definitionSection.innerHTML = '';
-
- 
     const titleDiv = document.createElement('div');
     titleDiv.className = 'credential-section-title';
-    titleDiv.textContent = 'ZKP Information'; 
+    titleDiv.textContent = 'ZKP Information';
     definitionSection.appendChild(titleDiv);
 
     const inputGroupDiv = document.createElement('div');
     inputGroupDiv.className = 'input-group';
-
 
     if (definitionData.attrTypes && Array.isArray(definitionData.attrTypes)) {
       definitionData.attrTypes.forEach(attrType => {
@@ -580,6 +553,11 @@ async function createCredentialDefinitionForm(schemaId) {
 
   } catch (error) {
     console.error('Error creating credential definition form:', error);
+    const definitionSection = document.getElementById('credentialDefinitionSection');
+    if (definitionSection) {
+      definitionSection.style.display = 'none';
+      definitionSection.innerHTML = '';
+    }
   }
 }
 
@@ -625,32 +603,37 @@ async function saveUserInfo() {
   };
 
   const dynamicFields = {};
-  const schemaInputs = document.querySelectorAll('#credentialSchemaSection input');
-  const definitionInputs = document.querySelectorAll('#credentialDefinitionSection input');
-
+  const schemaSection = document.getElementById('credentialSchemaSection');
+  const definitionSection = document.getElementById('credentialDefinitionSection');
+  
   let hasError = false;
+  if (schemaSection && schemaSection.style.display !== 'none') {
+    const schemaInputs = schemaSection.querySelectorAll('input');
+    schemaInputs.forEach(input => {
+      if (input.required && !input.value) {
+        alert(`Please fill out all required fields: ${input.getAttribute('data-caption')}`);
+        hasError = true;
+        return;
+      }
+      if (input.id && input.value) {
+        dynamicFields[input.id] = input.value;
+      }
+    });
+  }
 
-  schemaInputs.forEach(input => {
-    if (input.required && !input.value) {
-      alert(`Please fill out all required fields: ${input.getAttribute('data-caption')}`);
-      hasError = true;
-      return;
-    }
-    if (input.id && input.value) {
-      dynamicFields[input.id] = input.value;
-    }
-  });
-
-  definitionInputs.forEach(input => {
-    if (input.required && !input.value) {
-      alert(`Please fill out all required fields: ${input.getAttribute('data-caption')}`);
-      hasError = true;
-      return;
-    }
-    if (input.id && input.value) {
-      dynamicFields[input.id] = input.value;
-    }
-  });
+  if (definitionSection && definitionSection.style.display !== 'none') {
+    const definitionInputs = definitionSection.querySelectorAll('input');
+    definitionInputs.forEach(input => {
+      if (input.required && !input.value) {
+        alert(`Please fill out all required fields: ${input.getAttribute('data-caption')}`);
+        hasError = true;
+        return;
+      }
+      if (input.id && input.value) {
+        dynamicFields[input.id] = input.value;
+      }
+    });
+  }
 
   if (hasError) return;
 
@@ -685,22 +668,21 @@ async function saveUserInfo() {
 }
 
 async function saveServerSettings() {
-  const tasServer = document.getElementById('tasServer')?.value || '';
-  const issuerServer = document.getElementById('issuerServer')?.value || '';
-  const caServer = document.getElementById('caServer')?.value || '';
-  const verifierServer = document.getElementById('verifierServer')?.value || '';
+  const tasServer = document.getElementById('tasServer')?.value?.trim() || '';
+  const issuerServer = document.getElementById('issuerServer')?.value?.trim() || '';
+  const caServer = document.getElementById('caServer')?.value?.trim() || '';
+  const verifierServer = document.getElementById('verifierServer')?.value?.trim() || '';
   
   const vcPlanInput = document.getElementById('vcPlanIssuance');
+  const vcPlan = vcPlanInput ? (vcPlanInput.getAttribute('data-id') || vcPlanInput.value?.trim() || '') : '';
+  const vcPlanName = vcPlanInput ? (vcPlanInput.value?.trim() || '') : '';
+  
   const vpPolicyInput = document.getElementById('vpPolicySubmission');
-  
-  const vcPlan = vcPlanInput ? vcPlanInput.getAttribute('data-id') || vcPlanInput.value : '';
-  const vcPlanName = vcPlanInput ? vcPlanInput.value : '';
-  
-  const vpPolicy = vpPolicyInput ? vpPolicyInput.getAttribute('data-id') || vpPolicyInput.value : '';
-  const vpPolicyName = vpPolicyInput ? vpPolicyInput.value : '';
+  const vpPolicy = vpPolicyInput ? (vpPolicyInput.getAttribute('data-id') || vpPolicyInput.value?.trim() || '') : '';
+  const vpPolicyName = vpPolicyInput ? (vpPolicyInput.value?.trim() || '') : '';
 
   if (!tasServer || !issuerServer || !caServer || !verifierServer) {
-    alert('Please enter all server URLs');
+    alert('Please enter all required server URLs (TAS, Issuer, CA, Verifier)');
     return;
   }
 
@@ -727,15 +709,28 @@ async function saveServerSettings() {
     });
 
     if (!response.ok) {
-      throw new Error('Failed to save server settings');
+      const errorData = await response.json();
+      throw new Error(errorData.message || 'Failed to save server settings');
     }
     
+    const result = await response.json();
     AppState.serverSettings = settings;
     
-    alert('Server settings saved successfully!');
+    if (result.success) {
+      alert('Server settings saved successfully!\n\n' + 
+            'Changes have been applied immediately - no restart required.\n\n' +
+            'Current URLs:\n' +
+            `TAS: ${result.currentUrls?.tasServer || tasServer}\n` +
+            `Issuer: ${result.currentUrls?.issuerServer || issuerServer}\n` +
+            `CA: ${result.currentUrls?.caServer || caServer}\n` +
+            `Verifier: ${result.currentUrls?.verifierServer || verifierServer}`);
+    } else {
+      alert('Server settings saved but there might be issues: ' + (result.message || 'Unknown error'));
+    }
+    
   } catch (error) {
     console.error('Error saving server settings:', error);
-    alert('Failed to save server settings. Please try again.');
+    alert('Failed to save server settings: ' + error.message);
   } finally {
     hideLoading();
   }
@@ -777,16 +772,32 @@ async function testConnection() {
     const results = await response.json();
 
     if (results.allSuccess) {
-      alert('All server connections successful!');
+      alert('✅ All server connections successful!\n\n' + 
+            results.message + '\n\n' +
+            'The URLs have been applied and are ready for use.');
     } else {
       const failedServers = results.results
         .filter(result => !result.success)
+        .map(result => `${result.server}: ${result.message}`);
+      
+      const successServers = results.results
+        .filter(result => result.success)
         .map(result => result.server);
-      alert(`Connection failed for: ${failedServers.join(', ')}. Please check your server settings and try again.`);
+        
+      let message = '❌ Connection test results:\n\n';
+      
+      if (successServers.length > 0) {
+        message += '✅ Successful: ' + successServers.join(', ') + '\n\n';
+      }
+      
+      message += '❌ Failed:\n' + failedServers.join('\n');
+      message += '\n\nPlease check the failed URLs and try again.';
+      
+      alert(message);
     }
   } catch (error) {
     console.error('Error testing connections:', error);
-    alert('Failed to test connections. Please try again.');
+    alert('Failed to test connections: ' + error.message + '\n\nPlease check your network connection and try again.');
   } finally {
     hideLoading();
   }
@@ -843,8 +854,6 @@ async function searchVcPlanIssuance() {
     
     popup.innerHTML = popupContent;
     document.body.appendChild(popup);
-    
-    
     window._popupData = {
       items: vcPlans,
       type: 'vcplan'
@@ -874,7 +883,6 @@ function selectVcPlan() {
     alert('Selected plan not found');
     return;
   }
-  
   
   const vcPlanInput = document.getElementById('vcPlanIssuance');
   if (vcPlanInput) {
@@ -975,8 +983,6 @@ async function searchVpPolicy() {
     
     popup.innerHTML = popupContent;
     document.body.appendChild(popup);
-    
-    
     window._popupData = {
       items: vpPolicies,
       type: 'vppolicy'
@@ -1472,8 +1478,6 @@ async function submitCertificate() {
 
     if (data.result) {
       alert("Mobile ID Issued Successfully");
-      
-      
       const externalResponse = await fetch("/vcSuccess");
       if (externalResponse.ok) {
         const externalHTML = await externalResponse.text();
@@ -1518,8 +1522,6 @@ async function submitVPComplete() {
 
     if (data.result) {
       alert("ID submission completed.");
-      
-      
       const externalResponse = await fetch("/success");
       if (externalResponse.ok) {
         const externalHTML = await externalResponse.text();
@@ -1577,10 +1579,7 @@ function vcOfferRefresh() {
   })
     .then((response) => response.json())
     .then((data) => {
-      hideLoading();
-      
-    
-      const responseTextArea = document.getElementById("responseTextArea");
+      hideLoading();const responseTextArea = document.getElementById("responseTextArea");
       if (responseTextArea) {
         responseTextArea.value = JSON.stringify(data, null, 2);
       }
@@ -1599,8 +1598,7 @@ function vcOfferRefresh() {
             vcQrImage.style.height = 'auto';
           }
           vcQrImage.src = "data:image/png;base64," + imageData;
-          qrContainer.innerHTML = ''; 
-          qrContainer.appendChild(vcQrImage);
+          qrContainer.innerHTML = '';qrContainer.appendChild(vcQrImage);
         }
       }
       
@@ -1628,14 +1626,12 @@ function refreshImage() {
     .then((response) => response.json())
     .then((data) => {
       hideLoading();
-      
 
       const responseTextArea = document.getElementById("responseTextArea");
       if (responseTextArea) {
         responseTextArea.value = JSON.stringify(data, null, 2);
       }
       
-
       const imageData = data.qrImage;
       if (imageData) {
         const qrContainer = document.querySelector('.qr-img');
@@ -1649,8 +1645,7 @@ function refreshImage() {
             qrImage.style.height = 'auto';
           }
           qrImage.src = "data:image/png;base64," + imageData;
-          qrContainer.innerHTML = '';
-          qrContainer.appendChild(qrImage);
+          qrContainer.innerHTML = '';qrContainer.appendChild(qrImage);
         }
       }
       
@@ -1789,8 +1784,7 @@ async function openVcSchemaSelector() {
       await AppState.loadVcSchemas();
     }
     
-    const schemas = AppState.vcSchemaData;
-    hideLoading();
+    const schemas = AppState.vcSchemaData;  hideLoading();
     
     if (schemas.length === 0) {
       alert('No credential types available. Please try again later.');
@@ -1826,7 +1820,7 @@ function handleEnterInfo(type) {
     case "사용자정보":
       window.open("/addUserInfo", "popup", "width=480,height=768");
       break;
-    case "신분증정보":      
+    case "신분증정보":
       if (isMobile) {
         openVcSchemaSelector();
       } else {
