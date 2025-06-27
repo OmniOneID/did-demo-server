@@ -18,8 +18,8 @@ puppeteer:
 Open DID Demo Server Installation And Operation Guide
 ==
 
-- Date: 2024-09-02
-- Version: v1.0.0
+- Date: 2025-05-30
+- Version: v2.0.0
 
 목차
 ==
@@ -49,12 +49,19 @@ Open DID Demo Server Installation And Operation Guide
   - [5.1. application.yml](#51-applicationyml)
     - [5.1.1. Spring 기본 설정](#511-spring-기본-설정)
     - [5.1.2. Jackson 기본 설정](#512-jackson-기본-설정)
-    - [5.1.3. 서버 설정](#513-서버-설정)
-    - [5.1.4. Open DID 서버 통신 설정](#514-open-did-서버-통신-설정)
+    - [5.1.3. 서버 설정](#513-서버-설정)    
   - [5.2. application-logging.yml](#52-application-loggingyml)
-    - [5.2.1. 로깅 설정](#521-로깅-설정)
-  - [5.3. application-demo.yml](#53-application-demoyml)
-  - [5.4. application-spring-docs.yml](#54-application-spring-docsyml)
+    - [5.2.1. 로깅 설정](#521-로깅-설정)  
+  - [5.3. application-spring-docs.yml](#53-application-spring-docsyml)
+- [6. 데모 운영 가이드](#6-데모-운영-가이드)
+  - [6.1. 화면 구성](#61-화면-구성)
+  - [6.2. 운영 서버 설정](#62-운영-서버-설정)
+  - [6.3. 사용자 정보 입력](#63-사용자-정보-입력)
+  - [6.4. VC 발급](#64-vc-발급)
+  - [6.5. VP 제출](#65-vp-제출)
+  - [6.6. 서버 연결 테스트](#66-서버-연결-테스트)
+  - [6.7. 주요 에러 상황 및 해결 방법](#67-주요-에러-상황-및-해결-방법)
+
     
 
 # 1. 소개
@@ -69,12 +76,12 @@ OpenDID의 전체 설치에 대한 가이드는 [Open DID Installation Guide]를
 ## 1.2. Demo 서버 정의
 
 Demo 서버는 Open DID에서 제공하는 데모 프로젝트입니다.<br>
-VC 발급, VP 제출, 사용자 등록 기능을 테스트할 수 있는 화면을 제공합니다.
+VC 발급, 제출, 사용자 등록, 서버세팅 기능을 테스트할 수 있는 화면을 제공합니다.
 
 <br/>
 
 ## 1.3. 시스템 요구 사항
-- **Java 17** 이상
+- **Java 21** 이상
 - **Gradle 7.0** 이상
 - **Docker** 및 **Docker Compose** (Docker 사용 시)
 - 최소 **2GB RAM** 및 **10GB 디스크 공간**
@@ -110,7 +117,7 @@ git --version
 터미널을 열고 다음 명령어를 실행하여 DEMO 서버의 리포지토리를 로컬 컴퓨터에 복사합니다.
 ```bash
 # Git 저장소에서 리포지토리 복제
-git clone http://gitlab.raondevops.com/opensourcernd/source/server/did-demo-server.git
+git clone https://github.com/OmniOneID/did-demo-server.git
 
 # 복제한 리포지토리로 이동
 cd did-demo-server
@@ -143,7 +150,7 @@ did-demo-server
     └── demo
         ├── gradle
         ├── libs
-            └── did-crypto-sdk-server-1.0.0.jar
+            └── did-crypto-sdk-server-2.0.0.jar
         └── src
         └── build.gradle
         └── README.md
@@ -241,7 +248,7 @@ IntelliJ IDEA는 Java 개발에 널리 사용되는 통합 개발 환경(IDE)으
       cd build/libs
       ls
     ```
-- 이 명령어는 `did-demo-server-1.0.0.jar` 파일을 생성합니다.
+- 이 명령어는 `did-demo-server-2.0.0.jar` 파일을 생성합니다.
 
 <br/>
 
@@ -249,7 +256,7 @@ IntelliJ IDEA는 Java 개발에 널리 사용되는 통합 개발 환경(IDE)으
 빌드된 JAR 파일을 사용하여 서버를 구동합니다:
 
 ```bash
-java -jar did-demo-server-1.0.0.jar
+java -jar did-demo-server-2.0.0.jar
 ```
 
 - 서버가 정상적으로 구동되면, 브라우저에서 http://localhost:8099/swagger-ui/index.html 주소로 이동하여 Swagger UI를 통해 API 문서가 제대로 표시되는지 확인합니다.
@@ -316,26 +323,6 @@ Jackson은 Spring Boot에서 기본적으로 사용되는 JSON 직렬화/역직�
 
 <br/>
 
-### 5.1.4. Open DID 서버 통신 설정
-Demo 서비스는 TAS, Verifier, CAS, Issuer 서버와 통신을 합니다. 직접 구축한 서버의 주소값을 설정하면 됩니다.
-* `tas.url`:  
-    - TAS(Trust Agent Service) 서비스의 URL입니다. 이메일전송, Push 서비스를 호출합니다.
-    - 예시: `http://localhost:8090/contextpath/tas`
-
-* `cas.url`:  
-    - CAS(Certificate App Server) 서비스의 URL입니다. PII설정에 대한 값을 전달합니다.
-    - 예시: `http://localhost:8094/contextpath/cas`
-
-* `verifier.url`:  
-    - Verifier 서비스의 URL입니다. Vp제출 및 확인을 위한 서비스를 호출합니다.
-    - 예시: `http://localhost:8093/contextpath/verifier`
-
-* `issuer.url`:  
-    - Issuer 서비스의 URL입니다. VC발급 요청을 위한 서비스를 호출합니다.
-    - 예시: `http://localhost:8091/contextpath/issuer`
-
-<br/>
-
 ## 5.2. application-logging.yml
 - 역할: 로그 그룹과 로그 레벨을 설정합니다. 이 설정 파일을 통해 특정 패키지나 모듈에 대해 로그 그룹을 정의하고, 각 그룹에 대한 로그 레벨을 개별적으로 지정할 수 있습니다.
 
@@ -360,31 +347,7 @@ logging:
 
 <br/>
 
-## 5.3. application-demo.yml
-이 설정 파일은 Demo 서버에 VP Offer 및 VC 발급 Offer에 qr생성시 사용하는 값을 관리합니다. 이는 Verifier서버의 VP Policy(vp정책)과 Issuer 서버의 VC plan에 해당하는 값들이며, Demo 구현 및 sample로 작성된 값으로 테스트시 해당 파일에 있는 값과 반드시 일치해야합니다. 자세한 해당 내용은 설계문서(Design)데이터명세서(4.6.7.1. VerifyOfferPayload, 4.6.5.1. VcPlan)와 Presentation of VP_ko.md 파일을 참고바랍니다.
-
-* `demo.device`: 🔒
-  - 검증 사업자의 어떤 장치에서 verify offer를 제공하였는지를 확인하기 위한 식별자이며, 현재는 Verifier 서버의 VpPolcy.json에 해당하는 값이 세팅되어있습니다.
-  - 예시: `WEB`
-  
-* `demo.service`: 🔒
-  - 검증 사업자에 의해 지정된 서비스명 VP 제출에 의해 제공받는 서비스에 대한 식별자값이며, 현재는 Verifier 서버의 VpPolcy.json에 해당하는 값이 세팅되어있습니다.
-  - 예시: `login`, `signup`
-
-* `demo.mode`: 🔒
-  - 제출 모드는 VP를 어떤 경로로 제출하느냐에 대한 방법에 대한 값이며, 재는 Verifier 서버의 VpPolcy.json에 해당하는 값이 세팅되어있습니다.
-  - 예시 : `Direct`
-
-* `demo.vcPlanId`: 🔒
-  - issuer의 VC plan ID 값이며, Issuer서버에 application-issue내 profile을 찾기 위한 값입니다.현재는 sample 및 데모 호출을 위해 값을 세팅했습니다.
-  - 예시 : `vcplanid000000000001`
-
-* `demo.issuer`: 🔒
-  - issuer 서버의 DID 값이며, VC offer 요청시 해당 issuer를 호출하기 위한 값입니다. 현재는 sample 및 데모 호출을 위해 값을 세팅했습니다.
-  - 예시 : `did:omn:issuer`
-
-
-## 5.4. application-spring-docs.yml
+## 5.3. application-spring-docs.yml
 - 역할: 애플리케이션에서 SpringDoc 및 Swagger UI 설정을 관리합니다.
 
 - 위치: `src/main/resources/`
@@ -425,4 +388,112 @@ logging:
   - API 문서에서 응답 본문의 기본 미디어 타입을 설정합니다.
   - 예시: `application/json`
 
-[Open DID Installation Guide]: https://github.com/OmniOneID/did-release/blob/main/release-V1.0.0.0/OepnDID_Installation_Guide-V1.0.0.0.md
+# 6. 데모 운영 가이드
+
+이 장에서는 서버의 모든 설정 파일에 포함된 각 설정 값에 대해 안내합니다. 각 설정은 서버의 동작과 환경을 제어하는 중요한 요소로, 서버를 안정적으로 운영하기 위해 적절한 설정이 필요합니다. 항목별 설명과 예시를 참고하여 각 환경에 맞는 설정을 적용하세요.
+
+이 장에서는 서버의 모든 설정을 완료, 기동을 한 뒤 사용하는 동작 절차에 대한 기본적인 안내입니다. 상세 데이터의 구조와 절차는 [Open DID Software Architecture] 문서를 참고해주세요.
+
+## 6.1. 화면 구성
+<img src="./images/demo_main.png" width="800"/>
+메인화면은 위와 같이 구성되어 있습니다. 화면 상단에는 OpenDID Demo 타이틀이 표시되고 중앙에는 VC 발급, VP 제출, 정보 입력, 서버 설정과 같은 주요 기능이 카드 형태로 배치되어 있습니다.
+
+## 6.2. 운영 서버 설정
+데모는 사용자 정보입력, VC의 발급, VP 제출을 위해 다른 서버들과 통신합니다. 서버별 주요 기능과 역할은 다음과 같습니다:
+
+| 서버명 | 주요 기능 | 역할 설명 |
+|--------|-----------|----------|
+| TAS 서버 | 트랜잭션 인증 | 사용자 인증 및 트랜잭션 관리 |
+| Issuer 서버 | VC 발급 | 자격증명 발급 및 관리 |
+| CA 서버 | 인증 관리 | 인증서 발급 및 검증 |
+| Verifier 서버 | VP 검증 | 제출된 검증가능한 제시(VP) 검증 |
+
+서버 설정은 실제 기동한 서버의 IP 주소를 입력하면 됩니다. 
+
+<img src="./images/server_settings.png" width="800"/>
+
+## 6.3. 사용자 정보 입력
+OpenDID 데모를 사용하기 위해서는 사용자 정보를 입력해야 합니다.
+데모는 사용자의 정보를 기반으로 VC를 발급받고 이를 통해 VP를 제출하므로, 이 절차는 필수적입니다. 사용자 정보는 다음과 같은 항목을 포함합니다:
+
+1. 기본 사용자 정보
+   - 이름 (First Name)
+   - 성 (Last Name)
+   - DID (사용자 식별자)
+   - 이메일
+
+2. 자격증명 유형 선택(예제)
+   - 신분증 (National ID)
+   - 모바일 운전면허증 (MDL)
+
+선택한 자격증명 유형에 따라 추가 정보를 입력해야 합니다.
+
+<img src="./images/enter_information.png" width="800"/>
+
+## 6.4. VC 발급 
+
+VC(Verifiable Credential, 검증가능한 자격증명)를 발급받기 위한 과정은 다음과 같습니다:
+
+1. 발급받을 자격증을 선택합니다.
+   <img src="./images/vc_plan_select.png" width="800"/>
+
+   > 참고: 자격증 발급플랜(VcPlan)에 등록되어 있는 경우에만 자격증 발급이 가능합니다. 
+   > VC 플랜 등록은 이슈어 가이드[Issuer Admin Guide]를 상세히 참고바랍니다.
+
+2. 'Search' 버튼을 클릭하여 발급받을 VC를 선택하는 팝업을 통해 발급 계획을 선택합니다.
+   <img src="./images/vc_plan_popup.png" width="800"/>
+
+3. 'Issuance of ID card' 버튼을 클릭하여 QR 코드를 요청합니다. 
+   - QR 코드는 유효시간이 있으며, 'Renew' 버튼을 통해 초기화할 수 있습니다.
+   <img src="./images/vc_qr.png" width="800"/>
+
+4. VC 발급 요청은 다음과 같은 다양한 방법으로 받을 수 있습니다:
+   - QR 코드 스캔: OpenDID 앱으로 QR 코드를 스캔
+   - 푸시 알림: 앱에 등록된 사용자의 DID를 사용하여 푸시 알림 발송
+   <img src="./images/vc_push.png" width="800"/>
+   - 이메일: 사용자 정보에 입력된 이메일로 QR 코드 전송
+
+## 6.5. VP 제출 
+VP(Verifiable Presentation, 검증가능한 제시)를 제출하는 과정은 다음과 같습니다:
+
+1. VP 정책을 선택합니다.
+   <img src="./images/vp_policy.png" width="800"/>
+
+   > 참고: VP 제출을 위해서는 사전에 등록된 VP 정책이 필요합니다. 등록 방법은 Verifier 어드민 가이드[Verifier Admin Guide]를 참고해주세요.
+
+2. VP 제출 절차는 VC 발급 절차와 유사합니다:
+   - VP 정책 선택
+   - 'Submit your ID' 버튼 클릭하여 QR 코드 발급
+   - OpenDID 앱으로 QR 코드 스캔하여 VP 제출
+   - 정상 제출 완료 여부 확인
+
+## 6.6. 서버 연결 테스트
+
+서버 설정을 저장한 후, 'Test Connection' 버튼을 클릭하여 각 서버와의 연결 상태를 확인할 수 있습니다. 연결 테스트는 다음과 같은 서버들과의 통신을 확인합니다:
+
+- TAS 서버
+- Issuer 서버
+- CA 서버
+- Verifier 서버
+
+연결 테스트가 성공하면 모든 서버와의 연결이 정상임을 확인하는 메시지가 표시됩니다. 실패한 경우, 어떤 서버와의 연결이 실패했는지 알려주며 서버 설정을 다시 확인하도록 안내합니다.
+
+## 6.7. 주요 에러 상황 및 해결 방법
+
+| 에러 상황 | 원인 | 해결 방법 |
+|----------|------|----------|
+| QR 코드 생성 실패 | 서버 연결 문제 또는 VC 플랜 미선택 | 서버 연결 상태 확인 및 VC 플랜 선택 |
+| 푸시 알림 전송 실패 | 잘못된 DID 정보 또는 앱 미설치 | DID 정보 확인 및 앱 설치 여부 확인 |
+| 이메일 전송 실패 | 잘못된 이메일 주소 | 사용자 정보의 이메일 주소 확인 |
+| VC 발급 실패 | 필수 정보 누락 또는 서버 오류 | 모든 필수 정보 입력 확인 및 서버 로그 확인 |
+| VP 제출 실패 | 발급된 VC 없음 또는 VP 정책 문제 | VC 발급 여부 확인 및 VP 정책 설정 검토 |
+| 서버 연동 실패 | 서버 주소값 설정 오류 | 서버 주소 확인 필요 |
+
+
+
+
+[Open DID Installation Guide]: https://github.com/OmniOneID/did-release/blob/develop/release-V2.0.0.0/OpenDID_Installation_Guide-V2.0.0.0_ko.md
+
+[Open DID Software Architecture]: https://omnioneid.github.io/?locale=ko&version=V1.0.0
+[Verifier Admin Guide]: https://github.com/OmniOneID/did-verifier-server/blob/develop/docs/admin/OpenDID_VerifierAdmin_Operation_Guide_ko.md
+[Issuer Admin Guide]: https://github.com/OmniOneID/did-issuer-server/blob/develop/docs/admin/OpenDID_IssuerAdmin_Operation_Guide_ko.md

@@ -17,19 +17,17 @@
 package org.omnione.did.demo.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.zxing.WriterException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.omnione.did.base.config.ConfigService;
 import org.omnione.did.crypto.enums.MultiBaseType;
-import org.omnione.did.crypto.util.MultiBaseUtils;
-import org.omnione.did.demo.api.CasFeign;
-import org.omnione.did.demo.api.IssuerFeign;
-import org.omnione.did.demo.api.TasFeign;
-import org.omnione.did.demo.api.VerifierFeign;
+import org.omnione.did.demo.api.*;
 import org.omnione.did.base.exception.ErrorCode;
 import org.omnione.did.base.exception.OpenDidException;
 import org.omnione.did.demo.dto.*;
-import org.omnione.did.base.property.DemoProperty;
+
 import org.omnione.did.demo.util.BaseDigestUtil;
 import org.omnione.did.demo.util.BaseMultibaseUtil;
 import org.omnione.did.demo.util.HexUtil;
@@ -38,8 +36,12 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.security.SecureRandom;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 
 import static org.omnione.did.demo.util.QrMaker.*;
@@ -57,7 +59,10 @@ public class DemoServiceImpl implements DemoService{
     private final TasFeign tasFeign;
     private final CasFeign casFeign;
     private final IssuerFeign issuerFeign;
-    private final DemoProperty demoProperty;
+    private final IssuerAdminFeign issuerAdminFeign;
+    private final ConfigService configService;
+    private final ListFeign listFeign;
+    private final ObjectMapper objectMapper;
 
     /**
      * Refreshes the Verifiable Presentation (VP) offer.
@@ -67,20 +72,14 @@ public class DemoServiceImpl implements DemoService{
      */
     @Override
     public VpResultDto vpOfferRefresh(){
-        log.debug("=== Starting VpOfferRefresh ===");
-        log.debug("\t Make VP Offer Request");
         try {
             RequestVpOfferReqDto offerReqDto = RequestVpOfferReqDto.builder()
-                    .mode(demoProperty.getMode())
-                    .device(demoProperty.getDevice())
-                    .service(demoProperty.getService())
+                    .policyId(configService.getConfig().getCurrentVpPolicy())
                     .build();
-            log.debug("\t Request VP Offer QR");
             RequestVpOfferResDto requestVpOfferResDto = verifierFeign.requestVpOfferQR(offerReqDto);
             if (requestVpOfferResDto == null) {
                 throw new OpenDidException(ErrorCode.VP_OFFER_NOT_FOUND);
             }
-            log.debug("\t Serialize and Encode VP Offer Payload");
             String jsonString = JsonUtil.serializeAndSort(requestVpOfferResDto.getPayload());
             String encDataPayload = BaseMultibaseUtil.encode(jsonString.getBytes(), MultiBaseType.base64);
             VpResultDto vpResultDto = VpResultDto.builder()
@@ -88,22 +87,15 @@ public class DemoServiceImpl implements DemoService{
                     .payload(encDataPayload)
                     .validUntil(requestVpOfferResDto.getPayload().getValidUntil())
                     .build();
-            log.debug("\t Make QR Image");
             QrImageData qrImageData = makeQrImage(vpResultDto);
             vpResultDto.setQrImage(qrImageData.getQrIamge());
             vpResultDto.setOfferId(requestVpOfferResDto.getPayload().getOfferId());
-            log.debug("=== End VpOfferRefresh ===");
             return vpResultDto;
 
         } catch (OpenDidException e){
-            log.error("OpenDidException occurred during Requesting VP Offer: {}", e.getErrorCode().getMessage());
             throw e;
-        } catch (JsonProcessingException e) {
-            log.error("JsonProcessingException occurred during Requesting VP Offer: {}", e.getMessage());
+        } catch (IOException | WriterException e) {
             throw new OpenDidException(ErrorCode.JSON_PROCESSING_ERROR);
-        } catch (Exception e) {
-            log.error("Exception occurred during Requesting VP Offer: {}", e.getMessage(), e);
-            throw new OpenDidException(ErrorCode.UNKNOWN_SERVER_ERROR);
         }
 
     }
@@ -116,13 +108,11 @@ public class DemoServiceImpl implements DemoService{
      */
     @Override
     public VcResultDto vcOfferRefresh() throws IOException, WriterException {
-        log.debug("=== Starting VcOfferRefresh ===");
-        log.debug("\t Make VC Offer Request");
         RequestVcOfferReqDto vcOfferReqDto = RequestVcOfferReqDto.builder()
-                .vcPlanId(demoProperty.getVcPlanId())
-                .issuer(demoProperty.getIssuer())
+                .vcPlanId(configService.getConfig().getCurrentVcPlan())
+                .issuer(configService.getConfig().getIssuer())
                 .build();
-        log.debug("\t Request VC Offer to TAS");
+
         RequestVcOfferResDto requestVcOfferResDto = tasFeign.requestVcOfferQR(vcOfferReqDto);
         String jsonString = JsonUtil.serializeAndSort(requestVcOfferResDto.getIssueOfferPayload());
         String encDataPayload = BaseMultibaseUtil.encode(jsonString.getBytes(), MultiBaseType.base64);
@@ -130,12 +120,10 @@ public class DemoServiceImpl implements DemoService{
                 .payloadType("ISSUE_VC")
                 .payload(encDataPayload)
                 .build();
-        log.debug("\t Make VcPayload data to QR Image");
         QrImageData qrImageData = makeQrImage(vcResultDto);
         vcResultDto.setQrImage(qrImageData.getQrIamge());
         vcResultDto.setValidUntil(requestVcOfferResDto.getValidUntil());
         vcResultDto.setOfferId(requestVcOfferResDto.getOfferId());
-        log.debug("=== End VcOfferRefresh ===");
         return vcResultDto;
     }
 
@@ -148,7 +136,6 @@ public class DemoServiceImpl implements DemoService{
      */
     @Override
     public RequestVcSubmitResDto vcOfferSubmit(RequestVcSubmitReqDto requestVcSubmitReqDto) {
-        log.debug("requestVcSubmitReqDto : {}", requestVcSubmitReqDto);
         return tasFeign.requestVcSubmitConfirm(requestVcSubmitReqDto);
     }
 
@@ -161,18 +148,16 @@ public class DemoServiceImpl implements DemoService{
      */
     @Override
     public VcOfferPushResDto vcOfferPush(RequestVcOfferReqDto requestVcOfferReqDto) {
-        log.debug("requestVcOfferReqDto : {}", requestVcOfferReqDto);
         String messageId = new UUID(new SecureRandom().nextLong(), new SecureRandom().nextLong()).toString().substring(0, 8);
         VcOfferPushResDto vcOfferPushResDto = tasFeign.requestVcOfferPush(RequestVcOfferReqDto.builder()
                 .holder(requestVcOfferReqDto.getDid())
-                .issuer(demoProperty.getIssuer())
+                .issuer(configService.getConfig().getIssuer())
                 .id(messageId)
-                .vcPlanId(demoProperty.getVcPlanId())
+                .vcPlanId(configService.getConfig().getCurrentVcPlan())
                 .build());
         if(vcOfferPushResDto != null){
             vcOfferPushResDto.setResult("success");
         }
-        log.debug("requestVcOfferReqDto : {}", requestVcOfferReqDto);
         return vcOfferPushResDto;
     }
 
@@ -188,8 +173,8 @@ public class DemoServiceImpl implements DemoService{
         RequestVcOfferResDto requestVcOfferResDto =
                 tasFeign.requestVcOfferEmail(RequestVcOfferReqDto.builder()
                 .email(requestVcOfferReqDto.getEmail())
-                .vcPlanId(demoProperty.getVcPlanId())
-                .issuer(demoProperty.getIssuer())
+                .vcPlanId(configService.getConfig().getCurrentVcPlan())
+                .issuer(configService.getConfig().getIssuer())
                 .build());
 
         if(requestVcOfferResDto != null){
@@ -212,12 +197,17 @@ public class DemoServiceImpl implements DemoService{
                             .firstname(saveUserInfoReqDto.getFirstname())
                             .lastname(saveUserInfoReqDto.getLastname())
                             .build());
+
             byte[] hashedDataBytes = BaseDigestUtil.generateHash(json.getBytes(StandardCharsets.UTF_8));
-            String encode = BaseMultibaseUtil.encode(hashedDataBytes, MultiBaseType.base64);
-            log.info("encode : {}", encode);
             String hexStringPii = HexUtil.toHexString(hashedDataBytes);
             saveUserInfoReqDto.setPii(hexStringPii);
 
+            Map<String, String> fields = saveUserInfoReqDto.getFields();
+            if (fields != null) {
+                ObjectMapper objectMapper = new ObjectMapper();
+                String userInfoJson = objectMapper.writeValueAsString(fields);
+                saveUserInfoReqDto.setUserInfo(userInfoJson);
+            }
             SecureRandom random = new SecureRandom();
             String userId = new UUID(random.nextLong(), random.nextLong()).toString().substring(0, 8);
 
@@ -226,7 +216,11 @@ public class DemoServiceImpl implements DemoService{
                     .pii(hexStringPii)
                     .build());
 
-            issuerFeign.saveUserInfo(saveUserInfoReqDto);
+            if(saveUserInfoReqDto.getVcSchemaId() != null){
+                issuerAdminFeign.saveUserInfo(saveUserInfoReqDto);
+            }
+            saveUserInfoToConfig(saveUserInfoReqDto, userId, hexStringPii);
+
 
             return SaveUserInfoResDto.builder()
                     .userId(userId)
@@ -234,12 +228,31 @@ public class DemoServiceImpl implements DemoService{
                     .build();
 
         } catch (JsonProcessingException e) {
-            log.error("Json Processing error : " + e.getMessage());
             throw new OpenDidException(ErrorCode.JSON_PROCESSING_ERROR);
-        } catch (Exception e) {
-            log.error("saveUserInfo error : {}", e.getMessage());
-            throw new OpenDidException(ErrorCode.VC_SAVE_FAILED);
         }
+    }
+
+
+    private void saveUserInfoToConfig(SaveUserInfoReqDto dto, String userId, String pii) {
+
+        Map<String, Object> userInfoMap = new HashMap<>();
+
+        userInfoMap.put("firstname", dto.getFirstname());
+        userInfoMap.put("lastname", dto.getLastname());
+        userInfoMap.put("did", dto.getDid());
+        userInfoMap.put("email", dto.getEmail());
+        userInfoMap.put("userId", userId);
+        userInfoMap.put("pii", pii);
+
+        userInfoMap.put("vcSchemaId", dto.getVcSchemaId());
+        userInfoMap.put("vcSchemaTitle", dto.getVcSchemaTitle());
+        userInfoMap.put("vcSchemaIndex", dto.getVcSchemaIndex());
+
+        if (dto.getFields() != null) {
+            userInfoMap.put("fields", dto.getFields());
+        }
+        configService.saveUserInfo(userInfoMap);
+
     }
 
 
@@ -252,7 +265,6 @@ public class DemoServiceImpl implements DemoService{
      */
     @Override
     public SaveUserInfoResDto saveVcInfo(SaveVcInfoReqDto saveVcInfoReqDto) {
-        log.info("saveVcInfoReqDto : {}", saveVcInfoReqDto.toString());
         try {
             if (saveVcInfoReqDto.getDid() == null || saveVcInfoReqDto.getDid().isEmpty()) {
                 throw new OpenDidException(ErrorCode.VC_INVALID_FORMAT);
@@ -262,9 +274,6 @@ public class DemoServiceImpl implements DemoService{
                     .result(true)
                     .build();
         } catch (OpenDidException e) {
-            throw e;
-        } catch (Exception e) {
-            log.error("saveVcInfo error : {}", e.getMessage(), e);
             throw new OpenDidException(ErrorCode.VC_SAVE_FAILED);
         }
     }
@@ -293,6 +302,72 @@ public class DemoServiceImpl implements DemoService{
     public ConfirmVerifyResDto confirmVerify(ConfirmVerifyReqDto confirmVerifyReqDto) {
         return verifierFeign.confirmVerify(confirmVerifyReqDto);
     }
+
+    @Override
+    public VcSchemaResponseDto getVcSchemas() {
+        try {
+            String jsonString = listFeign.requestVcSchemaList();
+
+            return objectMapper.readValue(jsonString, VcSchemaResponseDto.class);
+
+        } catch (JsonProcessingException e) {
+            throw new OpenDidException(ErrorCode.VC_SCHEMA_NOT_FOUND);
+        }
+    }
+
+    @Override
+    public VcSchemaResponseDto.VcSchemaDto getVcSchema(String schemaName) {
+        try {
+            String jsonString = listFeign.  requestVcSchemaList();
+            VcSchemaResponseDto vcSchemas = objectMapper.readValue(jsonString, VcSchemaResponseDto.class);
+
+            return vcSchemas.getVcSchemaList().stream()
+                    .filter(schema -> {
+                        URL url = null;
+                        try {
+                            url = new URL(schema.getSchemaId());
+                        } catch (MalformedURLException e) {
+                            throw new RuntimeException(e);
+                        }
+                        String queryParams = url.getQuery();
+                        if (queryParams != null) {
+                            String[] params = queryParams.split("&");
+                            for (String param : params) {
+                                String[] keyValue = param.split("=");
+                                if (keyValue.length == 2 && "name".equals(keyValue[0]) && schemaName.equals(keyValue[1])) {
+                                    return true;
+                                }
+                            }
+                        }
+                        return false;
+                    }).findFirst()
+                    .orElseThrow(() -> new OpenDidException(ErrorCode.VC_SCHEMA_NOT_FOUND));
+
+        } catch (JsonProcessingException e) {
+            throw new OpenDidException(ErrorCode.VC_SCHEMA_NOT_FOUND);
+        }
+    }
+
+    @Override
+    public VcPlanResponseDto getAllVcPlans() {
+        try {
+            String jsonString = listFeign.requestVcPlanList();
+            return objectMapper.readValue(jsonString, VcPlanResponseDto.class);
+        } catch (JsonProcessingException e) {
+            throw new OpenDidException(ErrorCode.VC_PLAN_NOT_FOUND);
+        }
+    }
+
+    @Override
+    public CredentialSchemaDto getCredentialSchema(String credentialSchemaId) {
+        try {
+            String jsonString = listFeign.requestCredentialSchemaList(credentialSchemaId);
+            return objectMapper.readValue(jsonString, CredentialSchemaDto.class);
+        } catch (JsonProcessingException e) {
+            throw new OpenDidException(ErrorCode.CREDENTIAL_SCHEMA_NOT_FOUND);
+        }
+    }
+
 
 }
 

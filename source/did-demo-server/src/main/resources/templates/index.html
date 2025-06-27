@@ -4,9 +4,282 @@
   <meta charset="UTF-8" />
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Main Page</title>
+  <title>OpenDID Demo</title>
   <link rel="stylesheet" href="/styles/reset.css" />
   <link rel="stylesheet" href="/styles/index.css" />
+  <style>
+    .mt-20 {
+      margin-top: 20px;
+    }
+
+    /* Style for search button next to input */
+    .search-input {
+      display: flex;
+      width: 100%;
+      align-items: center; 
+    }
+
+    .search-input input {
+      flex-grow: 1;
+      border-top-right-radius: 0;
+      border-bottom-right-radius: 0;
+      margin-right: 5px; 
+    }
+
+    .btn-search {
+      padding: 6px 10px; 
+      background-color: #2F325E;
+      color: white;
+      border: none;
+      border-top-right-radius: 4px;
+      border-bottom-right-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+      margin-left: 5px; 
+      height: 90%; 
+      align-self: center; 
+    }
+
+    .btn-search:hover {
+      background-color: #242645;
+    }
+
+    /* Ensure proper display for the select elements */
+    select {
+      width: 100%;
+      padding: 8px 12px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      background-color: white;
+      font-size: 14px;
+    }
+
+    /* Search Popup Styles */
+    .search-popup {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.5);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+    }
+
+    .search-popup-content {
+      background-color: white;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+      width: 90%;
+      max-width: 400px;
+      max-height: 80vh;
+      overflow-y: auto;
+    }
+
+    .search-popup-content h3 {
+      margin-top: 0;
+      margin-bottom: 15px;
+      color: #2F325E;
+      font-size: 18px;
+      text-align: center;
+    }
+
+    .search-input-container {
+      margin-bottom: 15px;
+    }
+
+    .search-popup-input {
+      width: 100%;
+      padding: 8px 12px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      font-size: 14px;
+    }
+
+    .search-results {
+      margin-bottom: 20px;
+      max-height: 200px;
+      overflow-y: auto;
+      border: 1px solid #eee;
+      border-radius: 4px;
+      padding: 10px;
+    }
+
+    .search-option {
+      padding: 8px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      border-bottom: 1px solid #eee;
+    }
+
+    .search-option:last-child {
+      border-bottom: none;
+    }
+
+    .search-option:hover {
+      background-color: #f5f5f5;
+    }
+
+    .search-option input[type="radio"] {
+      margin-right: 10px;
+      width: 14px;
+      height: 14px;
+      cursor: pointer;
+      accent-color: #2F325E;
+    }
+
+    .search-option label {
+      cursor: pointer;
+      font-size: 14px;
+      flex: 1;
+    }
+
+    .search-popup-buttons {
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+    }
+
+    .icon-server {
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%232F325E' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='2' y='2' width='20' height='8' rx='2' ry='2'%3E%3C/rect%3E%3Crect x='2' y='14' width='20' height='8' rx='2' ry='2'%3E%3C/rect%3E%3Cline x1='6' y1='6' x2='6.01' y2='6'%3E%3C/line%3E%3Cline x1='6' y1='18' x2='6.01' y2='18'%3E%3C/line%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: center;
+      background-size: 60%;
+    }
+
+    .btn-secondary {
+      background-color: #f0f0f0;
+      color: #333;
+      border: 1px solid #ccc;
+      padding: 10px 20px;
+      border-radius: 5px;
+      cursor: pointer;
+      font-weight: 500;
+      transition: background-color 0.3s;
+      margin-left: 10px;
+    }
+
+    .btn-secondary:hover {
+      background-color: #e0e0e0;
+    }
+    
+    /* Loading indicator styles */
+    .loading-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(255, 255, 255, 0.8);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 2000;
+    }
+    
+    .spinner {
+      width: 50px;
+      height: 50px;
+      border: 5px solid #f3f3f3;
+      border-top: 5px solid #2F325E;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+    
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    /* 동적 폼 스타일 개선 */
+    .credential-form-container {
+      border: 1px solid #e0e0e0;
+      border-radius: 8px;
+      padding: 20px;
+      margin-top: 20px;
+      background-color: #f9f9f9;
+    }
+
+    .credential-section-title {
+      font-size: 18px;
+      font-weight: 500;
+      color: #2F325E;
+      margin-bottom: 15px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid #e0e0e0;
+    }
+
+    .identification-form {
+      margin-top: 15px;
+    }
+
+    .input-group {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+      margin-bottom: 15px;
+    }
+
+    /* 미디어 쿼리 삭제 또는 비활성화 */
+    @media screen and (min-width: 768px) {
+      /* 이 부분을 제거하거나 아래와 같이 변경 */
+      .input-group {
+        grid-template-columns: 1fr;  /* 단일 열로 유지 */
+      }
+    }
+
+    .input {
+      margin-bottom: 10px;
+    }
+
+    .input p {
+      font-size: 14px;
+      margin-bottom: 5px;
+      font-weight: 500;
+    }
+
+    .input input,
+    .input select {
+      width: 100%;
+      padding: 8px 12px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      font-size: 14px;
+      background-color: white;
+    }
+
+    .color-error {
+      color: #ff3b30;
+    }
+
+    .color-info {
+      color: #777;
+      font-size: 12px;
+      margin-top: 5px;
+    }
+
+    /* 레이블과 디바이더 스타일 */
+    .label {
+      margin-bottom: 15px;
+    }
+
+    .label p {
+      font-size: 16px;
+      font-weight: 500;
+      color: #333;
+    }
+
+    .divider {
+      height: 1px;
+      background-color: #e0e0e0;
+      margin-top: 5px;
+      margin-bottom: 15px;
+    }
+  </style>
 </head>
 
 <body>
@@ -17,19 +290,18 @@
         <button class="btn-gnb" onclick="handleReload()">
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
             <title>chevron-left</title>
-            <path
-                    d="M15.41,16.58L10.83,12L15.41,7.41L14,6L8,12L14,18L15.41,16.58Z"
-            />
+            <path d="M15.41,16.58L10.83,12L15.41,7.41L14,6L8,12L14,18L15.41,16.58Z" />
           </svg>
         </button>
         <h1 onclick="handleReload()">OpenDID Demo</h1>
+        <div id="userGreeting" class="sub-title"></div>
         <p class="sub-title">This is the main OpenDID demo page</p>
       </div>
 
       <div class="select-list">
         <button class="btn-select" data-ref="VC 발급">
           <div class="img-element icon-vc"></div>
-          <h5>VC issuance</h5>
+          <h5>VC Issuance</h5>
         </button>
         <button class="btn-select" data-ref="VP 제출">
           <div class="img-element icon-vp"></div>
@@ -39,29 +311,81 @@
           <div class="img-element icon-info"></div>
           <h5>Enter Information</h5>
         </button>
+        <button class="btn-select" data-ref="서버설정">
+          <div class="img-element icon-server"></div>
+          <h5>Server Settings</h5>
+        </button>
       </div>
 
       <div class="context">
+        <!-- VC 발급 섹션 -->
         <div class="context-item" data-ref="VC 발급">
-            <p>
-                Ready to issue your OpenDID mobile ID <br />
-                Click the button below to generate a QR code.
-            </p>
+          <p>
+            Ready to issue your OpenDID mobile ID<br />
+            Click the button below to generate a QR code.
+          </p>
+          <div class="input-group mt-20">
+            <div class="label">
+              <p>Choose VC Plan ID</p>
+              <div class="divider"></div>
+            </div>
+            <div class="input">
+              <p>
+                VC Plan
+                <span class="color-error">*</span>
+              </p>
+              <div class="search-input">
+                <input
+                  id="vcPlanIssuance"
+                  type="text"
+                  placeholder="Select VC Plan"
+                  maxlength="100"
+                  required
+                  readonly
+                />
+                <button class="btn-search" onclick="searchVcPlanIssuance()">Search</button>
+              </div>
+            </div>
+          </div>
           <div class="button-group">
             <button
-                    id="issueForm"
-                    class="btn-primary"
-                    onclick="openVCPopup()"
+              id="issueForm"
+              class="btn-primary"
+              onclick="openVCPopup()"
             >
               Issuance of ID card
             </button>
           </div>
         </div>
-
+        
         <div class="context-item" data-ref="VP 제출">
-          <p>OpenDID Demo Submit your mobile ID.<br/>
-          A QR code will be generated when you click the button.
+          <p>
+            OpenDID Demo Submit your mobile ID.<br/>
+            A QR code will be generated when you click the button.
           </p>
+          <div class="input-group mt-20">
+            <div class="label">
+              <p>Choose VP Policy ID</p>
+              <div class="divider"></div>
+            </div>
+            <div class="input">
+              <p>
+                VP Policy
+                <span class="color-error">*</span>
+              </p>
+              <div class="search-input">
+                <input
+                  id="vpPolicySubmission"
+                  type="text"
+                  placeholder="Select VP Policy"
+                  maxlength="100"
+                  required
+                  readonly
+                />
+                <button class="btn-search" onclick="searchVpPolicy()">Search</button>
+              </div>
+            </div>
+          </div>
           <div class="button-group">
             <button class="btn-primary" onclick="openVPPopup()">
               Submit your ID
@@ -69,6 +393,7 @@
           </div>
         </div>
 
+        <!-- 정보입력 섹션 -->
         <div class="context-item information" data-ref="정보입력">
           <p>
             Please enter the information required to issue an ID card.
@@ -78,134 +403,162 @@
 
           <div class="button-group mobile-only-flex">
             <button
-                    class="btn-tab active"
-                    data-ref="사용자정보"
-                    onclick="handleEnterInfo('사용자정보')"
+              class="btn-tab active"
+              data-ref="사용자정보"
+              onclick="handleEnterInfo('사용자정보')"
             >
               User Information
             </button>
             <button
-                    class="btn-tab"
-                    data-ref="신분증정보"
-                    onclick="handleEnterInfo('신분증정보')"
+              class="btn-tab"
+              data-ref="신분증정보"
+              onclick="handleEnterInfo('신분증정보')"
             >
               Identification information
             </button>
           </div>
 
           <div class="information-field pc-only-flex">
-            <div class="item-box show" data-ref="신분증정보">
-              <div class="label">
-                <p>User Information</p>
-                <div class="divider"></div>
+            <div class="credential-form-container">
+              <div class="credential-section-title">User Information</div>
+              <div class="input">
+                <p>
+                  First Name
+                  <span class="color-error">*</span>
+                </p>
+                <input
+                  id="firstname"
+                  type="text"
+                  placeholder="Please enter your first name"
+                  maxlength="50"
+                  required
+                />
               </div>
-
+              <div class="input">
+                <p>
+                  Last Name
+                  <span class="color-error">*</span>
+                </p>
+                <input
+                  id="lastname"
+                  type="text"
+                  placeholder="Please enter your last name"
+                  maxlength="50"
+                  required
+                />
+              </div>
+              <div class="input">
+                <p>DID</p>
+                <input
+                  id="did"
+                  type="text"
+                  placeholder="Enter your DID (optional)"
+                />
+              </div>
+              <div class="input">
+                <p>Email</p>
+                <input
+                  id="email"
+                  type="text"
+                  placeholder="Enter your email (optional)"
+                />
+              </div>
+            </div>
+            
+            <div class="credential-form-container">
+              <div class="credential-section-title">Choose Issue Plan</div>
               <div class="input-group">
                 <div class="input">
                   <p>
-                    First Name
+                    Issue plan
                     <span class="color-error">*</span>
                   </p>
-                  <input
-                          id="firstname"
-                          type="text"
-                          placeholder="please enter the contents."
-                          maxlength="50"
-                          required
-                  />
-                </div>
-                <div class="input">
-                  <p>
-                    Last Name
-                    <span class="color-error">*</span>
-                  </p>
-                  <input
-                          id="lastname"
-                          type="text"
-                          placeholder="please enter the contents."
-                          maxlength="50"
-                          required
-                  />
-                </div>
-                <div class="input pc-only-flex">
-                  <p>DID</p>
-                  <input
-                          id="did"
-                          type="text"
-                          placeholder="please enter the contents."
-                  />
-                </div>
-                <div class="input pc-only-flex">
-                  <p>Email</p>
-                  <input
-                          id="email"
-                          type="text"
-                          placeholder="please enter the contents."
-                  />
+                  <select id="vcSchema" onchange="displayIdentificationForm()">
+                    <option value="">-- Select VC Plan --</option>
+                  </select>
                 </div>
               </div>
             </div>
 
-            <div class="item-box" data-ref="신분증정보">
-              <div class="label">
-                <p>Identification information</p>
-                <div class="divider"></div>
-              </div>
+            
+            <div id="credentialSchemaSection" class="credential-form-container" style="display: none;">
+            
+            </div>
 
+            <div id="credentialDefinitionSection" class="credential-form-container" style="display: none;">
+            
+            </div>
+            
+            <p class="color-info">* Indicates required input.</p>
+          </div>
+
+          <div class="button-group pc-only-flex">
+            <button class="btn-primary" onclick="saveUserInfo()">Save</button>
+          </div>
+        </div>
+        
+        <div class="context-item information" data-ref="서버설정">
+          <p>
+            Please configure the server settings for OpenDID.
+            <br class="mobile-only" />
+            These settings will be used for the Demo environment.
+          </p>
+
+          <div class="information-field pc-only-flex">
+            <div class="credential-form-container">
+              <div class="credential-section-title">Servers Setting</div>
               <div class="input-group">
                 <div class="input">
                   <p>
-                    birth date
+                    TAS Server
                     <span class="color-error">*</span>
                   </p>
-                    <input
-                            id="birthdate"
-                            type="text"
-                            placeholder="YYYY-MM-DD"
-                            pattern="\d{4}-\d{2}-\d{2}"
-                            title="Please enter a date in the format YYYY-MM-DD"
-                            required
-                    />
-                </div>
-                <div class="input">
-                  <p>address
-                    <span class="color-error">*</span>
-                  </p>
-                    <input
-                            id="address"
-                            type="text"
-                            placeholder="Enter your address."
-                            maxlength="100"
-                            required
-                    />
-                </div>
-                <div class="input">
-                  <p>License number
-                    <span class="color-error">*</span>
-                  </p>
-                    <input
-                            id="licenseNum"
-                            type="text"
-                            placeholder="00-000000-000"
-                            pattern="\d{2}-\d{6}-\d{3}"
-                            title="Please enter the license number in the format: 00-000000-000"
-                            maxlength="12"
-                            required
-                    />
+                  <input
+                    id="tasServer"
+                    type="text"
+                    placeholder="https://tas.example.com/api"
+                    maxlength="100"
+                    required
+                  />
                 </div>
                 <div class="input">
                   <p>
-                      Date of issue
+                    Issuer Server
                     <span class="color-error">*</span>
                   </p>
-                    <input
-                            id="issueDate"
-                            type="text"
-                            placeholder="YYYY-MM-DD"
-                            pattern="\d{4}-\d{2}-\d{2}"
-                            title="Please enter a date in the format YYYY-MM-DD"
-                            required
-                    />
+                  <input
+                    id="issuerServer"
+                    type="text"
+                    placeholder="https://issuer.example.com/api"
+                    maxlength="100"
+                    required
+                  />
+                </div>
+                <div class="input">
+                  <p>
+                    CA Server
+                    <span class="color-error">*</span>
+                  </p>
+                  <input
+                    id="caServer"
+                    type="text"
+                    placeholder="https://ca.example.com/api"
+                    maxlength="100"
+                    required
+                  />
+                </div>
+                <div class="input">
+                  <p>
+                    Verifier Server
+                    <span class="color-error">*</span>
+                  </p>
+                  <input
+                    id="verifierServer"
+                    type="text"
+                    placeholder="https://verifier.example.com/api"
+                    maxlength="100"
+                    required
+                  />
                 </div>
               </div>
             </div>
@@ -213,8 +566,8 @@
           </div>
 
           <div class="button-group pc-only-flex">
-<!--            <button class="btn-primary" onclick="saveUserInfo()">저장</button>-->
-            <button class="btn-primary" onclick="saveUserInfo()">Save</button>
+            <button class="btn-primary" onclick="saveServerSettings()">Save Settings</button>
+            <button class="btn-secondary" onclick="testConnection()">Test Connection</button>
           </div>
         </div>
       </div>
@@ -310,10 +663,6 @@
             </div>
             <h5>Step 2</h5>
             <div class="text-info pc-only-flex">
-<!--              <span> 사용자 정보입력 </span>-->
-<!--              <span>-->
-<!--                    데모 사이트의 원활한 사용을 위해 정보를 입력 해주세요.-->
-<!--                  </span>-->
               <span>Enter user information</span>
               <span>Please enter your information to ensure smooth use of the demo site.</span>
             </div>
@@ -382,7 +731,6 @@
               />
             </svg>
           </div>
-
           <div class="step-item">
             <div class="icon-img">
               <svg
@@ -407,8 +755,8 @@
             </div>
             <h5>Step 4</h5>
             <div class="text-info pc-only-flex">
-                <span>Submit your ID</span>
-                <span>Please submit the issued mobile ID card</span>
+              <span>Submit your ID</span>
+              <span>Please submit the issued mobile ID card</span>
             </div>
           </div>
         </div>
@@ -442,7 +790,11 @@
 
 <div id="PopupArea"></div>
 
+<div id="loadingOverlay" class="loading-overlay" style="display: none;">
+  <div class="spinner"></div>
+</div>
+
 <script src="/scripts/index.js"></script>
-<script src="/scripts/addInformation.js"></script>
+
 </body>
 </html>

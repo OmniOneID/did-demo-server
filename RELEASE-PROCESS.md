@@ -71,6 +71,7 @@ After QA approval, manage the complete version control of all modules in a separ
    | Repository         | Version         | Changelog                   | Release                    |
    | ------------------ | --------------- | --------------------------- | --------------------------- |
    | did-demo-server    | V1.0.1          | [Changelog](https://github.com/OmniOneID/did-demo-server/blob/main/CHANGELOG.md) |
+   | did-demo-server    | V2.0.0          | [Changelog](https://github.com/OmniOneID/did-demo-server/blob/main/CHANGELOG.md) |
    | ..                 | ..              | ..                           |
 
 <br>

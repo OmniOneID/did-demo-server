@@ -16,18 +16,20 @@
 
 package org.omnione.did.demo.api;
 
-import org.omnione.did.demo.dto.SaveUserInfoResDto;
+import org.omnione.did.demo.dto.SaveUserInfoReqDto;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
+
 /**
- * The CasFeign interface is a Feign client that provides endpoints for saving user information.
- * It is used to communicate with the CAS service.
+ * The IssuerFeign interface is a Feign client that provides endpoints for saving user information and vc information.
+ * It is used to communicate with the Issuer service.
  */
-@FeignClient(value = "Cas", url = "${dynamic.cas.url:${cas.url}}", path = "/cas/api/v1")
-public interface CasFeign {
-        @RequestMapping(value = "/save-user-info", method = RequestMethod.POST)
-        void saveUserInfo(@RequestBody SaveUserInfoResDto saveUserInfoResDto);
+@FeignClient(value = "IssuerAdmin", url = "${dynamic.issuer.url:${issuer.url}}", path = "/issuer/admin/v1")
+public interface IssuerAdminFeign {
+    @RequestMapping(value = "/users/demo", method = RequestMethod.POST)
+    void saveUserInfo(@RequestBody SaveUserInfoReqDto saveUserInfoReqDto);
+
 }

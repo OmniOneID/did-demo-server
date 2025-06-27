@@ -4,6 +4,16 @@
 데모 서버 저장소에 오신 것을 환영합니다. <br>
 이 저장소는 데모 서버의 소스 코드, 문서, 그리고 관련 리소스를 포함하고 있습니다.
 
+## S/W 사양
+| 구분              | 내용                                 |
+|-------------------|--------------------------------------|
+| OS                | macOS / Linux / Windows 10 이상       |
+| Language          | Java 21 이상                          |
+| IDE               | IntelliJ IDEA                         |
+| Build System      | Gradle 7.0 이상                        |
+| Compatibility     | JDK 21 이상                            |
+| 기타 요구사항      | 최소 2GB RAM, 10GB 디스크 공간 이상     |
+
 # OpenDID 시연 영상
 
 OpenDID 시연 영상은 다음 네 가지 주요 시나리오를 포함합니다:
@@ -51,7 +61,7 @@ did-demo-server
     └── demo
         ├── gradle
         ├── libs
-            └── did-crypto-sdk-server-1.0.0.jar
+            └── did-crypto-sdk-server-2.0.0.jar
         └── src
         └── build.gradle
         └── README.md
@@ -92,7 +102,7 @@ did-demo-server
 
 1. **Open DID 라이브러리**: 이 라이브러리들은 Open DID 프로젝트에서 개발되었으며 [libs 폴더](source/did-demo-server/libs)에서 사용할 수 있습니다. 포함된 항목:
 
-   - `did-crypto-sdk-server-1.0.0.jar`
+   - `did-crypto-sdk-server-2.0.0.jar`
 
 2. **서드파티 라이브러리**: 이 라이브러리들은 [build.gradle](source/did-demo-server/build.gradle) 파일을 통해 관리되는 오픈소스 의존성입니다. 서드파티 라이브러리 및 해당 라이선스에 대한 자세한 목록은 [dependencies-license.md](dependencies-license.md) 파일을 참조하세요.
 
