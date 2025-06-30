@@ -484,8 +484,7 @@ If connection testing succeeds, a message confirming normal connection with all 
 | VP Submission Failure | No issued VC or VP policy issue | Check VC issuance status and review VP policy settings |
 | Server Integration Failure | Server address setting error | Need to verify server address |
 
-[Open DID Installation Guide]: https://github.com/OmniOneID/did-release/blob/develop/release-V2.0.0.0/OpenDID_Installation_Guide-V2.0.0.0_en.md
-
-[Open DID Software Architecture]: https://omnioneid.github.io/?locale=en&version=V1.0.0
-[Verifier Admin Guide]: https://github.com/OmniOneID/did-verifier-server/blob/develop/docs/admin/OpenDID_VerifierAdmin_Operation_Guide_en.md
-[Issuer Admin Guide]: https://github.com/OmniOneID/did-issuer-server/blob/develop/docs/admin/OpenDID_IssuerAdmin_Operation_Guide_en.md
+[Open DID Installation Guide]: https://github.com/OmniOneID/did-release/blob/main/release-V2.0.0.0/OpenDID_Installation_Guide-V2.0.0.0.md
+[Open DID Software Architecture]: https://omnioneid.github.io/?locale=ko&version=V2.0.0
+[Verifier Admin Guide]: https://github.com/OmniOneID/did-verifier-server/blob/main/docs/admin/OpenDID_VerifierAdmin_Operation_Guide.md
+[Issuer Admin Guide]: https://github.com/OmniOneID/did-issuer-server/blob/main/docs/admin/OpenDID_IssuerAdmin_Operation_Guide.md
