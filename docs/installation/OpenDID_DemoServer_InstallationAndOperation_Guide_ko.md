@@ -492,8 +492,7 @@ VP(Verifiable Presentation, 검증가능한 제시)를 제출하는 과정은 �
 
 
 
-[Open DID Installation Guide]: https://github.com/OmniOneID/did-release/blob/develop/release-V2.0.0.0/OpenDID_Installation_Guide-V2.0.0.0_ko.md
-
-[Open DID Software Architecture]: https://omnioneid.github.io/?locale=ko&version=V1.0.0
-[Verifier Admin Guide]: https://github.com/OmniOneID/did-verifier-server/blob/develop/docs/admin/OpenDID_VerifierAdmin_Operation_Guide_ko.md
-[Issuer Admin Guide]: https://github.com/OmniOneID/did-issuer-server/blob/develop/docs/admin/OpenDID_IssuerAdmin_Operation_Guide_ko.md
+[Open DID Installation Guide]: https://github.com/OmniOneID/did-release/blob/main/release-V2.0.0.0/OpenDID_Installation_Guide-V2.0.0.0_ko.md
+[Open DID Software Architecture]: https://omnioneid.github.io/?locale=ko&version=V2.0.0
+[Verifier Admin Guide]: https://github.com/OmniOneID/did-verifier-server/blob/main/docs/admin/OpenDID_VerifierAdmin_Operation_Guide_ko.md
+[Issuer Admin Guide]: https://github.com/OmniOneID/did-issuer-server/blob/main/docs/admin/OpenDID_IssuerAdmin_Operation_Guide_ko.md
