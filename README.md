@@ -24,19 +24,19 @@ https://github.com/user-attachments/assets/2a8e99e6-34b0-4f75-8378-a561b71d2e34
 - **Description**: A scenario where the user directly issues a National ID VC using the app.
 
 ## 2. VC Issuance (App - National ID)
-https://github.com/user-attachments/assets/e9730f2b-e02a-4478-aa72-d972f16b316c
-- [VC Issuance_App_demo_sample(video)](videos/OpenDID_Demo_VCIssuance_App.mov)
+https://github.com/user-attachments/assets/494631d8-2521-4f33-9ac2-2de778fc4e72
+- [VC Issuance_App_demo_sample(video)](videos/OpenDID_Demo_VCIssuance_APP.mp4)
 - **Description**: A scenario where the user directly issues a National ID VC using the app.
 
-## 3. VC Issuance (Demo - Mobile Driver License)
-https://github.com/user-attachments/assets/d648d63e-419c-4eb4-92cc-36c13a935278
-- [ VC Issuance_Web_demo_sample(video)](videos/OpenDID_Demo_VCIssuance_Demo.mov)
-- **Description**: Demonstrates the scenario where the user receives a Mobile Driver License VC issuance request from the Demo site.
+## 3. VC Issuance (Demo - Mobile Employee ID Card)
+https://github.com/user-attachments/assets/475148f3-f3d0-4319-a780-583d16545bc2
+- [ VC Issuance_Web_demo_sample(video)](videos/OpenDID_Demo_VCIssuance_Demo_WEB_.mp4)
+- **Description**: Demonstrates the scenario where the user receives a Mobile Employee ID Card VC issuance request from the Demo site.
 
-## 4. VP Submission
-https://github.com/user-attachments/assets/2bca0ec8-ce31-491f-a427-28062e50db50
-- [VP Submission_demo_sample(video)](videos/OpenDID_Demo_VPSubmission.mov)
-- **Description**: A scenario where the user submits a Verifiable Presentation (VP) through the app after receiving a VP submission request from the Demo site.
+## 4. VP Submission & ZKP Proof
+https://github.com/user-attachments/assets/cbbaa74f-6bf8-4637-b4fb-9b3b7e86de07
+- [VP Submission_demo_sample(video)](videos/OpenDID_Demo_VPSubmission.mp4)
+- **Description**: Description: A scenario where the user receives a QR code request using their Mobile Employee ID Card, submits a Verifiable Presentation (VP) to gain access authorization, and proves certain information through ZKP (Zero-Knowledge Proof) without exposing some details.
 
 ## Folder Structure
 Overview of the major folders and documents in the project directory:
@@ -103,7 +103,7 @@ Libraries used in this project are organized into two main categories:
 
 1. **Open DID Libraries**: These libraries are developed by the Open DID project and are available in the [libs folder](source/did-demo-server/libs). They include:
 
-   - `did-crypto-sdk-server-1.0.0.jar`
+   - `did-crypto-sdk-server-2.0.0.jar`
 
 2. **Third-Party Libraries**: These libraries are open-source dependencies managed via the [build.gradle](source/did-demo-server/build.gradle) file. For a detailed list of third-party libraries and their licenses, please refer to the [dependencies-license.md](dependencies-license.md) file.
 
