@@ -26,7 +26,7 @@ import java.io.IOException;
 public interface DemoService {
 
     VpResultDto vpOfferRefresh() throws IOException, WriterException;
-    VcResultDto vcOfferRefresh() throws IOException, WriterException;
+    VcResultDto vcOfferRefresh(RequestVcOfferReqDto requestVcOfferReqDto) throws IOException, WriterException;
     RequestVcSubmitResDto vcOfferSubmit(RequestVcSubmitReqDto requestVcSubmitReqDto);
     VcOfferPushResDto vcOfferPush(RequestVcOfferReqDto requestVcOfferReqDto);
     RequestVcOfferResDto vcOfferEmail(RequestVcOfferReqDto requestVcOfferReqDto);
@@ -39,5 +39,6 @@ public interface DemoService {
 
     VcPlanResponseDto getAllVcPlans();
     CredentialSchemaDto getCredentialSchema(String credentialSchemaId);
+    String getUserQueryType(String vcSchemaId);
 
 }

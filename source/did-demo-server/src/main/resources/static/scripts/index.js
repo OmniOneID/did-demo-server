@@ -108,11 +108,34 @@ const AppState = {
   }
 };
 
+function getVcPlanId(plan) {
+  return plan?.vcPlanId || plan?.id || plan?.vcPlan?.vcPlanId || plan?.vcPlan?.id || '';
+}
+
+function getVcPlanDisplayName(plan) {
+  return plan?.name || plan?.title || plan?.vcPlanName || plan?.vcPlan?.name || plan?.vcPlan?.title || getVcPlanId(plan);
+}
+
+function getVcPlanManager(plan) {
+  return plan?.manager || plan?.issuer || plan?.vcPlan?.manager || plan?.vcPlan?.issuer || '';
+}
+
+function setSelectedVcPlanInput(plan) {
+  const vcPlanInput = document.getElementById('vcPlanIssuance');
+  if (!vcPlanInput) return;
+
+  const vcPlanId = getVcPlanId(plan);
+  const displayName = getVcPlanDisplayName(plan);
+
+  vcPlanInput.value = displayName;
+  vcPlanInput.setAttribute('data-id', vcPlanId);
+  vcPlanInput.dispatchEvent(new Event('change', { bubbles: true }));
+}
+
 let isMobile = false;
 
 function checkMobile() {
-  const width = window.innerWidth;
-  isMobile = width < 1024;
+  isMobile = /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
   console.log("isMobile", isMobile);
 }
 
@@ -236,7 +259,7 @@ function populateVcPlanSelect() {
   plans.forEach((plan, index) => {
     const option = document.createElement('option');
     option.value = index;
-    option.textContent = plan.name;
+    option.textContent = getVcPlanDisplayName(plan);
     selectElement.appendChild(option);
   });
 }
@@ -596,8 +619,8 @@ async function saveUserInfo() {
     lastname,
     did,
     email,
-    vcPlanId: plan.vcPlanId,
-    vcPlanName: plan.name,
+    vcPlanId: getVcPlanId(plan),
+    vcPlanName: getVcPlanDisplayName(plan),
     vcPlanIndex: planIndex,
     vcSchemaId: plan.credentialSchema.id,
   };
@@ -834,10 +857,11 @@ async function searchVcPlanIssuance() {
     
     
     vcPlans.forEach((plan, index) => {
-      const displayName = plan.name || plan.vcPlanId;
+      const vcPlanId = getVcPlanId(plan);
+      const displayName = getVcPlanDisplayName(plan);
       popupContent += `
         <div class="search-option" data-index="${index}">
-          <input type="radio" id="vcplan_${index}" name="vcPlanSelection" value="${plan.vcPlanId}">
+          <input type="radio" id="vcplan_${index}" name="vcPlanSelection" value="${vcPlanId}">
           <label for="vcplan_${index}">${displayName}</label>
         </div>
       `;
@@ -884,12 +908,7 @@ function selectVcPlan() {
     return;
   }
   
-  const vcPlanInput = document.getElementById('vcPlanIssuance');
-  if (vcPlanInput) {
-    vcPlanInput.value = plan.name || plan.vcPlanId;
-    vcPlanInput.setAttribute('data-id', plan.vcPlanId);
-  }
-  
+  setSelectedVcPlanInput(plan);
   
   saveCurrentVcPlan(plan);
   
@@ -906,8 +925,8 @@ async function saveCurrentVcPlan(plan) {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        vcPlanId: plan.vcPlanId,
-        manager: plan.manager || ''
+        vcPlanId: getVcPlanId(plan),
+        manager: getVcPlanManager(plan)
       })
     });
     
@@ -918,11 +937,11 @@ async function saveCurrentVcPlan(plan) {
     
     if (typeof AppState !== 'undefined') {
       if (!AppState.serverSettings) AppState.serverSettings = {};
-      AppState.serverSettings.vcPlan = plan.vcPlanId;
-      AppState.serverSettings.vcPlanName = plan.name || plan.vcPlanId;
+      AppState.serverSettings.vcPlan = getVcPlanId(plan);
+      AppState.serverSettings.vcPlanName = getVcPlanDisplayName(plan);
     }
     
-    console.log('Selected VC Plan saved:', plan.vcPlanId);
+    console.log('Selected VC Plan saved:', getVcPlanId(plan));
   } catch (error) {
     console.error('Error saving current VC Plan:', error);
     alert('Failed to save VC Plan selection. Please try again.');
@@ -1061,12 +1080,7 @@ async function saveCurrentVpPolicy(policy) {
 
 
 async function handleVcPlanSelection(plan) {
-  const vcPlanInput = document.getElementById('vcPlanIssuance');
-  if (!vcPlanInput) return;
-  
-  
-  vcPlanInput.value = plan.name || plan.vcPlanId;
-  vcPlanInput.setAttribute('data-id', plan.vcPlanId);
+  setSelectedVcPlanInput(plan);
   
   try {
     const response = await fetch('/demo/api/current-vc-plan', {
@@ -1075,8 +1089,8 @@ async function handleVcPlanSelection(plan) {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({ 
-        vcPlanId: plan.vcPlanId,
-        manager: plan.manager || ''
+        vcPlanId: getVcPlanId(plan),
+        manager: getVcPlanManager(plan)
       })
     });
     
@@ -1086,10 +1100,10 @@ async function handleVcPlanSelection(plan) {
     
     
     if (!AppState.serverSettings) AppState.serverSettings = {};
-    AppState.serverSettings.vcPlan = plan.vcPlanId;
-    AppState.serverSettings.vcPlanName = plan.name || plan.vcPlanId;
+    AppState.serverSettings.vcPlan = getVcPlanId(plan);
+    AppState.serverSettings.vcPlanName = getVcPlanDisplayName(plan);
     
-    console.log('Selected VC Plan saved:', plan.vcPlanId);
+    console.log('Selected VC Plan saved:', getVcPlanId(plan));
   } catch (error) {
     console.error('Error saving current VC Plan:', error);
     alert('Failed to save VC Plan selection. Please try again.');
@@ -1248,6 +1262,14 @@ function closeSearchPopup() {
 
 
 async function openVCPopup() {
+  const vcPlanInput = document.getElementById('vcPlanIssuance');
+  const vcPlanId = vcPlanInput?.getAttribute('data-id');
+  if (!vcPlanId) {
+    alert("Please select a VC Plan before proceeding.");
+    return;
+  }
+  window.currentVcPlanId = vcPlanId;
+
   if (isMobile) {
     try {
       const response = await fetch("/qrPush");
@@ -1257,7 +1279,7 @@ async function openVCPopup() {
         const didElement = document.getElementById("didDisplay");
         if (didElement) {
           const did = AppState.getDid();
-          didElement.value = did || (isMobile ? "Error loading DID" : "Please enter your DID");
+          didElement.value = did || "Error loading DID";
         }
       } else {
         console.error("Failed to load the external HTML file.");
@@ -1269,17 +1291,18 @@ async function openVCPopup() {
     }
   } else {
     try {
-      
+
       if (!AppState.userInfo || !AppState.userInfo.firstname) {
-        alert("User information is missing. Please ensure you have completed the registration process.");
-        return;
+        if (!confirm("User information has not been entered.\n\nIf the VC policy is in TEST mode, issuance will proceed with auto-generated data.\n\nContinue?")) {
+          return;
+        }
       }
-      
+
       const response = await fetch("/vcPopup");
       if (response.ok) {
         const externalHTML = await response.text();
         document.getElementById("PopupArea").innerHTML = externalHTML;
-        vcOfferRefresh();
+        vcOfferRefresh(vcPlanId);
       } else {
         console.error("Failed to load the external HTML file.");
         alert("Error: Failed to load the required content. Please try again later.");
@@ -1380,6 +1403,7 @@ function qrPushSubmit() {
     },
     body: JSON.stringify({
       did: did,
+      vcPlanId: window.currentVcPlanId,
     }),
   })
     .then((response) => {
@@ -1431,7 +1455,7 @@ function sendEmail() {
     headers: {
       "Content-Type": "application/json",
     },
-    body: JSON.stringify({ email: email }),
+    body: JSON.stringify({ email: email, vcPlanId: window.currentVcPlanId }),
   })
     .then((response) => {
       if (response.ok) {
@@ -1566,16 +1590,17 @@ function updateSuccessDialog(data) {
   infoTable.innerHTML = tableHTML;
 }
 
-function vcOfferRefresh() {
+function vcOfferRefresh(vcPlanId) {
   window.vcOfferId = "";
-  
+
   showLoading();
-  
+
   fetch('/demo/api/vc-offer-refresh-call', {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
     },
+    body: JSON.stringify({ vcPlanId: vcPlanId || window.currentVcPlanId }),
   })
     .then((response) => response.json())
     .then((data) => {
@@ -1768,7 +1793,6 @@ function handleReload() {
 }
 
 
-window.addEventListener("resize", checkMobile);
 checkMobile();
 
 

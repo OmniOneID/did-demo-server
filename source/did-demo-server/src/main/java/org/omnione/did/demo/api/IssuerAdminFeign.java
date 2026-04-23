@@ -16,11 +16,13 @@
 
 package org.omnione.did.demo.api;
 
+import org.omnione.did.demo.dto.IssueProfileResDto;
 import org.omnione.did.demo.dto.SaveUserInfoReqDto;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 
 
 /**
@@ -31,5 +33,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 public interface IssuerAdminFeign {
     @RequestMapping(value = "/users/demo", method = RequestMethod.POST)
     void saveUserInfo(@RequestBody SaveUserInfoReqDto saveUserInfoReqDto);
+
+    @RequestMapping(value = "/issue-profiles/by-vc-schema", method = RequestMethod.GET)
+    IssueProfileResDto getIssueProfileByVcSchemaId(@RequestParam String vcSchemaId);
 
 }

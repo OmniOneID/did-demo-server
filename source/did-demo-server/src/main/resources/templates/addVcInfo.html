@@ -40,6 +40,39 @@
       0% { transform: rotate(0deg); }
       100% { transform: rotate(360deg); }
     }
+
+    .skip-link {
+      display: block;
+      text-align: center;
+      margin-top: 16px;
+      font-size: 0.85em;
+      color: #888;
+      cursor: pointer;
+      text-decoration: underline;
+    }
+
+    .skip-link:hover {
+      color: #555;
+    }
+
+    .file-input-wrapper {
+      position: relative;
+    }
+
+    .file-input-wrapper input[type="file"] {
+      width: 100%;
+      padding: 8px;
+      box-sizing: border-box;
+    }
+
+    .image-preview {
+      margin-top: 8px;
+      max-width: 100%;
+      max-height: 150px;
+      display: none;
+      border-radius: 4px;
+      border: 1px solid #ddd;
+    }
   </style>
 </head>
 <body>
@@ -53,10 +86,10 @@
         </div>
 
         <div id="dynamicForm" class="input-group">
-          
+
         </div>
       </div>
-      
+
       <input id="did" type="text" hidden />
       <input id="userName" type="text" hidden />
       <input id="vcSchemaId" type="text" hidden />
@@ -66,6 +99,7 @@
     <div class="button-group">
       <button class="btn-primary" onclick="saveVcInfo()">Save</button>
     </div>
+    <span class="skip-link" onclick="onClose()">Skip — the issuer will auto-generate claim data</span>
   </div>
 </div>
 
@@ -81,8 +115,8 @@
     any: function() {
         return (this.Android() || this.iOS());
     }
-  };  
-  
+  };
+
   function getUrlParameter(name) {
     name = name.replace(/[\[]/, '\\[').replace(/[\]]/, '\\]');
     var regex = new RegExp('[\\?&]' + name + '=([^&#]*)');
@@ -90,12 +124,22 @@
     return results === null ? '' : decodeURIComponent(results[1].replace(/\+/g, ' '));
   }
 
-  // 폼 필드 유효성 검사
+  const IMAGE_TYPES = new Set(['image', 'png', 'jpg', 'jpeg', 'gif', 'bmp', 'webp', 'svg']);
+
+  function isImageType(type) {
+    return IMAGE_TYPES.has((type || '').toLowerCase());
+  }
+
   function validateField(fieldId, value) {
     const errorElement = document.getElementById(`${fieldId}Error`);
     if (!errorElement) return true;
 
-    if (!value || value.trim() === '') {
+    const inputElement = document.getElementById(fieldId);
+    const checkValue = inputElement && inputElement.type === 'file'
+      ? (inputElement.files && inputElement.files.length > 0 ? 'ok' : '')
+      : value;
+
+    if (!checkValue || checkValue.trim() === '') {
       errorElement.textContent = 'This field is required';
       errorElement.style.display = 'block';
       return false;
@@ -116,7 +160,7 @@
     schema.vcSchema.credentialSubject.claims.forEach(claim => {
       console.log(claim);
       const namespace = claim.namespace.id || 'default';
-      
+
       if (claim.items && Array.isArray(claim.items)) {
         claim.items.forEach(item => {
           allItems.push({
@@ -124,7 +168,8 @@
             namespace: namespace,
             caption: item.caption,
             type: item.type,
-            required: item.required !== false 
+            format: item.format,
+            required: item.required !== false
           });
         });
       }
@@ -149,37 +194,72 @@
 
     inputDiv.appendChild(labelP);
 
+    const fieldId = `${item.namespace}.${item.id}`;
 
     const inputElement = document.createElement('input');
-    inputElement.type = item.type === 'date' ? 'text' : (item.type || 'text');
-    
-    
-    const fieldId = `${item.namespace}.${item.id}`;
+    if (isImageType(item.type) || isImageType(item.format)) {
+      inputElement.type = 'file';
+      const fmt = (item.format || item.type || '').toLowerCase();
+      inputElement.accept = fmt === 'image' ? 'image/*' : `image/${fmt}`;
+      inputElement.setAttribute('data-field-type', 'image');
+    } else if (item.type === 'date') {
+      inputElement.type = 'text';
+      inputElement.placeholder = 'YYYY-MM-DD';
+    } else {
+      inputElement.type = 'text';
+      inputElement.placeholder = `Enter ${item.caption}`;
+    }
+
     inputElement.id = fieldId;
     inputElement.name = fieldId;
-    
-    inputElement.placeholder = `Enter ${item.caption}`;
     inputElement.required = item.required;
     inputElement.setAttribute('data-caption', item.caption);
-    inputElement.setAttribute('data-original-id', item.id); 
-    inputElement.setAttribute('data-namespace', item.namespace); 
-
-
+    inputElement.setAttribute('data-original-id', item.id);
+    inputElement.setAttribute('data-namespace', item.namespace);
 
     inputDiv.appendChild(inputElement);
+
+    if (isImageType(item.type) || isImageType(item.format)) {
+      const preview = document.createElement('img');
+      preview.className = 'image-preview';
+      preview.id = `${fieldId}Preview`;
+      inputDiv.appendChild(preview);
+
+      inputElement.addEventListener('change', function() {
+        if (this.files && this.files[0]) {
+          const reader = new FileReader();
+          reader.onload = e => {
+            preview.src = e.target.result;
+            preview.style.display = 'block';
+          };
+          reader.readAsDataURL(this.files[0]);
+        }
+        validateField(fieldId, this.files && this.files.length > 0 ? 'ok' : '');
+      });
+    } else {
+      inputElement.addEventListener('blur', function() {
+        validateField(fieldId, this.value);
+      });
+    }
+
     formContainer.appendChild(inputDiv);
 
     const errorDiv = document.createElement('div');
     errorDiv.id = `${fieldId}Error`;
     errorDiv.className = 'error-valid-message';
     formContainer.appendChild(errorDiv);
-
-
-    inputElement.addEventListener('blur', function() {
-      validateField(fieldId, this.value);
-    });
   });
 }
+
+  function onClose() {
+    if (isMobile.Android() && window.android) {
+      window.android.onCompletedAddVcUpload();
+    } else if (isMobile.iOS() && window.webkit && window.webkit.messageHandlers && window.webkit.messageHandlers.onCompletedAddVcUpload) {
+      window.webkit.messageHandlers.onCompletedAddVcUpload.postMessage('success');
+    } else {
+      alert('Closed');
+    }
+  }
 
   async function fetchVcSchema(schemaId) {
     try {
@@ -195,118 +275,108 @@
     }
   }
 
-  async function saveVcInfo() {
-  
-  const inputs = document.querySelectorAll('#dynamicForm input');
-  let isValid = true;
-  const dynamicFields = {};
-
-  inputs.forEach(input => {
-    const isFieldValid = validateField(input.id, input.value);
-    if (!isFieldValid) {
-      isValid = false;
-    }
-
-    if (input.id) {      
-      dynamicFields[input.id] = input.value;
-    }
-  });
-
-  if (!isValid) {
-    alert('Please check the form for errors and try again.');
-    return;
+  function compressImage(file, maxSize = 1024, quality = 0.7) {
+    return new Promise(resolve => {
+      const img = new Image();
+      const objectUrl = URL.createObjectURL(file);
+      img.onload = () => {
+        let w = img.width, h = img.height;
+        if (w > maxSize || h > maxSize) {
+          const ratio = Math.min(maxSize / w, maxSize / h);
+          w = Math.round(w * ratio);
+          h = Math.round(h * ratio);
+        }
+        const canvas = document.createElement('canvas');
+        canvas.width = w;
+        canvas.height = h;
+        canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+        URL.revokeObjectURL(objectUrl);
+        resolve(canvas.toDataURL('image/jpeg', quality));
+      };
+      img.onerror = () => {
+        URL.revokeObjectURL(objectUrl);
+        const reader = new FileReader();
+        reader.onload = e => resolve(e.target.result);
+        reader.readAsDataURL(file);
+      };
+      img.src = objectUrl;
+    });
   }
 
-  const did = document.getElementById('did').value;
-  const userName = document.getElementById('userName').value;
-  const vcSchemaId = document.getElementById('vcSchemaId').value;
+  async function saveVcInfo() {
+    const inputs = document.querySelectorAll('#dynamicForm input');
+    let isValid = true;
 
-  const data = {
-    did,
-    userName,
-    vcSchemaId,
-    fields: dynamicFields
-  };  
+    inputs.forEach(input => {
+      const checkValue = input.type === 'file'
+        ? (input.files && input.files.length > 0 ? 'ok' : '')
+        : input.value;
+      if (!validateField(input.id, checkValue)) isValid = false;
+    });
 
-  try {
+    if (!isValid) {
+      alert('Please check the form for errors and try again.');
+      return;
+    }
+
     document.getElementById('loadingOverlay').style.display = 'flex';
 
-    const response = await fetch('/demo/api/save-user-info', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(data)    
-      }).then(response => {
-            if (!response.ok) {
-                return response.json().then(err => { throw err; });
-            }
-            return response.json();
-        })
-        .then(data => {                        
-           
-            if (document.getElementById('loadingOverlay')) {
-                document.getElementById('loadingOverlay').style.display = 'none';
-            }
+    try {
+      const dynamicFields = {};
+      for (const input of inputs) {
+        if (!input.id) continue;
+        if (input.type === 'file' && input.files && input.files[0]) {
+          dynamicFields[input.id] = await compressImage(input.files[0]);
+        } else {
+          dynamicFields[input.id] = input.value;
+        }
+      }
 
-            if (isMobile.any()) {
-                if (isMobile.Android()) {
-                    
-                    if (window.android) {
-                        window.android.onCompletedAddVcUpload();
-                    }
-                } else if (isMobile.iOS()) {
-                   
-                    alert('information has been saved');
-                    if (window.webkit && window.webkit.messageHandlers && window.webkit.messageHandlers.onCompletedAddVcUpload) {
-                        window.webkit.messageHandlers.onCompletedAddVcUpload.postMessage("success");
-                    }
-                }
-            } else {
-                alert('information has been saved');
-            }
-        })
-        .catch(error => {         
-            console.error(error);
+      const data = {
+        did: document.getElementById('did').value,
+        userName: document.getElementById('userName').value,
+        vcSchemaId: document.getElementById('vcSchemaId').value,
+        fields: dynamicFields
+      };
 
-            if (document.getElementById('loadingOverlay')) {
-                document.getElementById('loadingOverlay').style.display = 'none';
-            }
-
-            if (isMobile.any()) {
-                if (isMobile.Android()) {
-                    
-                    if (window.android) {
-                        window.android.onFailedAddVcUpload();
-                    }
-                } else if (isMobile.iOS()) {
-                   
-                    alert('Failed to save ID information');
-                    if (window.webkit && window.webkit.messageHandlers && window.webkit.messageHandlers.onFailedAddVcUpload) {
-                        window.webkit.messageHandlers.onFailedAddVcUpload.postMessage("failed");
-                    }
-                }
-            } else {
-                alert(error.message || 'Failed to save ID information');
-            }
-        });
+      const response = await fetch('/demo/api/save-user-info', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+      });
 
       if (!response.ok) {
-        throw new Error('Failed to save VC information');
+        const err = await response.json().catch(() => ({}));
+        throw new Error(err.message || 'Server error');
+      }
+
+      if (isMobile.Android() && window.android) {
+        window.android.onCompletedAddVcUpload();
+      } else if (isMobile.iOS() && window.webkit && window.webkit.messageHandlers && window.webkit.messageHandlers.onCompletedAddVcUpload) {
+        alert('Information has been saved.');
+        window.webkit.messageHandlers.onCompletedAddVcUpload.postMessage('success');
+      } else {
+        alert('Information has been saved.');
       }
 
     } catch (error) {
       console.error('Error saving VC information:', error);
-      alert('Failed to save information. Please try again.');
+      if (isMobile.Android() && window.android) {
+        window.android.onFailedAddVcUpload();
+      } else if (isMobile.iOS() && window.webkit && window.webkit.messageHandlers && window.webkit.messageHandlers.onFailedAddVcUpload) {
+        alert('Failed to save ID information.');
+        window.webkit.messageHandlers.onFailedAddVcUpload.postMessage('failed');
+      } else {
+        alert(error.message || 'Failed to save information. Please try again.');
+      }
     } finally {
-     
-      document.getElementById('loadingOverlay').style.display = 'none';
+      const overlay = document.getElementById('loadingOverlay');
+      if (overlay) overlay.style.display = 'none';
     }
   }
 
 
-  document.addEventListener('DOMContentLoaded', async function() {
-  
+  async function initPage() {
     const did = getUrlParameter('did');
     const userName = getUrlParameter('userName');
     const vcSchemaId = getUrlParameter('vcSchemaId');
@@ -316,16 +386,12 @@
     if (vcSchemaId) document.getElementById('vcSchemaId').value = vcSchemaId;
 
     if (vcSchemaId) {
-
       const schema = await fetchVcSchema(vcSchemaId);
       if (schema) {
-
         createDynamicForm(schema);
-
         document.getElementById('loadingOverlay').style.display = 'none';
       }
     } else {
-
       const defaultForm = `
         <div class="input">
           <p>Birthdate<span class="color-error">*</span></p>
@@ -353,8 +419,6 @@
       `;
 
       document.getElementById('dynamicForm').innerHTML = defaultForm;
-
-
       document.getElementById('loadingOverlay').style.display = 'none';
 
       document.querySelectorAll('#dynamicForm input').forEach(input => {
@@ -363,7 +427,9 @@
         });
       });
     }
-  });
+  }
+
+  document.addEventListener('DOMContentLoaded', initPage);
 </script>
 </body>
 </html>

@@ -1,6 +1,7 @@
 package org.omnione.did.base.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
@@ -269,6 +270,33 @@ public class ConfigService {
                 }
                 if (!currentUrls.containsKey("verifierServer") || currentUrls.get("verifierServer").isEmpty()) {
                     settings.put("verifierServer", serverSettings.has("verifierServer") ? serverSettings.get("verifierServer").asText() : "");
+                }
+            }
+
+            String currentVcPlan = configNode.has("currentVcPlan") ? configNode.get("currentVcPlan").asText("") : "";
+            String currentVpPolicy = configNode.has("currentVpPolicy") ? configNode.get("currentVpPolicy").asText("") : "";
+            settings.put("vcPlan", currentVcPlan);
+            settings.put("vpPolicy", currentVpPolicy);
+
+            JsonNode vcPlans = configNode.get("vcPlans");
+            if (vcPlans != null && vcPlans.isArray()) {
+                for (JsonNode vcPlan : vcPlans) {
+                    String vcPlanId = vcPlan.has("vcPlanId") ? vcPlan.get("vcPlanId").asText("") : "";
+                    if (currentVcPlan.equals(vcPlanId)) {
+                        settings.put("vcPlanName", vcPlan.has("name") ? vcPlan.get("name").asText(vcPlanId) : vcPlanId);
+                        break;
+                    }
+                }
+            }
+
+            JsonNode vpPolicies = configNode.get("vpPolicies");
+            if (vpPolicies != null && vpPolicies.isArray()) {
+                for (JsonNode vpPolicy : vpPolicies) {
+                    String vpPolicyId = vpPolicy.has("policyId") ? vpPolicy.get("policyId").asText("") : "";
+                    if (currentVpPolicy.equals(vpPolicyId)) {
+                        settings.put("vpPolicyName", vpPolicy.has("policyTitle") ? vpPolicy.get("policyTitle").asText(vpPolicyId) : vpPolicyId);
+                        break;
+                    }
                 }
             }
 

@@ -107,9 +107,9 @@ public class DemoServiceImpl implements DemoService{
      * @return VcResultDto containing the VC offer as a QR code
      */
     @Override
-    public VcResultDto vcOfferRefresh() throws IOException, WriterException {
+    public VcResultDto vcOfferRefresh(RequestVcOfferReqDto requestVcOfferReqDto) throws IOException, WriterException {
         RequestVcOfferReqDto vcOfferReqDto = RequestVcOfferReqDto.builder()
-                .vcPlanId(configService.getConfig().getCurrentVcPlan())
+                .vcPlanId(requestVcOfferReqDto.getVcPlanId())
                 .issuer(configService.getConfig().getIssuer())
                 .build();
 
@@ -153,7 +153,7 @@ public class DemoServiceImpl implements DemoService{
                 .holder(requestVcOfferReqDto.getDid())
                 .issuer(configService.getConfig().getIssuer())
                 .id(messageId)
-                .vcPlanId(configService.getConfig().getCurrentVcPlan())
+                .vcPlanId(requestVcOfferReqDto.getVcPlanId())
                 .build());
         if(vcOfferPushResDto != null){
             vcOfferPushResDto.setResult("success");
@@ -173,7 +173,7 @@ public class DemoServiceImpl implements DemoService{
         RequestVcOfferResDto requestVcOfferResDto =
                 tasFeign.requestVcOfferEmail(RequestVcOfferReqDto.builder()
                 .email(requestVcOfferReqDto.getEmail())
-                .vcPlanId(configService.getConfig().getCurrentVcPlan())
+                .vcPlanId(requestVcOfferReqDto.getVcPlanId())
                 .issuer(configService.getConfig().getIssuer())
                 .build());
 
@@ -365,6 +365,17 @@ public class DemoServiceImpl implements DemoService{
             return objectMapper.readValue(jsonString, CredentialSchemaDto.class);
         } catch (JsonProcessingException e) {
             throw new OpenDidException(ErrorCode.CREDENTIAL_SCHEMA_NOT_FOUND);
+        }
+    }
+
+    @Override
+    public String getUserQueryType(String vcSchemaId) {
+        try {
+            IssueProfileResDto profile = issuerAdminFeign.getIssueProfileByVcSchemaId(vcSchemaId);
+            if (profile == null || profile.getUserQueryType() == null) return "DB";
+            return profile.getUserQueryType();
+        } catch (Exception e) {
+            return "DB";
         }
     }
 

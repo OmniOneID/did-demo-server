@@ -22,6 +22,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.omnione.did.demo.dto.*;
 import org.omnione.did.demo.service.DemoService;
 import org.springframework.web.bind.annotation.*;
+import java.util.Map;
 import java.io.IOException;
 
 
@@ -43,8 +44,8 @@ public class DemoDataController {
 
     @RequestMapping(value = "/api/vc-offer-refresh-call", method = RequestMethod.POST)
     @ResponseBody
-    public VcResultDto vcOfferRefresh() throws IOException, WriterException {
-        return demoService.vcOfferRefresh();
+    public VcResultDto vcOfferRefresh(@RequestBody RequestVcOfferReqDto requestVcOfferReqDto) throws IOException, WriterException {
+        return demoService.vcOfferRefresh(requestVcOfferReqDto);
     }
     @RequestMapping(value = "/api/vc-offer-submit", method = RequestMethod.POST)
     @ResponseBody
@@ -110,7 +111,12 @@ public class DemoDataController {
         return demoService.getCredentialSchema(credentialSchemaId);
     }
 
-
+    @GetMapping("/api/user-query-type")
+    @ResponseBody
+    public Map<String, String> getUserQueryType(@RequestParam String vcSchemaId) {
+        String type = demoService.getUserQueryType(vcSchemaId);
+        return Map.of("userQueryType", type);
+    }
 
 
 }
