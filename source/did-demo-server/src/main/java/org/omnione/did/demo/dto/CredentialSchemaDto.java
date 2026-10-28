@@ -16,9 +16,7 @@ public class CredentialSchemaDto {
     private String id;
     private String name;
     private String version;
-    private List<String> attrNames;
     private List<AttrType> attrTypes;
-    private String tag;
 
     @Getter
     @Setter

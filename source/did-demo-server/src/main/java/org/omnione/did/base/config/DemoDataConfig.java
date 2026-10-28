@@ -30,6 +30,7 @@ public class DemoDataConfig {
         private String policyId;
         private String policyTitle;
         private String payloadService;
+        private String protocolType;
     }
 
     private String issuer;

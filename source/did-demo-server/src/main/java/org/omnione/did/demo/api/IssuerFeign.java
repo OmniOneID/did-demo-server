@@ -17,10 +17,7 @@
 package org.omnione.did.demo.api;
 
 import org.omnione.did.demo.dto.IssueVcResultResDto;
-import org.omnione.did.demo.dto.SaveUserInfoReqDto;
-import org.omnione.did.demo.dto.SaveVcInfoReqDto;
 import org.springframework.cloud.openfeign.FeignClient;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -31,12 +28,6 @@ import org.springframework.web.bind.annotation.RequestParam;
  */
 @FeignClient(value = "Issuer", url = "${dynamic.issuer.url:${issuer.url}}", path = "/issuer/api/v1")
 public interface IssuerFeign {
-    @RequestMapping(value = "/users/demo", method = RequestMethod.POST)
-    void saveUserInfo(@RequestBody SaveUserInfoReqDto saveUserInfoReqDto);
-
-    @RequestMapping(value = "/vc", method = RequestMethod.POST)
-    void saveVcInfo(@RequestBody SaveVcInfoReqDto saveVcInfoReqDto);
-
     @RequestMapping(value = "/issue-vc/result", method = RequestMethod.GET)
     IssueVcResultResDto issueVcResult(@RequestParam("offerId") String offerId);
 

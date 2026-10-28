@@ -28,11 +28,11 @@ import lombok.*;
 @ToString
 @Builder
 public class VpResultDto {
-    private String txId;
     private String payload;
     private String payloadType;
     private String validUntil;
     private String offerId;
     private byte[] qrImage;
-
+    private String protocol;
+    private String sessionId;
 }

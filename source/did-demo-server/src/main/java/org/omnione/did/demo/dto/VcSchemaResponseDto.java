@@ -26,7 +26,6 @@ public class VcSchemaResponseDto {
     @JsonIgnoreProperties(ignoreUnknown = true)
     public static class VcSchemaDto {
         private String schemaId;
-        private String issuerDid;
         private String issuerName;
         private String title;
         private String description;
@@ -103,12 +102,9 @@ public class VcSchemaResponseDto {
     @Getter
     @Setter
     @NoArgsConstructor
-    @AllArgsConstructor
     @ToString
     @Builder
     @JsonIgnoreProperties(ignoreUnknown = true)
     public static class Metadata {
-        private String formatVersion;
-        private String language;
     }
 }

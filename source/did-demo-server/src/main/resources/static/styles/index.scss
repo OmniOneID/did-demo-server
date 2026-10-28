@@ -766,9 +766,37 @@ i.icons {
         th {
           font-weight: 700;
           color: $G90;
+          max-width: 6.25rem;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
         }
         td {
           color: $G70;
+          word-break: break-word;
+          overflow-wrap: anywhere;
+          .claim-value-json {
+            margin: 0;
+            padding: 0.5rem;
+            background: #ffffff;
+            border: 1px solid $G20;
+            border-radius: 0.375rem;
+            font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+            font-size: 0.75rem;
+            line-height: 1.4;
+            white-space: pre-wrap;
+            word-break: break-word;
+            overflow-wrap: anywhere;
+          }
+          // Show at most 3 lines of the value so the popup does not overflow and hide the confirm button;
+          // the rest is truncated with "..." and the full value stays in the title tooltip (formatClaimValue).
+          .claim-value-clamp {
+            display: -webkit-box;
+            -webkit-box-orient: vertical;
+            -webkit-line-clamp: 3;
+            overflow: hidden;
+            cursor: help;
+          }
         }
         th,
         td {

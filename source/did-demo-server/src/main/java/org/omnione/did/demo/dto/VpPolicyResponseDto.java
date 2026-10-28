@@ -13,4 +13,5 @@ import lombok.*;
 public class VpPolicyResponseDto {
     private String policyTitle;
     private String policyId;
+    private String protocolType;
 }

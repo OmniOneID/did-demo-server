@@ -40,7 +40,6 @@ public class ConfirmVerifyResDto {
         private String caption;
         private String code;
         private String format;
-        private boolean hideValue;
         private String type;
         private String value;
     }

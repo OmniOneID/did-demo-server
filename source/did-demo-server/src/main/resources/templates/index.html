@@ -27,7 +27,7 @@
     }
 
     .btn-search {
-      padding: 6px 10px; 
+      padding: 8px 14px;
       background-color: #2F325E;
       color: white;
       border: none;
@@ -35,9 +35,10 @@
       border-bottom-right-radius: 4px;
       cursor: pointer;
       font-size: 14px;
-      margin-left: 5px; 
-      height: 90%; 
-      align-self: center; 
+      margin-left: 5px;
+      align-self: center;
+      white-space: nowrap;
+      flex-shrink: 0;
     }
 
     .btn-search:hover {
@@ -252,6 +253,155 @@
       background-color: white;
     }
 
+    /* Selected protocol one-line description */
+    .vc-proto-desc {
+      margin: 12px 0 8px;
+      padding: 10px 14px;
+      background: #f5f6fa;
+      border-left: 3px solid #2F325E;
+      border-radius: 4px;
+      font-size: 13px;
+      color: #444;
+      line-height: 1.5;
+    }
+
+    .vc-proto-desc strong {
+      color: #2F325E;
+      font-weight: 600;
+    }
+
+    /* Protocol badge */
+    .protocol-badge {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 10px;
+      font-size: 11px;
+      font-weight: 600;
+      margin-left: 8px;
+      vertical-align: middle;
+    }
+
+    .protocol-badge.did-vp {
+      background-color: #e8f5e9;
+      color: #2e7d32;
+    }
+
+    .protocol-badge.oid4vp {
+      background-color: #e3f2fd;
+      color: #1565c0;
+    }
+
+    /* Policy selection modal */
+    .policy-modal-overlay {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0,0,0,0.5);
+      z-index: 1000;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .policy-modal {
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.12);
+      overflow: hidden;
+      max-width: 420px;
+      width: 90%;
+    }
+
+    .policy-modal-header {
+      padding: 20px 20px 16px;
+      border-bottom: 1px solid #f0f0f0;
+    }
+
+    .policy-modal-header h3 {
+      font-size: 16px;
+      color: #1a1a2e;
+      margin: 0;
+    }
+
+    .policy-modal-header p {
+      font-size: 13px;
+      color: #888;
+      margin-top: 4px;
+    }
+
+    .policy-modal-body {
+      padding: 12px 16px;
+      max-height: 300px;
+      overflow-y: auto;
+    }
+
+    .policy-modal-footer {
+      padding: 12px 16px;
+      border-top: 1px solid #f0f0f0;
+      display: flex;
+      gap: 8px;
+      justify-content: flex-end;
+    }
+
+    /* Filter chips */
+    .filter-row {
+      display: flex;
+      gap: 6px;
+      margin-bottom: 12px;
+      flex-wrap: wrap;
+    }
+
+    .filter-chip {
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 12px;
+      cursor: pointer;
+      border: 1px solid #ddd;
+      background: #fff;
+      color: #666;
+      transition: all 0.15s;
+    }
+
+    .filter-chip.active {
+      border-color: #2F325E;
+      background: #2F325E;
+      color: #fff;
+    }
+
+    /* Policy item in modal */
+    .policy-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 8px;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+
+    .policy-item:hover {
+      background: #f7f7f7;
+    }
+
+    .policy-item input[type="radio"] {
+      accent-color: #2F325E;
+      width: 16px;
+      height: 16px;
+      flex-shrink: 0;
+    }
+
+    .policy-item label {
+      font-size: 14px;
+      color: #333;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      flex: 1;
+    }
+
+    .policy-item .policy-name {
+      flex: 1;
+    }
+
     .color-error {
       color: #ff3b30;
     }
@@ -320,41 +470,127 @@
       <div class="context">
         <!-- VC 발급 섹션 -->
         <div class="context-item" data-ref="VC 발급">
-          <p>
-            Ready to issue your OpenDID mobile ID<br />
-            Click the button below to generate a QR code.
+          <p class="vc-intro">
+            Two issuance protocols are supported. Pick one to see its flow.
           </p>
-          <div class="input-group mt-20">
-            <div class="label">
-              <p>Choose VC Plan ID</p>
-              <div class="divider"></div>
-            </div>
-            <div class="input">
-              <p>
-                VC Plan
-                <span class="color-error">*</span>
-              </p>
-              <div class="search-input">
-                <input
-                  id="vcPlanIssuance"
-                  type="text"
-                  placeholder="Select VC Plan"
-                  maxlength="100"
-                  required
-                  readonly
-                />
-                <button class="btn-search" onclick="searchVcPlanIssuance()">Search</button>
+
+          <!-- Protocol sub-tabs -->
+          <div class="button-group vc-proto-tabs">
+            <button
+              type="button"
+              class="btn-tab active"
+              data-vc-proto="opendid"
+              onclick="handleVcProtoSelection('opendid')"
+            >
+              OpenDID Issuing
+            </button>
+            <button
+              type="button"
+              class="btn-tab"
+              data-vc-proto="oid4vc"
+              onclick="handleVcProtoSelection('oid4vc')"
+            >
+              OID4VC Issuing
+            </button>
+          </div>
+
+          <!-- One-line description of the selected protocol (dynamic) -->
+          <div class="vc-proto-desc" id="vcProtoDesc"></div>
+
+          <!-- Per-protocol step summary (dynamic) -->
+          <div class="proto-steps" id="vcProtoSteps"></div>
+
+          <!-- OpenDID panel (existing issuance flow) -->
+          <div class="vc-proto-panel" data-vc-proto="opendid">
+            <div class="input-group mt-20">
+              <div class="label">
+                <p>Choose VC Plan ID</p>
+                <div class="divider"></div>
+              </div>
+              <div class="input">
+                <p>
+                  VC Plan
+                  <span class="color-error">*</span>
+                </p>
+                <div class="search-input">
+                  <input
+                    id="vcPlanIssuance"
+                    type="text"
+                    placeholder="Select VC Plan"
+                    maxlength="100"
+                    required
+                    readonly
+                  />
+                  <button class="btn-search" onclick="searchVcPlanIssuance()">Search</button>
+                </div>
               </div>
             </div>
+            <div class="button-group">
+              <button
+                id="issueForm"
+                class="btn-primary"
+                onclick="openVCPopup()"
+              >
+                Issuance of ID card
+              </button>
+            </div>
           </div>
-          <div class="button-group">
-            <button
-              id="issueForm"
-              class="btn-primary"
-              onclick="openVCPopup()"
-            >
-              Issuance of ID card
-            </button>
+
+          <!-- OID4VC panel -->
+          <div class="vc-proto-panel hidden" data-vc-proto="oid4vc">
+            <div class="input-group mt-20">
+              <div class="label">
+                <p>Select Credential</p>
+                <div class="divider"></div>
+              </div>
+              <div class="input">
+                <p>
+                  Credential
+                  <span class="color-error">*</span>
+                </p>
+                <select id="oid4vcCredentialId" class="select-input">
+                  <option value="">Configure Issuer Server first</option>
+                </select>
+              </div>
+            </div>
+            <div class="input-group mt-20">
+              <div class="label">
+                <p>Enter User ID</p>
+                <div class="divider"></div>
+              </div>
+              <div class="input">
+                <p>
+                  User ID
+                  <span class="color-error">*</span>
+                </p>
+                <div class="search-input">
+                  <input
+                    id="oid4vcUserId"
+                    type="text"
+                    placeholder="Enter User ID"
+                    maxlength="64"
+                    required
+                  />
+                  <button
+                    type="button"
+                    class="btn-search"
+                    onclick="openOID4VCIssuerSettings()"
+                  >
+                    Open Settings
+                  </button>
+                </div>
+              </div>
+            </div>
+            <div class="button-group">
+              <button
+                type="button"
+                id="oid4vcIssueForm"
+                class="btn-primary"
+                onclick="openOID4VCPopup()"
+              >
+                Issuing
+              </button>
+            </div>
           </div>
         </div>
         
@@ -363,29 +599,6 @@
             OpenDID Demo Submit your mobile ID.<br/>
             A QR code will be generated when you click the button.
           </p>
-          <div class="input-group mt-20">
-            <div class="label">
-              <p>Choose VP Policy ID</p>
-              <div class="divider"></div>
-            </div>
-            <div class="input">
-              <p>
-                VP Policy
-                <span class="color-error">*</span>
-              </p>
-              <div class="search-input">
-                <input
-                  id="vpPolicySubmission"
-                  type="text"
-                  placeholder="Select VP Policy"
-                  maxlength="100"
-                  required
-                  readonly
-                />
-                <button class="btn-search" onclick="searchVpPolicy()">Search</button>
-              </div>
-            </div>
-          </div>
           <div class="button-group">
             <button class="btn-primary" onclick="openVPPopup()">
               Submit your ID
@@ -619,8 +832,8 @@
             </div>
             <h5>Step 1</h5>
             <div class="text-info pc-only-flex">
-              <span>Download and register on OpenDID app.</span>
-              <span>Register as a user via the app.</span>
+              <span>Register on OpenDID app</span>
+              <span>Sign up as a user via the app.</span>
 
             </div>
           </div>
@@ -663,8 +876,8 @@
             </div>
             <h5>Step 2</h5>
             <div class="text-info pc-only-flex">
-              <span>Enter user information</span>
-              <span>Please enter your information to ensure smooth use of the demo site.</span>
+              <span>Enter user info &amp; configure</span>
+              <span>For OID4VC, enter your UserID on the Issuer settings page.</span>
             </div>
           </div>
 
@@ -712,8 +925,8 @@
             </div>
             <h5>Step 3</h5>
             <div class="text-info pc-only-flex">
-              <span>Issue a mobile ID card</span>
-              <span>Get your own digital ID.</span>
+              <span>Issue a credential</span>
+              <span>OpenDID QR, or OID4VC QR + 4-digit Tx Code.</span>
             </div>
           </div>
 
@@ -755,8 +968,8 @@
             </div>
             <h5>Step 4</h5>
             <div class="text-info pc-only-flex">
-              <span>Submit your ID</span>
-              <span>Please submit the issued mobile ID card</span>
+              <span>Submit your VP</span>
+              <span>DID VP, or OID4VP — both flows are supported.</span>
             </div>
           </div>
         </div>
@@ -765,23 +978,23 @@
       <div class="text mobile-only-flex">
         <div class="text-item">
           <h5>Step 1.</h5>
-          <p>Download and register on OpenDID app.</p>
-          <p>Register as a user via the app.</p>
+          <p>Register on OpenDID app</p>
+          <p>Sign up as a user via the app.</p>
         </div>
         <div class="text-item">
           <h5>Step 2.</h5>
-          <p>Enter user information</p>
-          <p>Please enter your information to ensure smooth use of the demo site.</p>
+          <p>Enter user info &amp; configure</p>
+          <p>For OID4VC, enter your UserID on the Issuer settings page.</p>
         </div>
         <div class="text-item">
           <h5>Step 3.</h5>
-          <p>Issue a mobile ID card</p>
-          <p>Get your own digital ID.</p>
+          <p>Issue a credential</p>
+          <p>OpenDID QR, or OID4VC QR + 4-digit Tx Code.</p>
         </div>
         <div class="text-item">
           <h5>Step 4.</h5>
-          <p>Submit your ID</p>
-          <p>Please submit the issued mobile ID card.</p>
+          <p>Submit your VP</p>
+          <p>DID VP, or OID4VP — both flows are supported.</p>
         </div>
       </div>
     </div>
@@ -789,6 +1002,29 @@
 </main>
 
 <div id="PopupArea"></div>
+
+<!-- Policy Selection Modal (TO-BE B: filter chips + badges) -->
+<div id="policyModal" class="policy-modal-overlay" style="display: none;">
+  <div class="policy-modal">
+    <div class="policy-modal-header">
+      <h3>Select Policy</h3>
+      <p>Choose a verification policy to proceed.</p>
+    </div>
+    <div class="policy-modal-body">
+      <div class="filter-row" id="policyFilterRow">
+        <button class="filter-chip active" onclick="filterPolicies(this, 'all')">All</button>
+      </div>
+      <div id="policyList"></div>
+      <div id="policyEmptyMsg" style="display:none; text-align:center; color:#999; padding:20px; font-size:13px;">
+        No policies available.
+      </div>
+    </div>
+    <div class="policy-modal-footer">
+      <button class="btn-secondary" onclick="closePolicyModal()">Cancel</button>
+      <button class="btn-primary" onclick="confirmPolicySelection()">Select</button>
+    </div>
+  </div>
+</div>
 
 <div id="loadingOverlay" class="loading-overlay" style="display: none;">
   <div class="spinner"></div>

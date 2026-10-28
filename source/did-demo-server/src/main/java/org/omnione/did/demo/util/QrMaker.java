@@ -49,6 +49,21 @@ public class QrMaker {
         return qrImageData;
     }
 
+    /**
+     * Encodes the string into a QR code as-is, without JSON serialization.
+     * Used when the content itself must go into the QR code, such as a raw OID4VP openid4vp:// deep link.
+     */
+    public static QrImageData makeQrImageFromString(final String contents) throws IOException, WriterException {
+        byte[] qrImage = makeQrImage(contents, DEFAULT_IMAGE_FORMAT, DEFAULT_WIDTH, DEFAULT_HEIGHT);
+
+        QrImageData qrImageData = new QrImageData();
+        qrImageData.setFormat("image");
+        qrImageData.setMediaType(DEFAULT_IMAGE_FORMAT);
+        qrImageData.setQrIamge(qrImage);
+
+        return qrImageData;
+    }
+
     public static byte[] makeQrImage(final String contents, final String format, int width, int height) throws IOException, WriterException {
         BitMatrix bitMatrix = makeQrBitMatrix(contents, width, height);
 

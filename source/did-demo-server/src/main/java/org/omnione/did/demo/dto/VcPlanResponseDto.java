@@ -28,10 +28,8 @@ public class VcPlanResponseDto {
         private String name;
         private String description;
         private String manager;
-        private List<String> tags;
         private CredentialSchema credentialSchema;
         private Option option;
-        private List<String> allowedIssuers;
         private CredentialDefinition credentialDefinition;
 
         @Getter
@@ -49,14 +47,10 @@ public class VcPlanResponseDto {
         @Getter
         @Setter
         @NoArgsConstructor
-        @AllArgsConstructor
         @ToString
         @Builder
         @JsonIgnoreProperties(ignoreUnknown = true)
         public static class Option {
-            private boolean allowUserInit;
-            private boolean allowIssuerInit;
-            private boolean delegatedIssuance;
         }
 
         @Getter

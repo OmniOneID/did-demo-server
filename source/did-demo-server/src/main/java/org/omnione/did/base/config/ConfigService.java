@@ -134,6 +134,7 @@ public class ConfigService {
                         ObjectNode node = objectMapper.createObjectNode();
                         node.put("policyId", policy.getPolicyId());
                         node.put("policyTitle", policy.getPolicyTitle());
+                        node.put("protocolType", policy.getProtocolType() != null ? policy.getProtocolType() : "DID_VP");
                         return node;
                     })
                     .collect(Collectors.toList());
@@ -146,16 +147,6 @@ public class ConfigService {
         } catch (Exception e) {
             log.error("Failed to update VP Policy with dynamic URL", e);
             throw new RuntimeException("Failed to update VP policies: " + e.getMessage(), e);
-        }
-    }
-
-    public void updateCurrentVpPolicy(String vpPolicyId) {
-        try {
-            ObjectNode configNode = (ObjectNode) objectMapper.readTree(configFile);
-            configNode.put("currentVpPolicy", vpPolicyId);
-            objectMapper.writerWithDefaultPrettyPrinter().writeValue(configFile, configNode);
-        } catch (IOException e) {
-            throw new RuntimeException("Failed to update current VP Policy", e);
         }
     }
 

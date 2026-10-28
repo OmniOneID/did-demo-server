@@ -36,10 +36,4 @@ public interface TasFeign {
     //vcOfferEmail
     @RequestMapping(value = "/offer-issue-vc/email", method = RequestMethod.POST)
     RequestVcOfferResDto requestVcOfferEmail(@RequestBody RequestVcOfferReqDto requestVcOfferReqDto);
-
-
-    @RequestMapping(value = "/issue-vc/result", method = RequestMethod.POST)
-    RequestVcSubmitResDto requestVcSubmitConfirm(RequestVcSubmitReqDto requestVcSubmitReqDto);
-
-
 }

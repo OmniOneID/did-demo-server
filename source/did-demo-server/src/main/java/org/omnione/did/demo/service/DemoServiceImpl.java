@@ -18,6 +18,7 @@ package org.omnione.did.demo.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.google.zxing.WriterException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -65,42 +66,6 @@ public class DemoServiceImpl implements DemoService{
     private final ObjectMapper objectMapper;
 
     /**
-     * Refreshes the Verifiable Presentation (VP) offer.
-     * This method requests a VP offer from the Verifier and returns the offer as a QR code.
-     *
-     * @return VpResultDto containing the VP offer as a QR code
-     */
-    @Override
-    public VpResultDto vpOfferRefresh(){
-        try {
-            RequestVpOfferReqDto offerReqDto = RequestVpOfferReqDto.builder()
-                    .policyId(configService.getConfig().getCurrentVpPolicy())
-                    .build();
-            RequestVpOfferResDto requestVpOfferResDto = verifierFeign.requestVpOfferQR(offerReqDto);
-            if (requestVpOfferResDto == null) {
-                throw new OpenDidException(ErrorCode.VP_OFFER_NOT_FOUND);
-            }
-            String jsonString = JsonUtil.serializeAndSort(requestVpOfferResDto.getPayload());
-            String encDataPayload = BaseMultibaseUtil.encode(jsonString.getBytes(), MultiBaseType.base64);
-            VpResultDto vpResultDto = VpResultDto.builder()
-                    .payloadType("SUBMIT_VP")
-                    .payload(encDataPayload)
-                    .validUntil(requestVpOfferResDto.getPayload().getValidUntil())
-                    .build();
-            QrImageData qrImageData = makeQrImage(vpResultDto);
-            vpResultDto.setQrImage(qrImageData.getQrIamge());
-            vpResultDto.setOfferId(requestVpOfferResDto.getPayload().getOfferId());
-            return vpResultDto;
-
-        } catch (OpenDidException e){
-            throw e;
-        } catch (IOException | WriterException e) {
-            throw new OpenDidException(ErrorCode.JSON_PROCESSING_ERROR);
-        }
-
-    }
-
-    /**
      * Refreshes the Verifiable Credential (VC) offer.
      * This method requests a VC offer from the TAS and returns the offer as a QR code.
      *
@@ -125,18 +90,6 @@ public class DemoServiceImpl implements DemoService{
         vcResultDto.setValidUntil(requestVcOfferResDto.getValidUntil());
         vcResultDto.setOfferId(requestVcOfferResDto.getOfferId());
         return vcResultDto;
-    }
-
-    /**
-     * Submits the Verifiable Credential (VC) offer.
-     * This method submits the VC offer to the TAS and returns the result.
-     *
-     * @param requestVcSubmitReqDto the VC offer to submit
-     * @return RequestVcSubmitResDto containing the result of the submission
-     */
-    @Override
-    public RequestVcSubmitResDto vcOfferSubmit(RequestVcSubmitReqDto requestVcSubmitReqDto) {
-        return tasFeign.requestVcSubmitConfirm(requestVcSubmitReqDto);
     }
 
     /**
@@ -257,28 +210,6 @@ public class DemoServiceImpl implements DemoService{
 
 
     /**
-     * Saves the Verifiable Credential (VC) information.
-     * This method saves the VC information to the CAS and returns the result.
-     *
-     * @param saveVcInfoReqDto the VC information to save
-     * @return SaveUserInfoResDto containing the result of the save
-     */
-    @Override
-    public SaveUserInfoResDto saveVcInfo(SaveVcInfoReqDto saveVcInfoReqDto) {
-        try {
-            if (saveVcInfoReqDto.getDid() == null || saveVcInfoReqDto.getDid().isEmpty()) {
-                throw new OpenDidException(ErrorCode.VC_INVALID_FORMAT);
-            }
-            issuerFeign.saveVcInfo(saveVcInfoReqDto);
-            return SaveUserInfoResDto.builder()
-                    .result(true)
-                    .build();
-        } catch (OpenDidException e) {
-            throw new OpenDidException(ErrorCode.VC_SAVE_FAILED);
-        }
-    }
-
-    /**
      * Issues the Verifiable Credential (VC) result.
      * This method issues the VC result to the CAS and returns the result.
      *
@@ -379,6 +310,63 @@ public class DemoServiceImpl implements DemoService{
         }
     }
 
+    public VpResultDto initiateVerification(String policyId) {
+        try {
+            InitiateRequestDto request = InitiateRequestDto.builder()
+                    .policyId(policyId)
+                    .build();
+            InitiateResponseDto response = verifierFeign.initiateVerification(request);
+            if (response == null) {
+                throw new OpenDidException(ErrorCode.VP_OFFER_NOT_FOUND);
+            }
+
+            String protocol = response.getProtocol();
+            VpResultDto.VpResultDtoBuilder resultBuilder = VpResultDto.builder()
+                    .protocol(protocol)
+                    .sessionId(response.getSessionId());
+
+            if ("DID_VP".equals(protocol)) {
+                // DID VP: base64-encode the payload and build the QR code
+                String jsonString = JsonUtil.serializeAndSort(response.getPayload());
+                String encDataPayload = BaseMultibaseUtil.encode(jsonString.getBytes(), MultiBaseType.base64);
+                resultBuilder
+                        .payloadType("SUBMIT_VP")
+                        .payload(encDataPayload);
+
+                // Extract validUntil and offerId from the payload
+                if (response.getPayload() instanceof Map) {
+                    @SuppressWarnings("unchecked")
+                    Map<String, Object> payloadMap = (Map<String, Object>) response.getPayload();
+                    resultBuilder.validUntil((String) payloadMap.get("validUntil"));
+                    resultBuilder.offerId((String) payloadMap.get("offerId"));
+                }
+            } else if ("OID4VP".equals(protocol)) {
+                // OID4VP: put the authorizationRequest URI in the QR code
+                resultBuilder
+                        .payloadType("OID4VP")
+                        .payload(response.getAuthorizationRequest());
+            }
+
+            VpResultDto vpResultDto = resultBuilder.build();
+            // OID4VP: encode only the raw openid4vp:// deep link in the QR code (compatible with standard wallets)
+            // DID_VP: encode the whole VpResultDto as JSON, as before (compatible with the OpenDID wallet)
+            QrImageData qrImageData = "OID4VP".equals(protocol)
+                    ? makeQrImageFromString(vpResultDto.getPayload())
+                    : makeQrImage(vpResultDto);
+            vpResultDto.setQrImage(qrImageData.getQrIamge());
+            return vpResultDto;
+
+        } catch (OpenDidException e) {
+            throw e;
+        } catch (IOException | WriterException e) {
+            throw new OpenDidException(ErrorCode.JSON_PROCESSING_ERROR);
+        }
+    }
+
+    @Override
+    public StatusResponseDto getVerificationStatus(String sessionId) {
+        return verifierFeign.getVerificationStatus(sessionId);
+    }
 
 }
 
