@@ -18,8 +18,8 @@ puppeteer:
 Open DID Demo Server Installation And Operation Guide
 ==
 
-- Date: 2025-05-30
-- Version: v2.0.0
+- Date: 2026-11-03
+- Version: v3.0.0
 
 목차
 ==
@@ -58,6 +58,7 @@ Open DID Demo Server Installation And Operation Guide
   - [6.2. 운영 서버 설정](#62-운영-서버-설정)
   - [6.3. 사용자 정보 입력](#63-사용자-정보-입력)
   - [6.4. VC 발급](#64-vc-발급)
+    - [6.4.1. OID4VC 발급](#641-oid4vc-발급)
   - [6.5. VP 제출](#65-vp-제출)
   - [6.6. 서버 연결 테스트](#66-서버-연결-테스트)
   - [6.7. 주요 에러 상황 및 해결 방법](#67-주요-에러-상황-및-해결-방법)
@@ -137,23 +138,25 @@ did-demo-server
 ├── CLA.md
 ├── CODE_OF_CONDUCT.md
 ├── CONTRIBUTING.md
+├── dependencies-license.md
 ├── LICENSE
-├── dependencies-license.md 
 ├── MAINTAINERS.md
 ├── README.md
+├── README_ko.md
 ├── RELEASE-PROCESS.md
 ├── SECURITY.md
 ├── docs
-│   └── installation
-│       └── OpenDID_DemoServer_InstallationAndOperation_Guide.md
+│   └── installation
+│       ├── OpenDID_DemoServer_InstallationAndOperation_Guide.md
+│       └── OpenDID_DemoServer_InstallationAndOperation_Guide_ko.md
 └── source
-    └── demo
+    └── did-demo-server
+        ├── README.md
+        ├── build.gradle
         ├── gradle
         ├── libs
-            └── did-crypto-sdk-server-2.0.0.jar
+        │   └── did-crypto-sdk-server-2.0.0.jar
         └── src
-        └── build.gradle
-        └── README.md
 ```
 
 | Name                    | Description                              |
@@ -248,7 +251,7 @@ IntelliJ IDEA는 Java 개발에 널리 사용되는 통합 개발 환경(IDE)으
       cd build/libs
       ls
     ```
-- 이 명령어는 `did-demo-server-2.0.0.jar` 파일을 생성합니다.
+- 이 명령어는 `did-demo-server-3.0.0.jar` 파일을 생성합니다.
 
 <br/>
 
@@ -256,7 +259,7 @@ IntelliJ IDEA는 Java 개발에 널리 사용되는 통합 개발 환경(IDE)으
 빌드된 JAR 파일을 사용하여 서버를 구동합니다:
 
 ```bash
-java -jar did-demo-server-2.0.0.jar
+java -jar did-demo-server-3.0.0.jar
 ```
 
 - 서버가 정상적으로 구동되면, 브라우저에서 http://localhost:8099/swagger-ui/index.html 주소로 이동하여 Swagger UI를 통해 API 문서가 제대로 표시되는지 확인합니다.
@@ -419,20 +422,20 @@ OpenDID 데모를 사용하기 위해서는 사용자 정보를 입력해야 합
 1. 기본 사용자 정보
    - 이름 (First Name)
    - 성 (Last Name)
-   - DID (사용자 식별자)
-   - 이메일
+   - DID (사용자 식별자, 선택)
+   - 이메일 (선택)
 
-2. 자격증명 유형 선택(예제)
-   - 신분증 (National ID)
-   - 모바일 운전면허증 (MDL)
+2. 발급 플랜 선택 (Choose Issue Plan)
+   - Issuer 서버에 등록된 VC 플랜을 선택합니다.
+   - 플랜의 VC 스키마에 있는 클레임 입력 칸이 표시됩니다. ZKP를 지원하는 플랜이면 ZKP 정보 입력 칸도 함께 표시됩니다.
 
-선택한 자격증명 유형에 따라 추가 정보를 입력해야 합니다.
+'Save' 버튼을 눌러 정보를 저장합니다.
 
-<img src="./images/enter_information.png" width="800"/>
+<img src="./images/enter_information.png" width="600"/>
 
 ## 6.4. VC 발급 
 
-VC(Verifiable Credential, 검증가능한 자격증명)를 발급받기 위한 과정은 다음과 같습니다:
+VC 발급 화면에는 'OpenDID Issuing'과 'OID4VC Issuing' 두 탭이 있습니다. 'OpenDID Issuing'으로 VC(Verifiable Credential, 검증가능한 자격증명)를 발급받는 과정은 다음과 같습니다:
 
 1. 발급받을 자격증을 선택합니다.
    <img src="./images/vc_plan_select.png" width="800"/>
@@ -441,31 +444,49 @@ VC(Verifiable Credential, 검증가능한 자격증명)를 발급받기 위한 �
    > VC 플랜 등록은 이슈어 가이드[Issuer Admin Guide]를 상세히 참고바랍니다.
 
 2. 'Search' 버튼을 클릭하여 발급받을 VC를 선택하는 팝업을 통해 발급 계획을 선택합니다.
-   <img src="./images/vc_plan_popup.png" width="800"/>
+   <img src="./images/vc_plan_popup.png" width="400"/>
 
 3. 'Issuance of ID card' 버튼을 클릭하여 QR 코드를 요청합니다. 
    - QR 코드는 유효시간이 있으며, 'Renew' 버튼을 통해 초기화할 수 있습니다.
-   <img src="./images/vc_qr.png" width="800"/>
+   <img src="./images/vc_qr.png" width="450"/>
 
 4. VC 발급 요청은 다음과 같은 다양한 방법으로 받을 수 있습니다:
    - QR 코드 스캔: OpenDID 앱으로 QR 코드를 스캔
    - 푸시 알림: 앱에 등록된 사용자의 DID를 사용하여 푸시 알림 발송
-   <img src="./images/vc_push.png" width="800"/>
+   <img src="./images/vc_push.png" width="450"/>
    - 이메일: 사용자 정보에 입력된 이메일로 QR 코드 전송
+
+5. 클레임 입력 팝업에서 'Skip — the issuer will auto-generate claim data'를 누르면 사용자 정보를 입력하지 않고 VC를 발급받을 수 있습니다. 이때 Issuer가 테스트용 클레임 데이터를 만듭니다.
+   <img src="./images/vc_claim_skip.png" width="360"/>
+
+### 6.4.1. OID4VC 발급
+'OID4VC Issuing' 탭을 선택하면 OID4VCI(OpenID for Verifiable Credential Issuance)로 자격증명을 발급받을 수 있습니다.
+
+1. 발급받을 자격증명을 선택합니다. 목록은 Issuer 서버의 메타데이터에서 가져옵니다.
+2. Issuer 서버에 등록된 User ID를 입력합니다. 'Open Settings'를 누르면 Issuer 설정 페이지가 열립니다.
+   <img src="./images/vc_oid4vc_tab.png" width="800"/>
+3. 'Issuing' 버튼을 누르면 Credential Offer QR 코드와 Transaction Code(Tx Code)가 표시됩니다. 'Renew'를 누르면 Offer를 새로 만듭니다.
+   <img src="./images/vc_oid4vc_qr.png" width="450"/>
+4. OID4VCI 지갑으로 QR 코드를 스캔하고 Tx Code를 입력합니다.
 
 ## 6.5. VP 제출 
 VP(Verifiable Presentation, 검증가능한 제시)를 제출하는 과정은 다음과 같습니다:
 
-1. VP 정책을 선택합니다.
-   <img src="./images/vp_policy.png" width="800"/>
+1. VP 제출 화면에서 'Submit your ID' 버튼을 누릅니다.
+   <img src="./images/vp_submission.png" width="800"/>
 
    > 참고: VP 제출을 위해서는 사전에 등록된 VP 정책이 필요합니다. 등록 방법은 Verifier 어드민 가이드[Verifier Admin Guide]를 참고해주세요.
 
-2. VP 제출 절차는 VC 발급 절차와 유사합니다:
-   - VP 정책 선택
-   - 'Submit your ID' 버튼 클릭하여 QR 코드 발급
-   - OpenDID 앱으로 QR 코드 스캔하여 VP 제출
-   - 정상 제출 완료 여부 확인
+2. 정책 선택 팝업에서 정책을 고르고 'Select'를 누릅니다. 필터 버튼(All, DID VP, OID4VP)으로 프로토콜 유형별로 목록을 걸러 볼 수 있습니다.
+   <img src="./images/vp_policy.png" width="400"/>
+
+3. Verifier는 정책의 프로토콜 유형(`DID_VP` 또는 `OID4VP`)에 따라 검증을 시작하고, QR 코드가 표시됩니다.
+   - `DID_VP`: OpenDID QR 코드가 표시됩니다. OpenDID 앱으로 스캔해 VP를 제출합니다.
+   - `OID4VP`: OID4VP authorization request QR 코드가 표시됩니다. OID4VP 지갑으로 스캔해 자격증명을 제출합니다.
+   <img src="./images/vp_oid4vp_qr.png" width="450"/>
+
+4. 앱에서 제출한 뒤 'Submission Complete' 버튼을 누르면 데모가 검증 결과를 확인해 보여 줍니다. OID4VP는 프로토콜, 형식, 제출된 클레임을 보여 줍니다.
+   <img src="./images/vp_oid4vp_result.png" width="450"/>
 
 ## 6.6. 서버 연결 테스트
 

@@ -10,7 +10,7 @@ Here's an overview of the directory structure.
 demo
 ├── gradle
 ├── libs
-    └── did-crypto-sdk-server-1.0.0.jar
+    └── did-crypto-sdk-server-2.0.0.jar
 ├── sample
 └── src
 └── build.gradle
@@ -42,7 +42,7 @@ Libraries used in this project are organized into two main categories:
 2. **Third-Party Libraries**: These libraries are open-source dependencies managed via the [build.gradle](build.gradle) file. For a detailed list of third-party libraries and their licenses, please refer to the [dependencies-license.md](../../dependencies-license.md) file.
 
 
-## Documenttation
+## Documentation
 
 Refer to the following documents for more detailed information:
 

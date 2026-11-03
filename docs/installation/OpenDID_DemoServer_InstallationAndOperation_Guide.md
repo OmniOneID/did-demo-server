@@ -18,8 +18,8 @@ puppeteer:
 Open DID Demo Server Installation And Operation Guide
 ==
 
-- Date: 2025-05-30
-- Version: v2.0.0
+- Date: 2026-11-03
+- Version: v3.0.0
 
 Table of Contents
 ==
@@ -58,6 +58,7 @@ Table of Contents
   - [6.2. Operation Server Configuration](#62-operation-server-configuration)
   - [6.3. User Information Input](#63-user-information-input)
   - [6.4. VC Issuance](#64-vc-issuance)
+    - [6.4.1. OID4VC Issuance](#641-oid4vc-issuance)
   - [6.5. VP Submission](#65-vp-submission)
   - [6.6. Server Connection Test](#66-server-connection-test)
   - [6.7. Major Error Situations and Solutions](#67-major-error-situations-and-solutions)
@@ -134,23 +135,25 @@ did-demo-server
 ├── CLA.md
 ├── CODE_OF_CONDUCT.md
 ├── CONTRIBUTING.md
+├── dependencies-license.md
 ├── LICENSE
-├── dependencies-license.md 
 ├── MAINTAINERS.md
 ├── README.md
+├── README_ko.md
 ├── RELEASE-PROCESS.md
 ├── SECURITY.md
 ├── docs
 │   └── installation
-│       └── OpenDID_DemoServer_InstallationAndOperation_Guide.md
+│       ├── OpenDID_DemoServer_InstallationAndOperation_Guide.md
+│       └── OpenDID_DemoServer_InstallationAndOperation_Guide_ko.md
 └── source
-    └── demo
+    └── did-demo-server
+        ├── README.md
+        ├── build.gradle
         ├── gradle
         ├── libs
-            └── did-crypto-sdk-server-2.0.0.jar
+        │   └── did-crypto-sdk-server-2.0.0.jar
         └── src
-        └── build.gradle
-        └── README.md
 ```
 
 | Name                    | Description                                      |
@@ -244,7 +247,7 @@ This section guides you through running the Open DID server using console comman
       cd build/libs
       ls
     ```
-- This command creates the `did-demo-server-2.0.0.jar` file.
+- This command creates the `did-demo-server-3.0.0.jar` file.
 
 <br/>
 
@@ -252,7 +255,7 @@ This section guides you through running the Open DID server using console comman
 Start the server using the built JAR file:
 
 ```bash
-java -jar did-demo-server-2.0.0.jar
+java -jar did-demo-server-3.0.0.jar
 ```
 
 - Once the server is running properly, navigate to http://localhost:8099/swagger-ui/index.html in your browser to verify that the API documentation is displayed correctly through Swagger UI.
@@ -414,20 +417,20 @@ Since the demo issues VCs based on user information and submits VPs through them
 1. Basic User Information
    - First Name
    - Last Name
-   - DID (User Identifier)
-   - Email
+   - DID (User Identifier, optional)
+   - Email (optional)
 
-2. Credential Type Selection (Example)
-   - National ID
-   - Mobile Driver's License (MDL)
+2. Issue Plan Selection
+   - Select a VC plan registered on the Issuer server.
+   - Input fields for the claims of the plan's VC schema are displayed. If the plan supports ZKP, ZKP information fields are also displayed.
 
-Depending on the selected credential type, additional information must be entered.
+Click the 'Save' button to save the information.
 
-<img src="./images/enter_information.png" width="800"/>
+<img src="./images/enter_information.png" width="600"/>
 
 ## 6.4. VC Issuance 
 
-The process for issuing a VC (Verifiable Credential) is as follows:
+The VC issuance screen has two tabs: 'OpenDID Issuing' and 'OID4VC Issuing'. The process for issuing a VC (Verifiable Credential) with 'OpenDID Issuing' is as follows:
 
 1. Select the credential to be issued.
    <img src="./images/vc_plan_select.png" width="800"/>
@@ -436,31 +439,49 @@ The process for issuing a VC (Verifiable Credential) is as follows:
    > For VC plan registration, please refer to the [Issuer Admin Guide] in detail.
 
 2. Click the 'Search' button to select the issuance plan through a popup for selecting the VC to be issued.
-   <img src="./images/vc_plan_popup.png" width="800"/>
+   <img src="./images/vc_plan_popup.png" width="400"/>
 
 3. Click the 'Issuance of ID card' button to request a QR code.
    - QR codes have a validity period and can be reset using the 'Renew' button.
-   <img src="./images/vc_qr.png" width="800"/>
+   <img src="./images/vc_qr.png" width="450"/>
 
 4. VC issuance requests can be received through various methods:
    - QR Code Scan: Scan QR code with OpenDID app
    - Push Notification: Send push notification using registered user's DID in the app
-   <img src="./images/vc_push.png" width="800"/>
+   <img src="./images/vc_push.png" width="450"/>
    - Email: Send QR code to email entered in user information
+
+5. In the claim input popup, you can click 'Skip — the issuer will auto-generate claim data' to issue the VC without entering user information. The Issuer creates test claim data.
+   <img src="./images/vc_claim_skip.png" width="360"/>
+
+### 6.4.1. OID4VC Issuance
+Select the 'OID4VC Issuing' tab to issue a credential through OpenID for Verifiable Credential Issuance (OID4VCI).
+
+1. Select the credential. The list is loaded from the metadata of the Issuer server.
+2. Enter the User ID registered on the Issuer server. Click 'Open Settings' to open the Issuer settings page.
+   <img src="./images/vc_oid4vc_tab.png" width="800"/>
+3. Click the 'Issuing' button. A credential offer QR code and a Transaction Code (Tx Code) are displayed. Click 'Renew' to create a new offer.
+   <img src="./images/vc_oid4vc_qr.png" width="450"/>
+4. Scan the QR code with an OID4VCI wallet and enter the Tx Code.
 
 ## 6.5. VP Submission 
 The process for submitting a VP (Verifiable Presentation) is as follows:
 
-1. Select a VP policy.
-   <img src="./images/vp_policy.png" width="800"/>
+1. On the VP Submission screen, click the 'Submit your ID' button.
+   <img src="./images/vp_submission.png" width="800"/>
 
    > Note: Pre-registered VP policies are required for VP submission. For registration methods, please refer to the [Verifier Admin Guide].
 
-2. The VP submission procedure is similar to the VC issuance procedure:
-   - Select VP policy
-   - Click 'Submit your ID' button to issue QR code
-   - Scan QR code with OpenDID app to submit VP
-   - Confirm successful submission completion
+2. Select a policy in the policy selection popup and click 'Select'. The filter buttons (All, DID VP, OID4VP) filter the list by protocol type.
+   <img src="./images/vp_policy.png" width="400"/>
+
+3. The Verifier starts verification according to the protocol type of the policy (`DID_VP` or `OID4VP`), and a QR code is displayed.
+   - `DID_VP`: an OpenDID QR code is displayed. Scan it with the OpenDID app to submit the VP.
+   - `OID4VP`: an OID4VP authorization request QR code is displayed. Scan it with an OID4VP wallet to submit the credential.
+   <img src="./images/vp_oid4vp_qr.png" width="450"/>
+
+4. After submitting in the app, click the 'Submission Complete' button. The demo checks the verification result and shows it. For OID4VP, the protocol, the format and the submitted claims are shown.
+   <img src="./images/vp_oid4vp_result.png" width="450"/>
 
 ## 6.6. Server Connection Test
 

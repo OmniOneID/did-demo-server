@@ -5,7 +5,7 @@ This document provides a detailed overview of the licenses associated with the t
 
 #demo
 ##Dependency License Report
-_2024-09-02 19:20:41 KST_
+_2026-11-03 10:18:30 KST_
 ## Apache License, Version 2.0
 
 **1** **Group:** `com.google.zxing` **Name:** `javase` **Version:** `3.5.1` 
@@ -45,14 +45,24 @@ _2024-09-02 19:20:41 KST_
 > - **Embedded license files**: [spring-boot-starter-validation-3.2.4.jar/META-INF/LICENSE.txt](spring-boot-starter-validation-3.2.4.jar/META-INF/LICENSE.txt) 
     - [spring-boot-starter-validation-3.2.4.jar/META-INF/NOTICE.txt](spring-boot-starter-validation-3.2.4.jar/META-INF/NOTICE.txt)
 
-**8** **Group:** `org.springframework.boot` **Name:** `spring-boot-starter-web-services` **Version:** `3.2.4` 
+**8** **Group:** `org.springframework.boot` **Name:** `spring-boot-starter-actuator` **Version:** `3.2.4` 
+> - **POM Project URL**: [https://spring.io/projects/spring-boot](https://spring.io/projects/spring-boot)
+> - **POM License**: Apache License, Version 2.0 - [https://www.apache.org/licenses/LICENSE-2.0](https://www.apache.org/licenses/LICENSE-2.0)
+> - **Embedded license files**: [spring-boot-starter-actuator-3.2.4.jar/META-INF/LICENSE.txt](spring-boot-starter-actuator-3.2.4.jar/META-INF/LICENSE.txt) 
+    - [spring-boot-starter-actuator-3.2.4.jar/META-INF/NOTICE.txt](spring-boot-starter-actuator-3.2.4.jar/META-INF/NOTICE.txt)
+
+**9** **Group:** `org.springframework.boot` **Name:** `spring-boot-starter-web-services` **Version:** `3.2.4` 
 > - **POM Project URL**: [https://spring.io/projects/spring-boot](https://spring.io/projects/spring-boot)
 > - **POM License**: Apache License, Version 2.0 - [https://www.apache.org/licenses/LICENSE-2.0](https://www.apache.org/licenses/LICENSE-2.0)
 > - **Embedded license files**: [spring-boot-starter-web-services-3.2.4.jar/META-INF/LICENSE.txt](spring-boot-starter-web-services-3.2.4.jar/META-INF/LICENSE.txt) 
     - [spring-boot-starter-web-services-3.2.4.jar/META-INF/NOTICE.txt](spring-boot-starter-web-services-3.2.4.jar/META-INF/NOTICE.txt)
 
-**9** **Group:** `org.springframework.cloud` **Name:** `spring-cloud-starter-openfeign` **Version:** `4.1.1` 
+**10** **Group:** `org.springframework.boot` **Name:** `spring-boot-starter-logging` **Version:** `3.2.4` 
+> - **POM Project URL**: [https://spring.io/projects/spring-boot](https://spring.io/projects/spring-boot)
+> - **POM License**: Apache License, Version 2.0 - [https://www.apache.org/licenses/LICENSE-2.0](https://www.apache.org/licenses/LICENSE-2.0)
+> - **Embedded license files**: [spring-boot-starter-logging-3.2.4.jar/META-INF/LICENSE.txt](spring-boot-starter-logging-3.2.4.jar/META-INF/LICENSE.txt) 
+    - [spring-boot-starter-logging-3.2.4.jar/META-INF/NOTICE.txt](spring-boot-starter-logging-3.2.4.jar/META-INF/NOTICE.txt)
+
+**11** **Group:** `org.springframework.cloud` **Name:** `spring-cloud-starter-openfeign` **Version:** `4.1.1` 
 > - **POM Project URL**: [https://projects.spring.io/spring-cloud](https://projects.spring.io/spring-cloud)
 > - **POM License**: Apache License, Version 2.0 - [https://www.apache.org/licenses/LICENSE-2.0](https://www.apache.org/licenses/LICENSE-2.0)
-
-

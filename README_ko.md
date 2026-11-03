@@ -109,7 +109,7 @@ did-demo-server
 ## 설치 및 운영 가이드
 
 데모 서버 설치 및 구성에 대한 자세한 지침은 아래 가이드를 참조하세요:
-- [OpenDID 데모 서버 설치 및 운영 가이드](docs/installation/OpenDID_DemoServer_InstallationAndOperation_Guide.md)
+- [OpenDID 데모 서버 설치 및 운영 가이드](docs/installation/OpenDID_DemoServer_InstallationAndOperation_Guide_ko.md)
 
 ## 변경 이력
 

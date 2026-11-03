@@ -1717,7 +1717,7 @@ const VC_PROTO_DESC = {
     'The wallet app scans a QR and receives the VC directly.',
   oid4vc:
     '<strong>OID4VC</strong> — OpenID standard flow (OID4VCI) for cross-platform interop. ' +
-    'A compliant wallet scans the QR and confirms with a 4-digit Tx Code.',
+    'A compliant wallet scans the QR and confirms with a Tx Code.',
 };
 
 function renderProtoSteps(proto) {
