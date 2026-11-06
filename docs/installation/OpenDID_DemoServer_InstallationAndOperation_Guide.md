@@ -18,7 +18,7 @@ puppeteer:
 Open DID Demo Server Installation And Operation Guide
 ==
 
-- Date: 2026-11-03
+- Date: 2026-11-06
 - Version: v3.0.0
 
 Table of Contents
@@ -50,6 +50,7 @@ Table of Contents
     - [5.1.1. Spring Basic Configuration](#511-spring-basic-configuration)
     - [5.1.2. Jackson Basic Configuration](#512-jackson-basic-configuration)
     - [5.1.3. Server Configuration](#513-server-configuration)    
+    - [5.1.4. Server Settings File](#514-server-settings-file)
   - [5.2. application-logging.yml](#52-application-loggingyml)
     - [5.2.1. Logging Configuration](#521-logging-configuration)  
   - [5.3. application-spring-docs.yml](#53-application-spring-docsyml)
@@ -318,6 +319,13 @@ Server configuration defines the port number where the application will receive 
 * `server.port`:  
     - The port number where the application will run. The default port for Demo server is 8099.
     - Value: 8099
+
+### 5.1.4. Server Settings File
+
+* `app.config.file-path`:  
+    - Path of the file that keeps the server settings saved on the demo screen. The file is created when the server starts if it does not exist. It is not used under the `sample` profile.
+    - It can be changed with the `CONFIG_FILE_PATH` environment variable.
+    - Default: ./config/config.json
 
 <br/>
 

@@ -18,7 +18,7 @@ puppeteer:
 Open DID Demo Server Installation And Operation Guide
 ==
 
-- Date: 2026-11-03
+- Date: 2026-11-06
 - Version: v3.0.0
 
 목차
@@ -50,6 +50,7 @@ Open DID Demo Server Installation And Operation Guide
     - [5.1.1. Spring 기본 설정](#511-spring-기본-설정)
     - [5.1.2. Jackson 기본 설정](#512-jackson-기본-설정)
     - [5.1.3. 서버 설정](#513-서버-설정)    
+    - [5.1.4. 운영 서버 설정 파일](#514-운영-서버-설정-파일)
   - [5.2. application-logging.yml](#52-application-loggingyml)
     - [5.2.1. 로깅 설정](#521-로깅-설정)  
   - [5.3. application-spring-docs.yml](#53-application-spring-docsyml)
@@ -323,6 +324,13 @@ Jackson은 Spring Boot에서 기본적으로 사용되는 JSON 직렬화/역직�
 * `server.port`:  
     - 애플리케이션이 실행될 포트 번호입니다. Demo 서버의 기본 포트는 8099 입니다.
     - 값 : 8099
+
+### 5.1.4. 운영 서버 설정 파일
+
+* `app.config.file-path`:  
+    - 데모 화면에서 저장한 운영 서버 설정을 보관하는 파일의 경로입니다. 파일이 없으면 서버가 시작할 때 만듭니다. `sample` 프로파일에서는 사용하지 않습니다.
+    - 환경 변수 `CONFIG_FILE_PATH`로 바꿀 수 있습니다.
+    - 기본값 : ./config/config.json
 
 <br/>
 
