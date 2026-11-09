@@ -30,6 +30,7 @@ public interface DemoService {
     VcOfferPushResDto vcOfferPush(RequestVcOfferReqDto requestVcOfferReqDto);
     RequestVcOfferResDto vcOfferEmail(RequestVcOfferReqDto requestVcOfferReqDto);
     SaveUserInfoResDto saveUserInfo(SaveUserInfoReqDto saveUserInfoReqDto);
+    void saveVcInfo(SaveUserInfoReqDto saveUserInfoReqDto);
     IssueVcResultResDto issueVcResult(IssueVcResultReqDto issueVcResultReqDto);
     ConfirmVerifyResDto confirmVerify(ConfirmVerifyReqDto confirmVerifyReqDto);
     VcSchemaResponseDto getVcSchemas();

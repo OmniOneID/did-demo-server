@@ -712,6 +712,16 @@ async function saveUserInfo() {
       throw new Error(errorData.message || 'Failed to save user information');
     }
 
+    const { pii } = await response.json();
+    const vcResponse = await fetch('/demo/api/save-vc-info', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ ...userInfo, pii })
+    });
+    if (!vcResponse.ok) {
+      throw new Error('Failed to save VC information');
+    }
+
     AppState.userInfo = userInfo;
     updateUserGreeting();
 

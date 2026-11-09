@@ -59,6 +59,11 @@ public class DemoDataController {
         return demoService.saveUserInfo(saveUserInfoReqDto);
     }
 
+    @PostMapping("/api/save-vc-info")
+    public void saveVcInfo(@RequestBody SaveUserInfoReqDto request) {
+        demoService.saveVcInfo(request);
+    }
+
     @RequestMapping(value = "/api/issue-vc-result", method = RequestMethod.POST)
     @ResponseBody
     public IssueVcResultResDto issueVcResult(@RequestBody IssueVcResultReqDto issueVcResultReqDto) {

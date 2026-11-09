@@ -16,7 +16,6 @@
 
 package org.omnione.did.demo.service;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.google.zxing.WriterException;
@@ -155,12 +154,6 @@ public class DemoServiceImpl implements DemoService{
             String hexStringPii = HexUtil.toHexString(hashedDataBytes);
             saveUserInfoReqDto.setPii(hexStringPii);
 
-            Map<String, String> fields = saveUserInfoReqDto.getFields();
-            if (fields != null) {
-                ObjectMapper objectMapper = new ObjectMapper();
-                String userInfoJson = objectMapper.writeValueAsString(fields);
-                saveUserInfoReqDto.setUserInfo(userInfoJson);
-            }
             SecureRandom random = new SecureRandom();
             String userId = new UUID(random.nextLong(), random.nextLong()).toString().substring(0, 8);
 
@@ -169,9 +162,6 @@ public class DemoServiceImpl implements DemoService{
                     .pii(hexStringPii)
                     .build());
 
-            if(saveUserInfoReqDto.getVcSchemaId() != null){
-                issuerAdminFeign.saveUserInfo(saveUserInfoReqDto);
-            }
             saveUserInfoToConfig(saveUserInfoReqDto, userId, hexStringPii);
 
 
@@ -180,6 +170,18 @@ public class DemoServiceImpl implements DemoService{
                     .pii(hexStringPii)
                     .build();
 
+        } catch (JsonProcessingException e) {
+            throw new OpenDidException(ErrorCode.JSON_PROCESSING_ERROR);
+        }
+    }
+
+    @Override
+    public void saveVcInfo(SaveUserInfoReqDto request) {
+        try {
+            if (request.getFields() != null) {
+                request.setUserInfo(objectMapper.writeValueAsString(request.getFields()));
+            }
+            issuerAdminFeign.saveUserInfo(request);
         } catch (JsonProcessingException e) {
             throw new OpenDidException(ErrorCode.JSON_PROCESSING_ERROR);
         }
