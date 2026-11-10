@@ -16,27 +16,77 @@ This repository contains the source code, documentation, and related resources f
 
 # OpenDID Demonstration Videos
 
-The OpenDID demonstration videos include the following four key scenarios:
+The OpenDID demonstration videos cover the scenarios below. The issuance and presentation scenarios are shown for three credential formats: OpenDID VC, SD-JWT VC, and mdoc.
 
 ## 1. User Registration
-https://github.com/user-attachments/assets/2a8e99e6-34b0-4f75-8378-a561b71d2e34
-- [UserRegistration_demo_sample(video)](videos/OpenDID_Demo_UserRegistration.mov)
-- **Description**: A scenario where the user directly issues a National ID VC using the app.
+https://github.com/user-attachments/assets/b3872866-c867-4e75-840d-373df80ddd50
+- **Description**: The user registers as a demo user in the app and sets the wallet lock and PIN.
 
-## 2. VC Issuance (App - National ID)
-https://github.com/user-attachments/assets/494631d8-2521-4f33-9ac2-2de778fc4e72
-- [VC Issuance_App_demo_sample(video)](videos/OpenDID_Demo_VCIssuance_APP.mp4)
-- **Description**: A scenario where the user directly issues a National ID VC using the app.
+## 2. VC Issuance (User-Initiated)
+- **Description**: The user selects a VC plan from the list in the app, enters the information to include, and receives the VC.
 
-## 3. VC Issuance (Demo - Mobile Employee ID Card)
-https://github.com/user-attachments/assets/475148f3-f3d0-4319-a780-583d16545bc2
-- [ VC Issuance_Web_demo_sample(video)](videos/OpenDID_Demo_VCIssuance_Demo_WEB_.mp4)
-- **Description**: Demonstrates the scenario where the user receives a Mobile Employee ID Card VC issuance request from the Demo site.
+### 2.1 OpenDID VC
+https://github.com/user-attachments/assets/cced035c-394d-4e59-a89c-00fbdd13737a
 
-## 4. VP Submission & ZKP Proof
-https://github.com/user-attachments/assets/cbbaa74f-6bf8-4637-b4fb-9b3b7e86de07
-- [VP Submission_demo_sample(video)](videos/OpenDID_Demo_VPSubmission.mp4)
-- **Description**: Description: A scenario where the user receives a QR code request using their Mobile Employee ID Card, submits a Verifiable Presentation (VP) to gain access authorization, and proves certain information through ZKP (Zero-Knowledge Proof) without exposing some details.
+### 2.2 SD-JWT VC
+https://github.com/user-attachments/assets/62221a09-f2fc-409c-8075-97b843ce2935
+
+### 2.3 mdoc
+https://github.com/user-attachments/assets/056c25a2-09f3-4366-b7a8-efc2c82b84d7
+
+## 3. VC Issuance (Issuer-Initiated)
+- **Description**: The user enters information on the Demo site and requests issuance. The app scans the QR code shown on the site and receives the VC. SD-JWT VC and mdoc are issued through OID4VCI, and the app asks for the transaction code shown on the site.
+
+### 3.1 OpenDID VC
+https://github.com/user-attachments/assets/65c7ab3c-0863-4c74-96c8-5c529156cafc
+
+### 3.2 OpenDID VC (with ZKP)
+https://github.com/user-attachments/assets/9a9a9d2b-9af9-4040-9266-fc5feb844340
+- **Description**: Issues an OpenDID VC that also carries ZKP information such as age. The predicate proof in 6.2 uses this VC.
+
+### 3.3 SD-JWT VC
+https://github.com/user-attachments/assets/b005503d-6364-462a-bd1c-1aeec86c2842
+
+### 3.4 mdoc
+https://github.com/user-attachments/assets/b1b3b4f8-692d-440d-940e-7ba9ee1b7dab
+
+## 4. VP Submission (All Claims)
+- **Description**: The user selects a verification policy on the Demo site and scans the QR code with the app. The app shows the requested claims, and the user submits them after entering the PIN. OpenDID VC is submitted through the OpenDID protocol, and SD-JWT VC and mdoc through OID4VP.
+
+### 4.1 OpenDID VC
+https://github.com/user-attachments/assets/131eebef-8061-40a1-8bad-48480cc57568
+
+### 4.2 SD-JWT VC
+https://github.com/user-attachments/assets/606348e8-0707-40b3-951d-f529f27a49a3
+
+### 4.3 mdoc
+https://github.com/user-attachments/assets/db509dcf-3350-49f1-bb0f-a787e38cbe8d
+
+## 5. VP Submission (Selective Disclosure)
+- **Description**: Follows the same steps as section 4. The app separates required and optional claims, and the user chooses which optional claims to submit.
+
+### 5.1 OpenDID VC
+https://github.com/user-attachments/assets/68b8c85b-0c95-4a61-831e-33de7de1c811
+
+### 5.2 SD-JWT VC
+https://github.com/user-attachments/assets/9f4a55fe-7fcd-410e-bcb0-332585491905
+
+### 5.3 mdoc
+https://github.com/user-attachments/assets/0269b26c-8aeb-49b4-b028-506f3c593b76
+
+## 6. ZKP Proof
+
+### 6.1 Attribute Disclosure
+https://github.com/user-attachments/assets/3ce666a3-1b22-417d-a7d0-ecaf7f133bc6
+- **Description**: The user chooses which attributes of the OpenDID VC to reveal to the verifier.
+
+### 6.2 Predicate Proof
+https://github.com/user-attachments/assets/1785b631-8f7e-4617-9e29-8186cc63dbd4
+- **Description**: The user proves that a value such as age meets a condition without revealing the value itself.
+
+## 7. Proximity Presentation (mdoc)
+https://github.com/user-attachments/assets/824627b4-b4b2-4829-9ffb-3a7f643dbbae
+- **Description**: The user presents an mdoc in person to a verifier's app, following ISO/IEC 18013-5. The verifier app scans the QR code shown in the user's app, and the two devices connect directly to exchange the data.
 
 ## Folder Structure
 Overview of the major folders and documents in the project directory:
@@ -65,7 +115,6 @@ did-demo-server
         └── src
         └── build.gradle
         └── README.md
-└── videos
 ```
 
 <br/>
@@ -92,7 +141,6 @@ Below is a description of each folder and file in the directory:
 | &nbsp;&nbsp;&nbsp;┖ src                   | Main source code directory                          |
 | &nbsp;&nbsp;&nbsp;┖ build.gradle          | Gradle build configuration file                     |
 | &nbsp;&nbsp;&nbsp;┖ README.md             | Source code overview and guide                      |
-| videos                  | Demonstration videos                                |
 
 <br/>
 
